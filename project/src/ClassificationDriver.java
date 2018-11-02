@@ -10,17 +10,6 @@ public class ClassificationDriver {
     Timer timer = new Timer();
     timer.start();
     boolean sparse = false;
-    if(true) {
-      ArrayList<String> lines = DataMiningUtil.readLines("data/iris/OC1_iris_train.data");
-      ArrayList<ArrayList<String>> groups = DataMiningUtil.getStratifiedGroups(lines, 7, 4, new java.util.Random(484));
-      for(ArrayList<String> group : groups) {
-        for(String line : group) {
-          System.out.println(line);
-        }
-        System.out.println("------------------------------------------------------");
-      }
-      return;
-    }
     if(args[0].equals("sparse")) {
       sparse = true;
     }

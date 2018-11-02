@@ -12,5 +12,4 @@ set labels=data/arcene/arcene_train.labels
 set final_result=data/arcene/results/FODT_results.data
 set sparse=dense
 java -cp project/target ClassificationDriver %sparse% %test% %train% %labels% %final_result%
-python diff.py %final_result% data/arcene/arcene_valid.labels
 echo Completed: %date% %time%
