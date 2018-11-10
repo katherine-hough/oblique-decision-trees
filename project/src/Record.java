@@ -42,14 +42,20 @@ public class Record extends HashMap<Integer, Double> {
   public static ArrayList<Record> readRecords(String trainingFile, String trainingLabelFile, boolean sparse) {
     ArrayList<String> labels = DataMiningUtil.readLines(trainingLabelFile);
     ArrayList<String> lines = DataMiningUtil.readLines(trainingFile);
+    boolean missing = false;
     if(lines.size() != labels.size()) {
       throw new RuntimeException("Number of labels does not equal the number of vectors.");
     }
     ArrayList<Record> records = new ArrayList<>(lines.size());
     for(int i = 0; i < lines.size(); i++) {
       Record record = new Record(labels.get(i));
-      addFeaturesToRecord(record, sparse, lines.get(i));
+      if(addFeaturesToRecord(record, sparse, lines.get(i))) {
+        missing = true;
+      }
       records.add(record);
+    }
+    if(missing) {
+      fixMissingAttributes(records);
     }
     return records;
   }
@@ -61,16 +67,65 @@ public class Record extends HashMap<Integer, Double> {
   public static ArrayList<Record> readRecords(String trainingFile, boolean sparse) {
     ArrayList<String> lines = DataMiningUtil.readLines(trainingFile);
     ArrayList<Record> records = new ArrayList<>(lines.size());
+    boolean missing = false;
     for(int i = 0; i < lines.size(); i++) {
       Record record = new Record(null);
-      addFeaturesToRecord(record, sparse, lines.get(i));
+      if(addFeaturesToRecord(record, sparse, lines.get(i))) {
+        missing = true;
+      }
       records.add(record);
+    }
+    if(missing) {
+      fixMissingAttributes(records);
     }
     return records;
   }
 
-  /* Adds features extracts from the specified line to the specified record */
-  private static void addFeaturesToRecord(Record record, boolean sparse, String line) {
+  /* Replaces missing attributes (represented with nulls with the median value
+   * for the attribute in the record's class */
+  private static void fixMissingAttributes(ArrayList<Record> records) {
+    HashSet<Integer> allFeats = getAllFeatures(records);
+    for(int feature: allFeats) {
+      HashMap<String, ArrayList<Double>> classValuesMap = new HashMap<>();
+      ArrayList<Double> values = new ArrayList<>();
+      for(Record record : records) {
+        if(record.containsKey(feature) && record.get(feature)!=null) {
+          String label = record.getClassLabel();
+          classValuesMap.putIfAbsent(label, new ArrayList<Double>());
+          classValuesMap.get(label).add(record.get(feature));
+          values.add(record.get(feature));
+        }
+      }
+      double overallMedian = values.size()> 0 ? DataMiningUtil.getMedian(values) : -1;
+      HashMap<String, Double> medians = new HashMap<>();
+      for(String key : classValuesMap.keySet()) {
+        medians.put(key, DataMiningUtil.getMedian(classValuesMap.get(key)));
+      }
+      for(Record record : records) {
+        if(record.containsKey(feature) && record.get(feature)==null) {
+          String label = record.getClassLabel();
+          if(medians.containsKey(label)) {
+            // use the median for this record's class
+            record.put(feature, medians.get(label));
+          } else if (overallMedian > 0) {
+            // no other records in the same class contained this feature
+            // use the overall median
+            record.put(feature, overallMedian);
+          } else {
+            // no other records contained this feature
+            // remove the feature
+            record.remove(feature);
+          }
+          System.out.println(record.get(feature));
+        }
+      }
+    }
+  }
+
+  /* Adds features extracts from the specified line to the specified record. Returns
+   * whether a missing attribute was found */
+  private static boolean addFeaturesToRecord(Record record, boolean sparse, String line) {
+    boolean missing = false;
     line = line.replaceAll("^\\s+",""); // remove leading whitespace
     String[] temp = line.split("\\s+"); // split at whitespace
     if(sparse) {
@@ -78,13 +133,19 @@ public class Record extends HashMap<Integer, Double> {
         throw new RuntimeException("Missing a weight for a feature in a sparsely represented feature vector.");
       }
       for(int j = 0; j < temp.length; j+=2) {
-          record.put(Integer.parseInt(temp[j]), Double.parseDouble(temp[j+1]));
+        record.put(Integer.parseInt(temp[j]), Double.parseDouble(temp[j+1]));
       }
     } else {
       for(int j = 0; j < temp.length; j++) {
+        try {
           record.put(j, Double.parseDouble(temp[j]));
+        } catch (NumberFormatException e) {
+          record.put(j, null); // put null for missing attributes
+          missing = true;
+        }
       }
     }
+    return missing;
   }
 
   /* Returns all the feature keys contained in the specified iterable of records */
@@ -98,16 +159,20 @@ public class Record extends HashMap<Integer, Double> {
 
   /* Returns values to split the specified feature at */
   public static HashSet<Double> getSplitBuckets(List<Record> records, int feature, double defaultValue) {
-    int numBuckets = Math.min(records.size()-1, MAX_BUCKETS);
     HashSet<Double> buckets = new HashSet<>();
-    ArrayList<Double> values= new ArrayList<>(records.size());
+    HashSet<Double> valueSet = new HashSet<>(records.size());
     for(Record record : records) {
-      values.add(record.getOrDefault(feature, defaultValue));
+      valueSet.add(record.getOrDefault(feature, defaultValue));
     }
+    ArrayList<Double> values = new ArrayList<>(valueSet);
     Collections.sort(values);
-    int step = records.size()/(numBuckets+1);
-    for(int i = step; i < records.size(); i+=step) {
-      buckets.add((records.get(i-1).get(feature)+records.get(i).get(feature))/2.0);
+    if(values.size() <= 1) {
+      return buckets;
+    }
+    int numBuckets = Math.min(MAX_BUCKETS, values.size() - 1);
+    int step = values.size()/(numBuckets+1);
+    for(int i = step; i < values.size(); i+=step) {
+      buckets.add((values.get(i-1)+values.get(i))/2.0);
     }
     return buckets;
   }

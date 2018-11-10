@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 public class DecisionTree extends Classifier {
 
   protected static final double DEFAULT_FEATURE_VALUE = 0.0;
+  protected static final int MAX_NON_HOMOG = 2;
   protected Classifier leftChild;
   protected Classifier rightChild;
   protected String leafLabel;
@@ -18,6 +19,7 @@ public class DecisionTree extends Classifier {
   protected DecisionTree root;
   protected SplitCondition splitCondition;
   protected String defaultClass;
+
 
   /* Constructor for the root node calls two argument constructor*/
   public DecisionTree(List<Record> reachingRecords) {
@@ -43,11 +45,15 @@ public class DecisionTree extends Classifier {
     this.reachingRecords = reachingRecords;
     if (reachingRecords.size() == 0) {
       leafLabel = defaultClass;
-    } else if(homogeneous(reachingRecords)) {
+    } else if(mostlyHomogeneous(reachingRecords)) {
       leafLabel = getMostFrequentLabel(reachingRecords);
     } else {
       splitCondition = selectSplitCondition();
-      makeChildren();
+      if(splitCondition == null) {
+        leafLabel = getMostFrequentLabel(reachingRecords);
+      } else {
+        makeChildren();
+      }
     }
   }
 
@@ -56,7 +62,7 @@ public class DecisionTree extends Classifier {
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
-    System.out.printf("left: %d|right: %d\n", trueRecords.size(), falseRecords.size());
+    // System.out.printf("left: %d|right: %d\n", trueRecords.size(), falseRecords.size());
     leftChild = new DecisionTree(trueRecords, r);
     rightChild = new DecisionTree(falseRecords, r);
   }
@@ -101,13 +107,13 @@ public class DecisionTree extends Classifier {
         minTotal += classFreqs.get(key);
       }
     }
-    return minTotal <= 2;
+    return minTotal <= MAX_NON_HOMOG;
   }
 
   /* Selects the feature from the specified list of features that produces the
    * purest partition of the specified set of records */
   protected SplitCondition selectSplitCondition() {
-    // TODO CHECK MULTI-CLASS, RESOLVE TIES, ADD CODE FOR MISSING VALUES (FOR NON-SPARENESS reasons)
+    // TODO RESOLVE TIES
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
     PriorityQueue<SplitCondition> conditions = new PriorityQueue<>();
     for(Integer feature : features) {
@@ -122,7 +128,7 @@ public class DecisionTree extends Classifier {
       }
     }
     SplitCondition best = conditions.poll(); // TODO resolve ties
-    System.out.println(best);
+    // System.out.println(best);
     return best;
   }
 
@@ -139,7 +145,7 @@ public class DecisionTree extends Classifier {
   }
 
   /* Gets the GINI impurity of the specified list of records */
-  private static double getGiniImpurity(List<Record> records) {
+  protected static double getGiniImpurity(List<Record> records) {
     HashMap<String, Integer> classFreqs = DataMiningUtil.createFreqMap(records, (record) -> Collections.singleton(record.getClassLabel()));
     double sum = 0;
     for(String label : classFreqs.keySet()) {

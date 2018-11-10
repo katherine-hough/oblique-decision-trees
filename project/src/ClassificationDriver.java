@@ -9,10 +9,7 @@ public class ClassificationDriver {
   public static void main(String[] args) {
     Timer timer = new Timer();
     timer.start();
-    boolean sparse = false;
-    if(args[0].equals("sparse")) {
-      sparse = true;
-    }
+    boolean sparse = args[0].equals("sparse") ? true : false;
     timer.printElapsedTime("Reading in test records information from " + args[1]);
     ArrayList<Record> testRecords = Record.readRecords(args[1], sparse);
     timer.printElapsedTime("Reading in training records information from " + args[2]);

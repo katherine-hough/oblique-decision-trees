@@ -122,22 +122,22 @@ public class DataMiningUtil {
     return freqMap;
   }
 
-  /* Returns the specified numGroups number of random groups of Strings that partition
-   * spacified iterable of Strings. This groups are stratified with respect to
-   * specified list of classes.
-   * Uses the specified Random object for shuffling to produce randomness.*/
-  public static ArrayList<ArrayList<String>> getStratifiedGroups(Iterable<String> instances, int numGroups, List<String> classes, Random rand) {
-    ArrayList<ArrayList<String>> groups = new ArrayList<>(numGroups); // the created groups to be returned
+  /* Returns the specified numGroups number of random groups of objects that partitions
+   * specified iterable. This groups are stratified with respect to
+   * specified list of classes. Uses the specified Random object for shuffling
+   * to produce randomness.*/
+  public static <T, U> ArrayList<ArrayList<T>> getStratifiedGroups(Iterable<T> instances, int numGroups, List<U> classes, Random rand) {
+    ArrayList<ArrayList<T>> groups = new ArrayList<>(numGroups); // the created groups to be returned
     for(int i = 0; i < numGroups; i++) {
-      groups.add(new ArrayList<String>());
+      groups.add(new ArrayList<T>());
     }
-    HashMap<String, ArrayList<String>> subpops = new HashMap<>();
+    HashMap<U, ArrayList<T>> subpops = new HashMap<>();
     int x = 0;
-    for(String instance : instances) {
-      subpops.putIfAbsent(classes.get(x), new ArrayList<String>());
+    for(T instance : instances) {
+      subpops.putIfAbsent(classes.get(x), new ArrayList<T>());
       subpops.get(classes.get(x++)).add(instance);
     }
-    for(String key : subpops.keySet()) {
+    for(U key : subpops.keySet()) {
       Collections.shuffle(subpops.get(key), rand);
       for(int i = 0; i < subpops.get(key).size(); i++) {
         groups.get(i%numGroups).add(subpops.get(key).get(i));
@@ -158,5 +158,15 @@ public class DataMiningUtil {
       classes.add(temp[targetCol]);
     }
     return getStratifiedGroups(instances, numGroups, classes, rand);
+  }
+
+  public static double getMedian(List<Double> values) {
+    List<Double> copy = new ArrayList<>(values);
+    Collections.sort(copy);
+    if(copy.size()%2==0) {
+      return 0.5*(copy.get(copy.size()/2)+copy.get(copy.size()/2 - 1));
+    } else {
+      return copy.get(copy.size()/2);
+    }
   }
 }
