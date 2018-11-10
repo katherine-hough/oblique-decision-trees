@@ -116,7 +116,6 @@ public class Record extends HashMap<Integer, Double> {
             // remove the feature
             record.remove(feature);
           }
-          System.out.println(record.get(feature));
         }
       }
     }

@@ -6,9 +6,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.PriorityQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /* A trained decision tree used for classifying records. */
 public class DecisionTree extends Classifier {
+
+  // Number of threads in the thread pool
+  private static final int NUM_THREADS = 16;
 
   protected static final double DEFAULT_FEATURE_VALUE = 0.0;
   protected static final int MAX_NON_HOMOG = 2;
@@ -62,7 +68,7 @@ public class DecisionTree extends Classifier {
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
-    // System.out.printf("left: %d|right: %d\n", trueRecords.size(), falseRecords.size());
+    System.out.printf("%s\nleft: %d|right: %d\n", splitCondition, trueRecords.size(), falseRecords.size());
     leftChild = new DecisionTree(trueRecords, r);
     rightChild = new DecisionTree(falseRecords, r);
   }
@@ -113,23 +119,61 @@ public class DecisionTree extends Classifier {
   /* Selects the feature from the specified list of features that produces the
    * purest partition of the specified set of records */
   protected SplitCondition selectSplitCondition() {
-    // TODO RESOLVE TIES
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
-    PriorityQueue<SplitCondition> conditions = new PriorityQueue<>();
+    ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
     for(Integer feature : features) {
       for(double bucket : Record.getSplitBuckets(reachingRecords, feature, DEFAULT_FEATURE_VALUE)) {
         Predicate<Record> condition = (record) -> {
           return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
         };
         String desc = String.format("[Feat # %d] < %f", feature, bucket);
-        SplitCondition split = new SplitCondition(desc, condition);
-        split.setImpurity(getTotalGiniImpurity(split));
-        conditions.add(split);
+        conditions.add(new SplitCondition(desc, condition));
       }
     }
-    SplitCondition best = conditions.poll(); // TODO resolve ties
-    // System.out.println(best);
-    return best;
+    return mostPureConditions(1, conditions).get(0);
+  }
+
+  /* Return a list of the specified number of conditions with the lowest impurity.
+   * Includes any additional conditions that are tied for lowest impurity */
+  protected ArrayList<SplitCondition> mostPureConditions(int numConditions, ArrayList<SplitCondition> conditions) {
+    ExecutorService taskExecutor = Executors.newFixedThreadPool(NUM_THREADS);
+    final int conditionsPerTask = 100;
+    ArrayList<Callable<Boolean>> tasks = new ArrayList<>(conditions.size());
+    for(int x = 0; x < conditions.size(); x+=conditionsPerTask) {
+      final int i = x;
+      Callable<Boolean> task = () -> {
+        try {
+          for(int j = i; j < Math.min(i+conditionsPerTask, conditions.size()); j++) {
+            conditions.get(j).setImpurity(getTotalGiniImpurity(conditions.get(j)));
+          }
+          return true;
+        } catch(Exception e) {
+          e.printStackTrace();
+          return false;
+        }
+      };
+      tasks.add(task);
+    }
+    try {
+      taskExecutor.invokeAll(tasks);
+    } catch (InterruptedException e) {
+      throw new IllegalStateException(e);
+    } finally {
+      taskExecutor.shutdown();
+    }
+    PriorityQueue<SplitCondition> conditionQueue = new PriorityQueue<>(conditions);
+    ArrayList<SplitCondition> topConditions = new ArrayList<>();
+    double prevImpur = -1;
+    while(!conditionQueue.isEmpty()) {
+      SplitCondition next = conditionQueue.poll();
+      if(numConditions-- <= 0 && (prevImpur!=-1) && (prevImpur < next.getImpurity())) {
+        break;
+      } else {
+        topConditions.add(next);
+        prevImpur = next.getImpurity();
+      }
+    }
+    return topConditions;
   }
 
   /* The weighted GINI impurity if the records reaching this node are partitioned based on

@@ -17,6 +17,11 @@ public class SplitCondition implements Comparable<SplitCondition> {
     this.impurity = impurity;
   }
 
+  /* Getter for impurity */
+  public double getImpurity() {
+    return impurity;
+  }
+
   /* Compares the specified other SplitCondition to this SplitCondition */
   public int compareTo(SplitCondition other) {
     return ((Double)impurity).compareTo((Double)other.impurity);
