@@ -4,6 +4,7 @@ import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.HashSet;
+import java.util.function.Predicate;
 import java.util.Arrays;
 
 /* A DecisionTree that allows splits to be made on oblqiue axes */
@@ -34,6 +35,49 @@ public class ObliqueDecisionTree extends DecisionTree {
    * records */
    @Override
   protected SplitCondition selectSplitCondition() {
-    return super.selectSplitCondition();
+    int maxCond = Math.min(reachingRecords.size()/3, 100);
+    ArrayList<SplitCondition> conditions = getBaseConditions();
+    conditions = mostPureConditions(maxCond, conditions);
+    conditions.addAll(getSecondaryConditions(conditions));
+    // conditions = mostPureConditions(maxCond/2, conditions);
+    // conditions.addAll(getSecondaryConditions(conditions));
+    return mostPureConditions(1, conditions).get(0);
+  }
+
+  /*Creates conditions which are combinations of the specified conditions */
+  protected ArrayList<SplitCondition> getSecondaryConditions(ArrayList<SplitCondition> conditions) {
+    ArrayList<SplitCondition> secondaryConditions = new ArrayList<>();
+    for(int i = 0; i < conditions.size(); i++) {
+      for(int j = i+1; j < conditions.size(); j++) {
+        SplitCondition condition1 = conditions.get(i);
+        SplitCondition condition2 = conditions.get(j);
+        SplitCondition or = condition1.or(condition2);
+        SplitCondition and = condition1.and(condition2);
+        SplitCondition notOr = (condition1.negate()).and(condition2);
+        SplitCondition notAnd = (condition1.negate()).and(condition2);
+        secondaryConditions.add(or);
+        secondaryConditions.add(and);
+        secondaryConditions.add(notOr);
+        secondaryConditions.add(notAnd);
+      }
+    }
+    return secondaryConditions;
+  }
+
+  /* Gets the basic set of initial conditions which split the feature space
+   * along the feature axes */
+  private ArrayList<SplitCondition> getBaseConditions() {
+    ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
+    ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
+    for(Integer feature : features) {
+      for(double bucket : Record.getSplitBuckets(reachingRecords, feature, DEFAULT_FEATURE_VALUE)) {
+        Predicate<Record> condition = (record) -> {
+          return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
+        };
+        String desc = String.format("[Feat # %d] < %f", feature, bucket);
+        conditions.add(new SplitCondition(desc, condition));
+      }
+    }
+    return conditions;
   }
 }

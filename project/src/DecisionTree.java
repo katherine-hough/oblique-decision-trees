@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 public class DecisionTree extends Classifier {
 
   // Number of threads in the thread pool
-  private static final int NUM_THREADS = 16;
+  private static final int NUM_THREADS = 4;
 
   protected static final double DEFAULT_FEATURE_VALUE = 0.0;
   protected static final int MAX_NON_HOMOG = 2;
@@ -68,7 +68,6 @@ public class DecisionTree extends Classifier {
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
-    System.out.printf("%s\nleft: %d|right: %d\n", splitCondition, trueRecords.size(), falseRecords.size());
     leftChild = new DecisionTree(trueRecords, r);
     rightChild = new DecisionTree(falseRecords, r);
   }
@@ -164,9 +163,10 @@ public class DecisionTree extends Classifier {
     PriorityQueue<SplitCondition> conditionQueue = new PriorityQueue<>(conditions);
     ArrayList<SplitCondition> topConditions = new ArrayList<>();
     double prevImpur = -1;
+    int absoluteMax = 3*numConditions;
     while(!conditionQueue.isEmpty()) {
       SplitCondition next = conditionQueue.poll();
-      if(numConditions-- <= 0 && (prevImpur!=-1) && (prevImpur < next.getImpurity())) {
+      if((numConditions-- <=  -absoluteMax ) || (numConditions <= 0 && (prevImpur!=-1) && (prevImpur < next.getImpurity()))) {
         break;
       } else {
         topConditions.add(next);
