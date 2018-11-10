@@ -44,7 +44,7 @@ public class DecisionTree extends Classifier {
     }
   }
 
-  /* Constructor */
+  /* 2-arg Constructor */
   protected DecisionTree(List<Record> reachingRecords, DecisionTree root) {
     this.defaultClass = (root==null) ? getMostFrequentLabel(reachingRecords) : root.defaultClass;
     this.root = root;
@@ -116,8 +116,8 @@ public class DecisionTree extends Classifier {
     return minTotal <= MAX_NON_HOMOG;
   }
 
-  /* Selects the feature from the specified list of features that produces the
-   * purest partition of the specified set of records */
+  /* Returns the split condition that produces the purest partition of the reaching
+   * records */
   protected SplitCondition selectSplitCondition() {
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
     ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
