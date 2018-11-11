@@ -9,6 +9,7 @@ import java.util.List;
 public class Record extends HashMap<Integer, Double> {
 
   private static final int MAX_BUCKETS = 100;
+  public static final double DEFAULT_FEATURE_VALUE = 0.0;
   private final String classLabel; // the class of this record, null if no class
 
   /* Constructor. Initializes map based on the specified map. */
@@ -132,12 +133,18 @@ public class Record extends HashMap<Integer, Double> {
         throw new RuntimeException("Missing a weight for a feature in a sparsely represented feature vector.");
       }
       for(int j = 0; j < temp.length; j+=2) {
-        record.put(Integer.parseInt(temp[j]), Double.parseDouble(temp[j+1]));
+        double value = Double.parseDouble(temp[j+1]);
+        if(value != DEFAULT_FEATURE_VALUE) {
+          record.put(Integer.parseInt(temp[j]), value);
+        }
       }
     } else {
       for(int j = 0; j < temp.length; j++) {
         try {
-          record.put(j, Double.parseDouble(temp[j]));
+          double value = Double.parseDouble(temp[j]);
+          if(value != DEFAULT_FEATURE_VALUE) {
+            record.put(j, value);
+          }
         } catch (NumberFormatException e) {
           record.put(j, null); // put null for missing attributes
           missing = true;
@@ -157,11 +164,11 @@ public class Record extends HashMap<Integer, Double> {
   }
 
   /* Returns values to split the specified feature at */
-  public static HashSet<Double> getSplitBuckets(List<Record> records, int feature, double defaultValue) {
+  public static HashSet<Double> getSplitBuckets(List<Record> records, int feature) {
     HashSet<Double> buckets = new HashSet<>();
     HashSet<Double> valueSet = new HashSet<>(records.size());
     for(Record record : records) {
-      valueSet.add(record.getOrDefault(feature, defaultValue));
+      valueSet.add(record.getOrDefault(feature, DEFAULT_FEATURE_VALUE));
     }
     ArrayList<Double> values = new ArrayList<>(valueSet);
     Collections.sort(values);

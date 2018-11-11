@@ -6,9 +6,13 @@ import java.util.Iterator;
 import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 
 /* A DecisionTree that allows splits to be made on oblqiue axes */
 public class ObliqueDecisionTree extends DecisionTree {
+
+  private static final double MIN_SPARSE_FEATURE_PERCENT = 0.05;
 
   /* Constructor for the root node calls two argument constructor*/
   public ObliqueDecisionTree(List<Record> reachingRecords) {
@@ -23,6 +27,7 @@ public class ObliqueDecisionTree extends DecisionTree {
   /* Create the child nodes for the current node */
   @Override
   protected void makeChildren() {
+    System.out.println(this + " " + splitCondition);
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
@@ -35,17 +40,13 @@ public class ObliqueDecisionTree extends DecisionTree {
    @Override
   protected SplitCondition selectSplitCondition() {
     ArrayList<SplitCondition> conditions = getBaseConditions();
-    int maxCond = Math.max(50, Math.min(300,(int)(conditions.size()*.02)));
+    int maxCond = Math.min(400, (int)(conditions.size()*.02) + 50);
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(1, conditions);
-    if(conditions.size() > 0) {
-      return conditions.get(0);
-    } else {
-      return null;
-    }
+    return conditions.isEmpty() ? null : conditions.get(0);
   }
 
   /*Creates conditions which are combinations of the specified conditions */
@@ -72,11 +73,13 @@ public class ObliqueDecisionTree extends DecisionTree {
    * along the feature axes */
   private ArrayList<SplitCondition> getBaseConditions() {
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
+    HashMap<Integer, Integer> featureFreqs = DataMiningUtil.createFreqMap(reachingRecords, (record) -> record.keySet());
+    features.removeIf((feature) -> featureFreqs.get(feature) < MIN_SPARSE_FEATURE_PERCENT*reachingRecords.size());
     ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
     for(Integer feature : features) {
-      for(double bucket : Record.getSplitBuckets(reachingRecords, feature, DEFAULT_FEATURE_VALUE)) {
+      for(double bucket : Record.getSplitBuckets(reachingRecords, feature)) {
         Predicate<Record> condition = (record) -> {
-          return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
+          return record.getOrDefault(feature, Record.DEFAULT_FEATURE_VALUE) < bucket;
         };
         String desc = String.format("[#%d]<%2.2f", feature, bucket);
         conditions.add(new SplitCondition(desc, condition));

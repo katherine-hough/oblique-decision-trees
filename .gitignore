@@ -273,3 +273,7 @@ dmypy.json
 !data/dorothea/dorothea.data
 !data/dorothea/dorothea.labels
 !data/dorothea/dorothea.param
+
+# Include for farm-ads
+!data/farm-ads/farm-ads.data
+!data/farm-ads/farm-ads.labels

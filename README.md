@@ -13,4 +13,4 @@ Datasets:
 * Arcene: http://archive.ics.uci.edu/ml/datasets/Arcene
 * Dermatology: http://archive.ics.uci.edu/ml/datasets/Dermatology
 * Multiple Features: http://archive.ics.uci.edu/ml/datasets/Multiple+Features
-* Dexter: http://archive.ics.uci.edu/ml/datasets/Dexter
+* Farm Ads: http://archive.ics.uci.edu/ml/datasets/Farm+Ads
