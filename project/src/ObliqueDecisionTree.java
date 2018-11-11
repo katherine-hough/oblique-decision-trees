@@ -35,13 +35,18 @@ public class ObliqueDecisionTree extends DecisionTree {
    * records */
    @Override
   protected SplitCondition selectSplitCondition() {
-    int maxCond = Math.min(reachingRecords.size()/3, 100);
     ArrayList<SplitCondition> conditions = getBaseConditions();
+    int maxCond = Math.min(300, Math.max(100,(int)(conditions.size()*.02)));
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
-    // conditions = mostPureConditions(maxCond/2, conditions);
-    // conditions.addAll(getSecondaryConditions(conditions));
-    return mostPureConditions(1, conditions).get(0);
+    conditions = mostPureConditions(maxCond, conditions);
+    conditions.addAll(getSecondaryConditions(conditions));
+    conditions = mostPureConditions(1, conditions);
+    if(conditions.size() > 0) {
+      return conditions.get(0);
+    } else {
+      return null;
+    }
   }
 
   /*Creates conditions which are combinations of the specified conditions */
@@ -74,7 +79,7 @@ public class ObliqueDecisionTree extends DecisionTree {
         Predicate<Record> condition = (record) -> {
           return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
         };
-        String desc = String.format("[Feat # %d] < %f", feature, bucket);
+        String desc = String.format("[F#%d] < %4.4f", feature, bucket);
         conditions.add(new SplitCondition(desc, condition));
       }
     }

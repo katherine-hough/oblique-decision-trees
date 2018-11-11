@@ -14,9 +14,10 @@ import java.util.concurrent.Executors;
 public class DecisionTree extends Classifier {
 
   // Number of threads in the thread pool
-  private static final int NUM_THREADS = 4;
+  private static final int NUM_THREADS = 2;
 
   protected static final double DEFAULT_FEATURE_VALUE = 0.0;
+  protected static final double MAX_NON_HOMOG_PERCENT = 0.02;
   protected static final int MAX_NON_HOMOG = 2;
   protected Classifier leftChild;
   protected Classifier rightChild;
@@ -112,7 +113,7 @@ public class DecisionTree extends Classifier {
         minTotal += classFreqs.get(key);
       }
     }
-    return minTotal <= MAX_NON_HOMOG;
+    return (minTotal <= MAX_NON_HOMOG_PERCENT*records.size()) || (minTotal <= MAX_NON_HOMOG);
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
@@ -125,7 +126,7 @@ public class DecisionTree extends Classifier {
         Predicate<Record> condition = (record) -> {
           return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
         };
-        String desc = String.format("[Feat # %d] < %f", feature, bucket);
+        String desc = String.format("[F#%d] < %4.4f", feature, bucket);
         conditions.add(new SplitCondition(desc, condition));
       }
     }
