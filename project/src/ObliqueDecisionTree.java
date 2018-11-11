@@ -26,7 +26,6 @@ public class ObliqueDecisionTree extends DecisionTree {
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
-    System.out.printf("%s\nleft: %d|right: %d\n", splitCondition, trueRecords.size(), falseRecords.size());
     leftChild = new ObliqueDecisionTree(trueRecords, r);
     rightChild = new ObliqueDecisionTree(falseRecords, r);
   }
@@ -36,7 +35,7 @@ public class ObliqueDecisionTree extends DecisionTree {
    @Override
   protected SplitCondition selectSplitCondition() {
     ArrayList<SplitCondition> conditions = getBaseConditions();
-    int maxCond = Math.min(300, Math.max(100,(int)(conditions.size()*.02)));
+    int maxCond = Math.max(50, Math.min(300,(int)(conditions.size()*.02)));
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);
@@ -79,7 +78,7 @@ public class ObliqueDecisionTree extends DecisionTree {
         Predicate<Record> condition = (record) -> {
           return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
         };
-        String desc = String.format("[F#%d] < %4.4f", feature, bucket);
+        String desc = String.format("[#%d]<%2.2f", feature, bucket);
         conditions.add(new SplitCondition(desc, condition));
       }
     }
