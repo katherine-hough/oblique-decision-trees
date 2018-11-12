@@ -12,6 +12,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
     this.desc = desc;
     this.condition = condition;
     this.rank = 1;
+    this.impurity = -1;
   }
 
   /* Setter for impurity */
@@ -26,9 +27,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
 
   /* Compares the specified other SplitCondition to this SplitCondition */
   public int compareTo(SplitCondition other) {
-    double rankFactor = 1 + 0.1*(rank-1);
-    double otherRankFactor = 1 + 0.1*(other.rank-1);
-    int comp = ((Double)(impurity*rankFactor)).compareTo((Double)(other.impurity*otherRankFactor));
+    int comp = ((Double)impurity).compareTo((Double)other.impurity);
     if(comp == 0) {
       return ((Integer)rank).compareTo((Integer)other.rank);
     } else {

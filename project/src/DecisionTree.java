@@ -14,11 +14,9 @@ import java.util.concurrent.Executors;
 public class DecisionTree extends Classifier {
 
   // Number of threads in the thread pool
-  private static final int NUM_THREADS = 2;
-
-  protected static final double DEFAULT_FEATURE_VALUE = 0.0;
+  private static final int NUM_THREADS = 4;
   protected static final double MAX_NON_HOMOG_PERCENT = 0.01;
-  protected static final int MAX_NON_HOMOG = 3;
+  protected static final int MAX_NON_HOMOG = 4;
   protected DecisionTree leftChild;
   protected DecisionTree rightChild;
   protected String leafLabel;
@@ -31,7 +29,7 @@ public class DecisionTree extends Classifier {
   /* Constructor for the root node calls two argument constructor*/
   public DecisionTree(List<Record> reachingRecords) {
     this(reachingRecords, null);
-    printTree();
+    // printTree();
   }
 
   /* Classifies a single training instance and returns a string representation of
@@ -123,9 +121,9 @@ public class DecisionTree extends Classifier {
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
     ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
     for(Integer feature : features) {
-      for(double bucket : Record.getSplitBuckets(reachingRecords, feature, DEFAULT_FEATURE_VALUE)) {
+      for(double bucket : Record.getSplitBuckets(reachingRecords, feature)) {
         Predicate<Record> condition = (record) -> {
-          return record.getOrDefault(feature, DEFAULT_FEATURE_VALUE) < bucket;
+          return record.getOrDefault(feature, Record.DEFAULT_FEATURE_VALUE) < bucket;
         };
         String desc = String.format("[#%d]<%2.2f", feature, bucket);
         conditions.add(new SplitCondition(desc, condition));
@@ -145,7 +143,9 @@ public class DecisionTree extends Classifier {
       Callable<Boolean> task = () -> {
         try {
           for(int j = i; j < Math.min(i+conditionsPerTask, conditions.size()); j++) {
-            conditions.get(j).setImpurity(getTotalGiniImpurity(conditions.get(j)));
+            if(conditions.get(j).getImpurity() < 0) {
+              conditions.get(j).setImpurity(getTotalGiniImpurity(conditions.get(j)));
+            }
           }
           return true;
         } catch(Exception e) {
@@ -164,16 +164,9 @@ public class DecisionTree extends Classifier {
     }
     PriorityQueue<SplitCondition> conditionQueue = new PriorityQueue<>(conditions);
     ArrayList<SplitCondition> topConditions = new ArrayList<>();
-    double prevImpur = -1;
-    int absoluteMax = 3*numConditions;
-    while(!conditionQueue.isEmpty()) {
-      SplitCondition next = conditionQueue.poll();
-      if((numConditions-- <=  -absoluteMax ) || (numConditions <= 0 && (prevImpur!=-1) && (prevImpur < next.getImpurity()))) {
-        break;
-      } else {
-        topConditions.add(next);
-        prevImpur = next.getImpurity();
-      }
+    SplitCondition prev = null;
+    while(!conditionQueue.isEmpty() && topConditions.size() < numConditions) {
+      topConditions.add(conditionQueue.poll());
     }
     return topConditions;
   }
@@ -244,7 +237,8 @@ public class DecisionTree extends Classifier {
 
   /* Print the decision tree */
   public void printTree() {
-    ArrayList<ArrayList<DecisionTree>> levels = breadthFirstTraversal();
+    int maxLevels = 5;
+    ArrayList<ArrayList<DecisionTree>> levels = breadthFirstTraversal(maxLevels);
     int[] longest = getLongestStringPerLevel(levels);
     int numLines = 3*(levels.get(levels.size()-1).size()*2-1);
     String[] lines = new String[numLines];
@@ -359,7 +353,7 @@ public class DecisionTree extends Classifier {
     return ret;
   }
 
-  private ArrayList<ArrayList<DecisionTree>> breadthFirstTraversal() {
+  private ArrayList<ArrayList<DecisionTree>> breadthFirstTraversal(int maxLevels) {
     ArrayList<ArrayList<DecisionTree>> levels = new ArrayList<>();
     levels.add(new ArrayList<DecisionTree>());
     levels.get(0).add(this);
@@ -383,6 +377,10 @@ public class DecisionTree extends Classifier {
         levels.add(nextLevel);
       }
       i++;
+      if(i > maxLevels) {
+        System.out.printf("------> Showing only first %d levels of the tree <------\n", maxLevels);
+        return levels;
+      }
     }
     return levels;
   }
