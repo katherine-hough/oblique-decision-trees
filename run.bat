@@ -1,15 +1,16 @@
 @echo off
 echo Started: %date% %time%
-REM make mktree
-REM OC1_v3\mktree -tdata\iris\OC1_iris_train.data -V150
-REM OC1_v3\mktree -tdata\multiple-features\OC1_multi_feat_train.data -V5
-
+set dataset=iris
+set n=1
+set train=data/%dataset%/folds/5-folds/%dataset%%n%-train.data
+set test=data/%dataset%/folds/5-folds/%dataset%%n%-test.data
+REM OC1_v3\mktree -t%train% -T%test%
 REM ----------------------------FAST OBLIQUE DECISION TREE----------------------------------------
 javac -Xlint:unchecked -d project/target project/src/*.java
-set dataset=farm-ads
+set dataset=arcene
 set train=data/%dataset%/%dataset%.data
 set labels=data/%dataset%/%dataset%.labels
-set sparse=sparse
+set sparse=dense
 java -cp project/target CVDriver %sparse% %train% %labels% 5 1005 -f
 REM ----------------------------FAST OBLIQUE DECISION TREE----------------------------------------
 echo Completed: %date% %time%
