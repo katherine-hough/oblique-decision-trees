@@ -39,7 +39,7 @@ public class ObliqueDecisionTree extends DecisionTree {
    @Override
   protected SplitCondition selectSplitCondition() {
     ArrayList<SplitCondition> conditions = getBaseConditions();
-    int maxCond = Math.min(400, (int)(conditions.size()*.02) + 100);
+    int maxCond = Math.min(300, (int)(conditions.size()*.001)+100);
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);
