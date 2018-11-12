@@ -6,10 +6,10 @@ REM OC1_v3\mktree -tdata\multiple-features\OC1_multi_feat_train.data -V5
 
 REM ----------------------------FAST OBLIQUE DECISION TREE----------------------------------------
 javac -Xlint:unchecked -d project/target project/src/*.java
-set dataset=arcene
+set dataset=farm-ads
 set train=data/%dataset%/%dataset%.data
 set labels=data/%dataset%/%dataset%.labels
-set sparse=dense
-java -cp project/target CVDriver %sparse% %train% %labels%
+set sparse=sparse
+java -cp project/target CVDriver %sparse% %train% %labels% 5 1005 -f
 REM ----------------------------FAST OBLIQUE DECISION TREE----------------------------------------
 echo Completed: %date% %time%

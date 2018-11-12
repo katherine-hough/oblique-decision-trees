@@ -16,6 +16,15 @@ import java.util.List;
 /* Utility Class that contains methods that help with solving data mining problems */
 public class DataMiningUtil {
 
+  /* Tries to create all the necessary directories along the specified path */
+  public static void makeDirectoryPath(String path) {
+    try {
+      (new File(path)).mkdirs();
+    } catch (Exception e) {
+      throw new RuntimeException("Error occurred creating directory path: " + path);
+    }
+  }
+
   /* Returns a list of the String lines of the specified file */
   public static ArrayList<String> readLines(String filename) {
     try {

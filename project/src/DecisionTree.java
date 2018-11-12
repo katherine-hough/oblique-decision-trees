@@ -29,7 +29,7 @@ public class DecisionTree extends Classifier {
   /* Constructor for the root node calls two argument constructor*/
   public DecisionTree(List<Record> reachingRecords) {
     this(reachingRecords, null);
-    printTree();
+    // printTree();
   }
 
   /* Classifies a single training instance and returns a string representation of

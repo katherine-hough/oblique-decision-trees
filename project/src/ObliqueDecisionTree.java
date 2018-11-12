@@ -27,7 +27,6 @@ public class ObliqueDecisionTree extends DecisionTree {
   /* Create the child nodes for the current node */
   @Override
   protected void makeChildren() {
-    System.out.println(this + " " + splitCondition);
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
@@ -40,7 +39,7 @@ public class ObliqueDecisionTree extends DecisionTree {
    @Override
   protected SplitCondition selectSplitCondition() {
     ArrayList<SplitCondition> conditions = getBaseConditions();
-    int maxCond = Math.min(400, (int)(conditions.size()*.02) + 50);
+    int maxCond = Math.min(400, (int)(conditions.size()*.02) + 100);
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);

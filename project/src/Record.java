@@ -3,6 +3,7 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 /* Represents a data instance with a sparsely represention of its features and
  * a class label. Maps feature numbers to values */
@@ -28,6 +29,15 @@ public class Record extends HashMap<Integer, Double> {
   @Override
   public String toString() {
     return (classLabel==null ? "?" : classLabel) + ": " + size();
+  }
+
+  /* Converts the record into a dense string representation of all of its features */
+  public String toDenseString(TreeSet<Integer> allFeatures) {
+    String result = "";
+    for(int feature : allFeatures) {
+      result += getOrDefault(feature, DEFAULT_FEATURE_VALUE) + " ";
+    }
+    return result + classLabel;
   }
 
   /* Accessor for classLabel */
