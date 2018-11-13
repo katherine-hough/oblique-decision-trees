@@ -1,10 +1,10 @@
 @echo off
 echo Started: %date% %time%
-REM set dataset=dermatology
+REM set dataset=arcene
 REM FOR /l %%n IN (1,1,5) DO (
 REM   OC1_v3\mktree -tdata/%dataset%/folds/5-folds/%dataset%%%n-train.data -Tdata/%dataset%/folds/5-folds/%dataset%%%n-test.data
 REM )
-
+echo ----------------------------------------------------------------------------------
 REM ----------------------------FAST OBLIQUE DECISION TREE----------------------------------------
 javac -Xlint:unchecked -d project/target project/src/*.java
 set dataset=arcene
