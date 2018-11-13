@@ -23,7 +23,7 @@ public class ClassificationDriver {
 
   /* Returns a list of the labels calculated for the specified training and test data */
   public static ArrayList<String> calculateLabels(ArrayList<Record> trainingData, ArrayList<Record> testData) {
-    Classifier classifier = new ObliqueDecisionTree(trainingData);
+    Classifier classifier = new DecisionTree(trainingData);
     return classifier.classifyAll(testData);
   }
 }

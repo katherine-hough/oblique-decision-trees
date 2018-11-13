@@ -129,7 +129,24 @@ public class DecisionTree extends Classifier {
         conditions.add(new SplitCondition(desc, condition));
       }
     }
-    return mostPureConditions(1, conditions).get(0);
+    return resolveTiedConditions(mostPureConditions(1, conditions));
+  }
+
+  /* Selected and returns a SplitCondition from the specified list of tied (with respected
+   * to their impurities) conditions. */
+  protected SplitCondition resolveTiedConditions(ArrayList<SplitCondition> ties) {
+    if(ties.size() == 0) {
+      return null;
+    } else if(ties.size() == 1 || this.root==null) {
+      return ties.get(0);
+    } else {
+      ArrayList<SplitCondition> tiesCopy = new ArrayList<>(ties.size());
+      for(SplitCondition tie : ties) {
+        tiesCopy.add(tie.copy());
+      }
+      ArrayList<SplitCondition> reEvals = this.root.mostPureConditions(1, ties);
+      return reEvals.size() == 0 ? null : reEvals.get(0);
+    }
   }
 
   /* Return a list of the specified number of conditions with the lowest impurity.

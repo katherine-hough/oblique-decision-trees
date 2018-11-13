@@ -7,7 +7,7 @@ REM )
 
 REM ----------------------------FAST OBLIQUE DECISION TREE----------------------------------------
 javac -Xlint:unchecked -d project/target project/src/*.java
-set dataset=multiple-features
+set dataset=arcene
 set train=data/%dataset%/%dataset%.data
 set labels=data/%dataset%/%dataset%.labels
 set sparse=dense

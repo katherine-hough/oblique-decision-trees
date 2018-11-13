@@ -174,22 +174,7 @@ public class Record extends HashMap<Integer, Double> {
   }
 
   /* Returns values to split the specified feature at */
-  public static HashSet<Double> getSplitBuckets(List<Record> records, int feature) {
-    HashSet<Double> buckets = new HashSet<>();
-    HashSet<Double> valueSet = new HashSet<>(records.size());
-    for(Record record : records) {
-      valueSet.add(record.getOrDefault(feature, DEFAULT_FEATURE_VALUE));
-    }
-    ArrayList<Double> values = new ArrayList<>(valueSet);
-    Collections.sort(values);
-    if(values.size() <= 1) {
-      return buckets;
-    }
-    int numBuckets = Math.min(MAX_BUCKETS, values.size() - 1);
-    int step = values.size()/(numBuckets+1);
-    for(int i = step; i < values.size(); i+=step) {
-      buckets.add((values.get(i-1)+values.get(i))/2.0);
-    }
-    return buckets;
+  public static ArrayList<Double> getSplitBuckets(List<Record> records, int feature) {
+    return AttributeSpace.getSplitBuckets(records, feature, DEFAULT_FEATURE_VALUE, MAX_BUCKETS);
   }
 }
