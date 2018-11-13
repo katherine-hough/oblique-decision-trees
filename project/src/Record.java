@@ -40,6 +40,17 @@ public class Record extends HashMap<Integer, Double> {
     return result + classLabel;
   }
 
+  /* Converts the record into a sparse string representation of all of its features */
+  public String toSparseString() {
+    String result = "";
+    for(int feature : keySet()) {
+      if(get(feature) != DEFAULT_FEATURE_VALUE) {
+        result += feature + " " + get(feature) + " ";
+      }
+    }
+    return result + classLabel;
+  }
+
   /* Accessor for classLabel */
   public String getClassLabel() {
     return classLabel;
