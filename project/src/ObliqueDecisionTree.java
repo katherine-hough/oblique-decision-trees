@@ -27,7 +27,6 @@ public class ObliqueDecisionTree extends DecisionTree {
   /* Create the child nodes for the current node */
   @Override
   protected void makeChildren() {
-    System.out.println(splitCondition);
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
@@ -41,12 +40,9 @@ public class ObliqueDecisionTree extends DecisionTree {
   protected SplitCondition selectSplitCondition() {
     double curImpurity = getGiniImpurity(reachingRecords); // GINI impurity of this node
     ArrayList<SplitCondition> conditions = getBaseConditions();
-    System.out.printf("Checking %d base conditions\n", conditions.size());
     int maxCond = Math.min(300, (int)(conditions.size()*.001)+100);
     conditions = mostPureConditions(maxCond, conditions);
     conditions.removeIf((condition) -> condition.getImpurity() > curImpurity);
-    System.out.printf("Kept %d base conditions\n", conditions.size());
-
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
