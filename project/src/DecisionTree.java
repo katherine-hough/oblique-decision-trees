@@ -353,6 +353,8 @@ public class DecisionTree extends Classifier {
     return ret;
   }
 
+  /* Creates lists containing the nodes at each level of the tree for up to the
+   * specified maximum number of levels */
   private ArrayList<ArrayList<DecisionTree>> breadthFirstTraversal(int maxLevels) {
     ArrayList<ArrayList<DecisionTree>> levels = new ArrayList<>();
     levels.add(new ArrayList<DecisionTree>());

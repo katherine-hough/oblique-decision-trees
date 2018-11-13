@@ -18,7 +18,7 @@ public class ClassificationDriver {
     ArrayList<String> calculatedLabels = calculateLabels(trainingRecords, testRecords);
     timer.printElapsedTime("Writing predicted labels to " + args[4]);
     DataMiningUtil.writeToFile(calculatedLabels, args[4]);
-    timer.printElapsedTime("Finished.");
+    timer.printElapsedTime("Finished");
   }
 
   /* Returns a list of the labels calculated for the specified training and test data */
