@@ -42,7 +42,6 @@ public class CVDriver {
     double mean = DataMiningUtil.mean(accuracies);
     double stdDev = DataMiningUtil.sampleStandardDeviation(accuracies);
     System.out.printf("Accuracy: mean = %f, std.dev = %f\n", mean, stdDev);
-    timer.printElapsedTime("Finished.");
   }
 
   /* Returns the percentage of predictedLabels that match the label for the corresponding
