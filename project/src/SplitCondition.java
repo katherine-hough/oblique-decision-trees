@@ -15,6 +15,13 @@ public class SplitCondition implements Comparable<SplitCondition> {
     this.impurity = -1;
   }
 
+  /* Returns a copy of this SplitCondition without its impurity set */
+  public SplitCondition copy() {
+    SplitCondition copy = new SplitCondition(this.desc, this.condition);
+    copy.rank = this.rank;
+    return copy;
+  }
+
   /* Setter for impurity */
   public void setImpurity(double impurity) {
     this.impurity = impurity;
@@ -43,7 +50,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
   /* Returns a string representation of the split condition */
   @Override
   public String toString() {
-    return desc;
+    return String.format("%s", desc);
   }
 
   /* Returns a condition that is the logical negation of this condition */

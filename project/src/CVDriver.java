@@ -3,6 +3,9 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Random;
 import java.util.TreeSet;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.File;
 
 /* Performs n-folds cross validation on the classifier or creates the specified number of folds
  * Usage: CVDriver [sparse|dense] training_file_name training_label_file_name num_folds random_seed [-f]*/
@@ -26,7 +29,7 @@ public class CVDriver {
       crossValidate();
     } else {
       timer.printElapsedTime("Writing folds to files");
-      writeFoldsToFiles(args[1], trainingRecords);
+      writeFoldsToFiles(args[1], trainingRecords, sparse);
     }
     timer.printElapsedTime("Finished");
   }
@@ -37,7 +40,7 @@ public class CVDriver {
     for(int fold = 0; fold < NUM_FOLDS; fold++) {
       ArrayList<String> predictedLabels = ClassificationDriver.calculateLabels(trainingFolds.get(fold), testFolds.get(fold));
       accuracies.add(calcAccuracy(predictedLabels, testFolds.get(fold)));
-      System.out.printf("Fold #%d's Accuracy: %f\n", (fold+1), accuracies.get(fold));
+      System.out.printf("Fold #%d's Accuracy: %.5f\n", (fold+1), accuracies.get(fold));
     }
     double mean = DataMiningUtil.mean(accuracies);
     double stdDev = DataMiningUtil.sampleStandardDeviation(accuracies);
@@ -81,7 +84,7 @@ public class CVDriver {
     }
   }
 
-  private static void writeFoldsToFiles(String trainFilename, ArrayList<Record> trainingRecords) {
+  private static void writeFoldsToFiles(String trainFilename, ArrayList<Record> trainingRecords, boolean sparse) {
     String[] dataPath = trainFilename.split("\\/");
     String[] dataFile = (dataPath[dataPath.length-1]).split("\\.");
     TreeSet<Integer> features = new TreeSet<>(Record.getAllFeatures(trainingRecords));
@@ -94,17 +97,29 @@ public class CVDriver {
     for(int i = 0; i < NUM_FOLDS; i++) {
       String testFile = directoryPath + "/" + dataFile[0] + (i+1) + "-test." + dataFile[1];
       String trainFile = directoryPath + "/" + dataFile[0] + (i+1) + "-train." + dataFile[1];
-      ArrayList<String> lines = new ArrayList<>();
-      for(Record record : testFolds.get(i)) {
-        lines.add(record.toDenseString(features));
+
+      try {
+        PrintWriter pw = new PrintWriter(testFile);
+        for(Record record : testFolds.get(i)) {
+          if(sparse) {
+            pw.println(record.toSparseString());
+          } else {
+            pw.println(record.toDenseString(features));
+          }
+        }
+        pw.close();
+        PrintWriter pw2 = new PrintWriter(trainFile);
+        for(Record record : trainingFolds.get(i)) {
+          if(sparse) {
+            pw2.println(record.toSparseString());
+          } else {
+            pw2.println(record.toDenseString(features));
+          }
+        }
+        pw2.close();
+      } catch (IOException e) {
+        System.err.println("Error occurred writing folds to files.");
       }
-      DataMiningUtil.writeToFile(lines, testFile);
-      //
-      lines = new ArrayList<>();
-      for(Record record : trainingFolds.get(i)) {
-        lines.add(record.toDenseString(features));
-      }
-      DataMiningUtil.writeToFile(lines, trainFile);
     }
   }
 }

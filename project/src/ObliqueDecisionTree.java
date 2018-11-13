@@ -38,14 +38,16 @@ public class ObliqueDecisionTree extends DecisionTree {
    * records */
    @Override
   protected SplitCondition selectSplitCondition() {
+    double curImpurity = getGiniImpurity(reachingRecords); // GINI impurity of this node
     ArrayList<SplitCondition> conditions = getBaseConditions();
     int maxCond = Math.min(300, (int)(conditions.size()*.001)+100);
     conditions = mostPureConditions(maxCond, conditions);
+    conditions.removeIf((condition) -> condition.getImpurity() > curImpurity);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(1, conditions);
-    return conditions.isEmpty() ? null : conditions.get(0);
+    return resolveTiedConditions(conditions);
   }
 
   /*Creates conditions which are combinations of the specified conditions */
