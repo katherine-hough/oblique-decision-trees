@@ -97,7 +97,6 @@ public class CVDriver {
     for(int i = 0; i < NUM_FOLDS; i++) {
       String testFile = directoryPath + "/" + dataFile[0] + (i+1) + "-test." + dataFile[1];
       String trainFile = directoryPath + "/" + dataFile[0] + (i+1) + "-train." + dataFile[1];
-
       try {
         PrintWriter pw = new PrintWriter(testFile);
         for(Record record : testFolds.get(i)) {
