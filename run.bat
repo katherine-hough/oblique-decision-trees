@@ -1,5 +1,5 @@
 @echo off
-set dataset=arcene
+set dataset=dermatology
 set sparse=dense
 REM ---------------------------------------------------------------------------------
 REM echo Started: %date% %time%

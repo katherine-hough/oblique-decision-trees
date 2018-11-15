@@ -9,11 +9,11 @@ import java.util.Random;
 public class ObliqueDecisionTree extends DecisionTree {
 
   // Maximum number of most pure base conditions considered
-  private static final int MAX_BASE_CONDITIONS = 200;
-  // Size of population in genetic algorithm
-  private static final int POP_SIZE = 128;
+  private static final int MAX_BASE_CONDITIONS = 50;
+  // Size of population in the genetic algorithm
+  private static final int POP_SIZE = 264;
   // Maximum number of generations run in the genetic algorithm
-  private static final int MAX_GENS = 100;
+  private static final int MAX_GENS = 200;
   // Used to generate random numbers
   private static final Random RAND = new Random(848);
   // Maximum number of buckets considered for splitting per attribute
@@ -52,7 +52,7 @@ public class ObliqueDecisionTree extends DecisionTree {
    * These feature are the features that would have resulted in the purest traditional
    * decision tree split. */
   private int[] targetFeatures() {
-    int maxBaseConditions = Math.min(reachingRecords.size(), MAX_BASE_CONDITIONS);
+    int maxBaseConditions = Math.min(reachingRecords.size()/10+1, MAX_BASE_CONDITIONS);
     TreeSet<Integer> features = new TreeSet<>(Record.getAllFeatures(reachingRecords));
     if(features.size() > maxBaseConditions) {
       HashMap<SplitCondition, Pair<Integer, Double>> baseConditions = getBaseConditions();

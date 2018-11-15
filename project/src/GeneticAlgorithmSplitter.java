@@ -45,84 +45,59 @@ public class GeneticAlgorithmSplitter {
     if(population == null) {
       return null;
     }
-    double[][] valueRanges = getValueRanges();
     Individual best = null;
     for(int gen = 0; gen < maxGenerations; gen++) {
       Individual popBest = assessFitness(population);
-      best = (best == null || popBest.fitness > best.fitness) ? popBest : best;
+      if(best == null || popBest.fitness > best.fitness) {
+        best = popBest;
+      }
       Individual[] nextGen = new Individual[populationSize];
       for(int c = 0; c < populationSize; c+=2) {
         Individual parent1 = selectParent(population);
         Individual parent2 = selectParent(population);
-        // Individual[] children = uniformCrossover(parent1, parent2);
-        Individual[] children = intermediateRecombination(parent1, parent2, valueRanges);
-        mutate(children[0], valueRanges);
-        mutate(children[1], valueRanges);
+        Individual[] children = intermediateRecombination(parent1, parent2);
+        mutate(children[0]);
+        mutate(children[1]);
         nextGen[c] = children[0];
         nextGen[c+1] = children[1];
       }
       population = nextGen;
     }
+    boolean valid = false;
+    for(double d : best.genes) {
+      if(d != 0) {
+        valid = true;
+      }
+    }
     return best!= null ? best.toSplitCondition() : null;
   }
 
-  /* Returns arrays of the min and max values for each target attribute */
-  private double[][] getValueRanges() {
-    double[][] ranges = new double[2][targetFeatures.length+1];
-    for(int i = 0; i < ranges[0].length-1; i++) {
-      int featureNum = targetFeatures[i];
-      ranges[0][i] = 0.0;
-      ranges[1][i] = 0.0;
-      for(Record record : records) {
-        double value = 1.0/record.getOrDefault(featureNum);
-        ranges[0][i] = Math.min(ranges[0][i], 0.5*value);
-        ranges[1][i] = Math.max(ranges[1][i], 2*value);
-      }
-    }
-    ranges[0][ranges[0].length-1] = 0;
-    ranges[1][ranges[1].length-1] = targetFeatures.length;
-    return ranges;
-  }
-
   /* Mutates the childs genes using Gaussian Convolution */
-  private void mutate(Individual child, double[][] valueRanges) {
+  private void mutate(Individual child) {
     double noiseProb = 1.0;
     double std = 0.1;
     for(int i = 0; i < child.genes.length; i++) {
       if(noiseProb >= rand.nextDouble()) {
-        double n;
-        do {
-          n = rand.nextGaussian()*std;
-        } while(!inRange(child.genes[i]+n, valueRanges[0][i], valueRanges[1][i]));
-        child.genes[i]+=n;
+        child.genes[i]+=rand.nextGaussian()*std;
       }
     }
   }
 
   /* Produces child instances from the specified parents using intermediate recombination */
-  private Individual[] intermediateRecombination(Individual parent1, Individual parent2, double[][] valueRanges) {
+  private Individual[] intermediateRecombination(Individual parent1, Individual parent2) {
     double p = 0.25;
     Individual[] children = new Individual[2];
     children[0] = new Individual();
     children[1] = new Individual();
     for(int i = 0; i < parent1.genes.length; i++) {
-      double x;
-      double y;
-      do {
-        double a = (2*p+1)*rand.nextDouble()-p;
-        double b = (2*p+1)*rand.nextDouble()-p;
-        x = a*parent1.genes[i] + (1-a)*parent2.genes[i];
-        y = b*parent2.genes[i] + (1-b)*parent1.genes[i];
-      } while(!(inRange(x, valueRanges[0][i], valueRanges[1][i]) && inRange(y, valueRanges[0][i], valueRanges[1][i])));
+      double a = (2*p+1)*rand.nextDouble()-p;
+      double b = (2*p+1)*rand.nextDouble()-p;
+      double x = a*parent1.genes[i] + (1-a)*parent2.genes[i];
+      double y = b*parent2.genes[i] + (1-b)*parent1.genes[i];
       children[0].genes[i] = x;
       children[1].genes[i] = y;
     }
     return children;
-  }
-
-  /* Returns whether or not the specified value is in the specified inclusive range */
-  private boolean inRange(double value, double min, double max) {
-    return value >= min && value <= max;
   }
 
   /* Swaps the values at the same index in each parent at random to produce child instances */
@@ -164,12 +139,12 @@ public class GeneticAlgorithmSplitter {
     for(int i = 0; i < targetFeatures.length; i++) {
       ArrayList<Double> buckets = AttributeSpace.getSplitBuckets(records, targetFeatures[i], maxBuckets);
       if(buckets.size() == 0) {
-        return null;
+        break;
       }
       for(int p = 0; p < population.length; p++) {
-        if(rand.nextInt(2) == 0) {
-          population[p].genes[i] = 1.0/buckets.get(rand.nextInt(buckets.size()));
-          population[p].genes[population[p].genes.length-1]++;
+        if(rand.nextInt(4) == 0) {
+          population[p].genes[i] = 1.0;
+          population[p].genes[population[p].genes.length-1]+= buckets.get(rand.nextInt(buckets.size()));
         }
       }
     }
@@ -221,7 +196,7 @@ public class GeneticAlgorithmSplitter {
       sum += classFreq*classFreq;
       total += classFreq;
     }
-    return 1.0 - sum/(1.0 * total * total);
+    return (total == 0) ? 0.0 : (1.0 - sum/(1.0 * total * total));
   }
 
   /* Represents an individual in the population, encode a splits condition for the
@@ -241,10 +216,10 @@ public class GeneticAlgorithmSplitter {
       String desc = "";
       for(int i = 0; i < genes.length-1; i++) {
         if(genes[i] != 0) {
-          desc += String.format("%3.3f*X_%d + ", genes[i], targetFeatures[i]);
+          desc += String.format("%.5f*x[%d] + ", genes[i], targetFeatures[i]);
         }
       }
-      desc += String.format("-%3.3f < 0", genes[genes.length-1]);
+      desc += String.format("-%.5f < 0", genes[genes.length-1]);
       return desc;
     }
 
@@ -264,7 +239,9 @@ public class GeneticAlgorithmSplitter {
         }
         return sum - genes[genes.length-1] < 0;
       };
-      return new SplitCondition(toString(), pred);
+      SplitCondition cond = new SplitCondition(toString(), pred);
+      cond.setImpurity(1-fitness);
+      return cond;
     }
   }
 }
