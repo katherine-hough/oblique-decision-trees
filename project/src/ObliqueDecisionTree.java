@@ -1,18 +1,23 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.HashSet;
 import java.util.function.Predicate;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeSet;
+import java.util.Random;
 
 /* A DecisionTree that allows splits to be made on oblqiue axes */
 public class ObliqueDecisionTree extends DecisionTree {
 
-  private static final double MIN_SPARSE_FEATURE_PERCENT = 0.05;
+  // Maximum number of most pure base conditions considered
+  private static final int MAX_BASE_CONDITIONS = 50;
+  // Size of population in the genetic algorithm
+  private static final int POP_SIZE = 264;
+  // Maximum number of generations run in the genetic algorithm
+  private static final int MAX_GENS = 200;
+  // Used to generate random numbers
+  private static final Random RAND = new Random(848);
+  // Maximum number of buckets considered for splitting per attribute
+  private static final int MAX_BUCKETS = 100;
 
   /* Constructor for the root node calls two argument constructor*/
   public ObliqueDecisionTree(List<Record> reachingRecords) {
@@ -27,6 +32,7 @@ public class ObliqueDecisionTree extends DecisionTree {
   /* Create the child nodes for the current node */
   @Override
   protected void makeChildren() {
+    System.out.println(splitCondition);
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
     DecisionTree r = (root == null) ? this : root;
@@ -38,52 +44,44 @@ public class ObliqueDecisionTree extends DecisionTree {
    * records */
    @Override
   protected SplitCondition selectSplitCondition() {
-    double curImpurity = getGiniImpurity(reachingRecords); // GINI impurity of this node
-    ArrayList<SplitCondition> conditions = getBaseConditions();
-    int maxCond = Math.min(300, (int)(conditions.size()*.001)+100);
-    conditions = mostPureConditions(maxCond, conditions);
-    conditions.removeIf((condition) -> condition.getImpurity() > curImpurity);
-    conditions.addAll(getSecondaryConditions(conditions));
-    conditions = mostPureConditions(maxCond, conditions);
-    conditions.addAll(getSecondaryConditions(conditions));
-    conditions = mostPureConditions(1, conditions);
-    return resolveTiedConditions(conditions);
+    GeneticAlgorithmSplitter GASplitter = new GeneticAlgorithmSplitter(reachingRecords, targetFeatures(), POP_SIZE, RAND, MAX_BUCKETS);
+    return GASplitter.getBestSplitCondition(MAX_GENS);
   }
 
-  /*Creates conditions which are combinations of the specified conditions */
-  protected ArrayList<SplitCondition> getSecondaryConditions(ArrayList<SplitCondition> conditions) {
-    ArrayList<SplitCondition> secondaryConditions = new ArrayList<>();
-    for(int i = 0; i < conditions.size(); i++) {
-      for(int j = i+1; j < conditions.size(); j++) {
-        SplitCondition condition1 = conditions.get(i);
-        SplitCondition condition2 = conditions.get(j);
-        SplitCondition or = condition1.or(condition2);
-        SplitCondition and = condition1.and(condition2);
-        SplitCondition notOr = (condition1.negate()).and(condition2);
-        SplitCondition notAnd = (condition1.negate()).and(condition2);
-        secondaryConditions.add(or);
-        secondaryConditions.add(and);
-        secondaryConditions.add(notOr);
-        secondaryConditions.add(notAnd);
+  /* Returns an array of features to be considered by the genetic algorithm.
+   * These feature are the features that would have resulted in the purest traditional
+   * decision tree split. */
+  private int[] targetFeatures() {
+    int maxBaseConditions = Math.min(reachingRecords.size()/10+1, MAX_BASE_CONDITIONS);
+    TreeSet<Integer> features = new TreeSet<>(Record.getAllFeatures(reachingRecords));
+    if(features.size() > maxBaseConditions) {
+      HashMap<SplitCondition, Pair<Integer, Double>> baseConditions = getBaseConditions();
+      ArrayList<SplitCondition> mostPureConditions = mostPureConditions(maxBaseConditions, new ArrayList<>(baseConditions.keySet()));
+      baseConditions.keySet().retainAll(mostPureConditions);
+      features = new TreeSet<>();
+      for(Pair<Integer, Double> featureBucketPair : baseConditions.values()) {
+        features.add(featureBucketPair.getKey());
       }
     }
-    return secondaryConditions;
+    int[] targetFeatures = new int[features.size()];
+    for(int i = 0; i < targetFeatures.length; i++) {
+      targetFeatures[i] = features.pollFirst();
+    }
+    return targetFeatures;
   }
 
   /* Gets the basic set of initial conditions which split the feature space
    * along the feature axes */
-  private ArrayList<SplitCondition> getBaseConditions() {
+  private HashMap<SplitCondition, Pair<Integer, Double>> getBaseConditions() {
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
-    HashMap<Integer, Integer> featureFreqs = DataMiningUtil.createFreqMap(reachingRecords, (record) -> record.keySet());
-    features.removeIf((feature) -> featureFreqs.get(feature) < MIN_SPARSE_FEATURE_PERCENT*reachingRecords.size());
-    ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
+    HashMap<SplitCondition, Pair<Integer, Double>> conditions = new HashMap<>();
     for(Integer feature : features) {
-      for(double bucket : Record.getSplitBuckets(reachingRecords, feature)) {
+      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, MAX_BUCKETS)) {
         Predicate<Record> condition = (record) -> {
-          return record.getOrDefault(feature, Record.DEFAULT_FEATURE_VALUE) < bucket;
+          return record.getOrDefault(feature) < bucket;
         };
         String desc = String.format("[#%d]<%2.2f", feature, bucket);
-        conditions.add(new SplitCondition(desc, condition));
+        conditions.put(new SplitCondition(desc, condition), new Pair<Integer, Double>(feature, bucket));
       }
     }
     return conditions;

@@ -8,10 +8,10 @@ import java.util.Collections;
 
 public class AttributeSpace {
 
-  public static ArrayList<Double> getSplitBuckets(Iterable<Record> records, int attribute, double defaultValue, int maxBuckets) {
+  public static ArrayList<Double> getSplitBuckets(Iterable<Record> records, int attribute, int maxBuckets) {
     HashMap<Double, ValueBucket> temp = new HashMap<>();
     for(Record record : records) {
-      double value = record.getOrDefault(attribute, defaultValue);
+      double value = record.getOrDefault(attribute);
       temp.putIfAbsent(value, new ValueBucket(value, value));
       ValueBucket bucket = temp.get(value);
       int prevFreq = bucket.getOrDefault(record.getClassLabel(), 0);
