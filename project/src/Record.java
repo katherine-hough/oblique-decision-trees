@@ -9,7 +9,6 @@ import java.util.TreeSet;
  * a class label. Maps feature numbers to values */
 public class Record extends HashMap<Integer, Double> {
 
-  private static final int MAX_BUCKETS = 100;
   public static final double DEFAULT_FEATURE_VALUE = 0.0;
   private final String classLabel; // the class of this record, null if no class
 
@@ -31,11 +30,16 @@ public class Record extends HashMap<Integer, Double> {
     return (classLabel==null ? "?" : classLabel) + ": " + size();
   }
 
+  /* Returns the value mapped to the specified key or the default value if no mapping exists */
+  public Double getOrDefault(Integer key) {
+    return getOrDefault(key, DEFAULT_FEATURE_VALUE);
+  }
+
   /* Converts the record into a dense string representation of all of its features */
   public String toDenseString(TreeSet<Integer> allFeatures) {
     String result = "";
     for(int feature : allFeatures) {
-      result += getOrDefault(feature, DEFAULT_FEATURE_VALUE) + " ";
+      result += getOrDefault(feature) + " ";
     }
     return result + classLabel;
   }
@@ -182,10 +186,5 @@ public class Record extends HashMap<Integer, Double> {
       features.addAll(record.keySet());
     }
     return features;
-  }
-
-  /* Returns values to split the specified feature at */
-  public static ArrayList<Double> getSplitBuckets(List<Record> records, int feature) {
-    return AttributeSpace.getSplitBuckets(records, feature, DEFAULT_FEATURE_VALUE, MAX_BUCKETS);
   }
 }

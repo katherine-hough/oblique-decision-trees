@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 /* A trained decision tree used for classifying records. */
 public class DecisionTree extends Classifier {
 
+  // Maximum number of buckets considered for splitting per attribute
+  private static final int MAX_BUCKETS = 100;
   // Number of threads in the thread pool
   private static final int NUM_THREADS = 4;
   protected static final double MAX_NON_HOMOG_PERCENT = 0.01;
@@ -29,7 +31,6 @@ public class DecisionTree extends Classifier {
   /* Constructor for the root node calls two argument constructor*/
   public DecisionTree(List<Record> reachingRecords) {
     this(reachingRecords, null);
-    // printTree();
   }
 
   /* Classifies a single training instance and returns a string representation of
@@ -121,7 +122,7 @@ public class DecisionTree extends Classifier {
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
     ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
     for(Integer feature : features) {
-      for(double bucket : Record.getSplitBuckets(reachingRecords, feature)) {
+      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, MAX_BUCKETS)) {
         Predicate<Record> condition = (record) -> {
           return record.getOrDefault(feature, Record.DEFAULT_FEATURE_VALUE) < bucket;
         };
