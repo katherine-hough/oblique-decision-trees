@@ -2,6 +2,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.Random;
+import java.util.PriorityQueue;
 
 /* Uses a genetic algorithm to determine the oblique split to be made on a list of
  * records */
@@ -22,6 +23,8 @@ public class GeneticSplitter {
   private final int maxBuckets;
   /* Selectiveness of the tournament selection */
   private final int tournamentSize;
+  /* Selectiveness of the tournament selection for population replacement */
+  private final int replacementTournamentSize;
   /* Maximum number of generations */
   private final int maxGenerations;
 
@@ -34,6 +37,7 @@ public class GeneticSplitter {
     this.populationSize = builder.populationSize;
     this.maxBuckets = builder.maxBuckets;
     this.tournamentSize = builder.tournamentSize;
+    this.replacementTournamentSize = builder.replacementTournamentSize;
     this.maxGenerations = builder.maxGenerations;
   }
 
@@ -45,30 +49,55 @@ public class GeneticSplitter {
       return null;
     }
     Individual best = null;
-    for(int gen = 0; gen < maxGenerations; gen++) {
-      Individual popBest = assessFitness(population);
-      if(best == null || popBest.fitness > best.fitness) {
-        best = popBest;
+    for(Individual member : population) {
+      if(best == null || member.updateFitness() > best.fitness) {
+        best = member;
       }
-      Individual[] nextGen = new Individual[populationSize];
+    }
+    for(int gen = 0; gen < maxGenerations; gen++) {
       for(int c = 0; c < populationSize; c+=2) {
         Individual parent1 = selectParent(population);
         Individual parent2 = selectParent(population);
         Individual[] children = intermediateRecombination(parent1, parent2);
         mutate(children[0]);
         mutate(children[1]);
-        nextGen[c] = children[0];
-        nextGen[c+1] = children[1];
-      }
-      population = nextGen;
-    }
-    boolean valid = false;
-    for(double d : best.genes) {
-      if(d != 0) {
-        valid = true;
+        if(best == null || children[0].updateFitness() > best.fitness) {
+          best = children[0];
+        }
+        if(best == null || children[1].updateFitness() > best.fitness) {
+          best = children[1];
+        }
+        replaceMembers(population, children);
       }
     }
     return best!= null ? best.toSplitCondition() : null;
+  }
+
+  /* Selects to members of the specified population and replaces them with the
+   * specified children */
+  private void replaceMembers(Individual[] population, Individual[] children) {
+    int worstIndex1 = rand.nextInt(population.length);
+    for(int i = 2; i <= replacementTournamentSize; i++) {
+      int nextIndex = rand.nextInt(population.length);
+      if(population[nextIndex].fitness < population[worstIndex1].fitness) {
+        worstIndex1 = nextIndex;
+      }
+    }
+    int worstIndex2;
+    do {
+      worstIndex2 = rand.nextInt(population.length);
+    } while(worstIndex1 == worstIndex2);
+    for(int i = 2; i <= replacementTournamentSize; i++) {
+      int nextIndex;
+      do {
+        nextIndex = rand.nextInt(population.length);
+      } while(nextIndex == worstIndex1);
+      if(population[nextIndex].fitness < population[worstIndex2].fitness) {
+        worstIndex2 = nextIndex;
+      }
+    }
+    population[worstIndex1] = children[0];
+    population[worstIndex2] = children[1];
   }
 
   /* Mutates the childs genes using Gaussian Convolution */
@@ -129,7 +158,7 @@ public class GeneticSplitter {
     return best;
   }
 
-  /* Initializes the population */
+  /* Initializes the population. */
   private Individual[] initializePopulation() {
     Individual[] population = new Individual[populationSize];
     for(int p = 0; p < population.length; p++) {
@@ -150,28 +179,26 @@ public class GeneticSplitter {
     return population;
   }
 
-  /* Computes the fitness of each member of the population and returns the most
-   * fit individual in the population */
-  private Individual assessFitness(Individual[] population) {
-    Individual best = null;
-    for(Individual member : population) {
-      double fitness = member.calcFitness();
-      if(best == null || best.fitness < fitness) {
-        best = member;
-      }
-    }
-    return best;
-  }
-
   /* Represents an individual in the population, encode a splits condition for the
    * records */
-  private class Individual {
+  private class Individual implements Comparable<Individual> {
     double[] genes;
     double fitness;
 
     /* Constructor */
     Individual() {
-      genes = new double[targetFeatures.length+1];
+      this.genes = new double[targetFeatures.length+1];
+    }
+
+    /* Recalculates the individual's fitness */
+    double updateFitness() {
+      this.fitness = 1 - DecisionTree.getTotalGiniImpurity(records, this.toSplitCondition(), classIndexMap);
+      return this.fitness;
+    }
+
+    /* Compares this Individual to the specified oter Individual */
+    public int compareTo(Individual other) {
+      return ((Double)fitness).compareTo((Double)other.fitness);
     }
 
     /* Returns a string representation of the individual */
@@ -185,13 +212,6 @@ public class GeneticSplitter {
       }
       desc += String.format("-%.5f < 0", genes[genes.length-1]);
       return desc;
-    }
-
-    /* Calculates and stores the fitness of the individual. Returns the calculated
-     * value */
-    double calcFitness() {
-      this.fitness = 1 - DecisionTree.getTotalGiniImpurity(records, this.toSplitCondition(), classIndexMap);
-      return this.fitness;
     }
 
     /* Decodes the genes into a SplitCondition for the records */
@@ -218,6 +238,7 @@ public class GeneticSplitter {
     private int populationSize;
     private int maxBuckets;
     private int tournamentSize;
+    private int replacementTournamentSize;
     private int maxGenerations;
 
     public GeneticSplitterBuilder records(List<Record> records) {
@@ -255,6 +276,11 @@ public class GeneticSplitter {
 
     public GeneticSplitterBuilder tournamentSize(int tournamentSize) {
       this.tournamentSize = tournamentSize;
+      return this;
+    }
+
+    public GeneticSplitterBuilder replacementTournamentSize(int replacementTournamentSize) {
+      this.replacementTournamentSize = replacementTournamentSize;
       return this;
     }
 

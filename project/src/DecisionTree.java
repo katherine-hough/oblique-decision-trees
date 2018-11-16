@@ -85,7 +85,7 @@ public class DecisionTree extends Classifier {
     this.root = root;
     this.reachingRecords = reachingRecords;
     this.numAttributes = (root==null) ? Record.getAllFeatures(reachingRecords).size() : root.numAttributes;
-    this.maxNonHomogenuousRecords = (root==null) ? (int)(reachingRecords.size()*MAX_NON_HOMOG_PERCENT)+1 : maxNonHomogenuousRecords;
+    this.maxNonHomogenuousRecords = (root==null) ? (int)(reachingRecords.size()*MAX_NON_HOMOG_PERCENT)+1 : root.maxNonHomogenuousRecords;
   }
 
   /* Classifies a single training instance and returns a string representation of

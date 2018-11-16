@@ -38,6 +38,7 @@ public class GeneticDecisionTree extends DecisionTree {
                       .populationSize(264)
                       .maxBuckets(MAX_BUCKETS)
                       .tournamentSize(4)
+                      .replacementTournamentSize(7)
                       .maxGenerations(250);
     } else {
       this.builder = ((GeneticDecisionTree)root).builder;

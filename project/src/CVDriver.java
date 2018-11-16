@@ -22,7 +22,7 @@ public class CVDriver {
     boolean sparse = args[0].equals("sparse") ? true : false;
     timer.printElapsedTime("Reading in training records information from " + args[1]);
     ArrayList<Record> trainingRecords = Record.readRecords(args[1], args[2], sparse);
-    timer.printElapsedTime(String.format("Creating folds from %d records with %d attributes", trainingRecords.size(), Record.getAllFeatures(trainingRecords).size()));
+    timer.printElapsedTime(String.format("Creating folds from %d records with %d attributes and %d classes", trainingRecords.size(), Record.getAllFeatures(trainingRecords).size(), Record.getAllClasses(trainingRecords).size()));
     createFolds(trainingRecords, new Random(Integer.parseInt(args[4])));
     if(args[5].equals("F")) {
       timer.printElapsedTime("Writing folds to files");
@@ -44,6 +44,7 @@ public class CVDriver {
     }
     double mean = DataMiningUtil.mean(accuracies);
     double stdDev = DataMiningUtil.sampleStandardDeviation(accuracies);
+    System.out.printf("Accuracies: %s\n", accuracies);
     System.out.printf("Accuracy: mean = %f, std.dev = %f\n", mean, stdDev);
   }
 

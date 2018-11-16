@@ -15,7 +15,7 @@ public class Timer {
     SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
     formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     String formatted = formatter.format(date);
-    System.out.println("Elapsed Time: " + formatted);
+    System.out.printf("Elapsed Time: %s\n", formatted);
   }
 
   public void printElapsedTime(String message) {
@@ -23,7 +23,7 @@ public class Timer {
     SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
     formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     String formatted = formatter.format(date);
-    System.out.println("Elapsed Time: " + formatted + " | " + message);
+    System.out.printf("Elapsed Time: %s | %s\n", formatted, message);
   }
 
 }

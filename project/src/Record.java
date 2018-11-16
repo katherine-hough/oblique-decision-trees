@@ -187,4 +187,13 @@ public class Record extends HashMap<Integer, Double> {
     }
     return features;
   }
+
+  /* Returns all the class labels contained in the specified iterable of records */
+  public static HashSet<String> getAllClasses(Iterable<Record> records) {
+    HashSet<String> labels = new HashSet<>();
+    for(Record record : records) {
+      labels.add(record.getClassLabel());
+    }
+    return labels;
+  }
 }

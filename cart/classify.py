@@ -1,15 +1,10 @@
 from sklearn.tree import DecisionTreeClassifier
 from scipy.sparse import coo_matrix
-import numpy as np
-import sys
 
-def main():
-    folds_base_path = sys.argv[1]
-    num_folds = int(sys.argv[2])
-    sparse = True if sys.argv[3]=="sparse" else False
+def cross_validate(folds_base_path, num_folds, sparse, random_seed):
     accuracies = []
     for i in range(1, num_folds+1):
-        clf = DecisionTreeClassifier()
+        clf = DecisionTreeClassifier(random_state = random_seed)
         test_lines = [line for line in read_file(f'{folds_base_path}{i}-test.data') if len(line) > 0]
         training_lines = [line for line in read_file(f'{folds_base_path}{i}-train.data') if len(line) > 0]
         test_data, test_labels = parse_data_labels(test_lines)
@@ -18,8 +13,7 @@ def main():
             training_data, test_data = create_sparse_matrices(training_data, test_data)
         clf.fit(training_data, training_labels)
         accuracies.append(clf.score(test_data, test_labels))
-        print(f'Fold {i}\'s Accuracy: {accuracies[i-1]:.5}')
-    print(f'Accuracy: mean = {np.average(accuracies):.5}, std.dev = {np.std(accuracies):.5}')
+    return accuracies
 
 
  # Extracts labels and feature vectors from the specified lines
@@ -52,6 +46,3 @@ def create_sparse_matrices(training_data, test_data):
 def read_file(filename):
     with open(filename) as file:
         return file.read().split('\n')
-
-if __name__ == '__main__':
-    main()

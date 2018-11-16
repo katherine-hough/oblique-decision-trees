@@ -1,5 +1,5 @@
 @echo off
-set dataset=arcene
+set dataset=breast-cancer
 set sparse=dense
 
 REM FOR /l %%n IN (1,1,5) DO (
@@ -7,6 +7,6 @@ REM   OC1\mktree -tdata/%dataset%/folds/5-folds/%dataset%%%n-train.data -Tdata/%
 REM )
 
 javac -Xlint:unchecked -d project/target project/src/*.java
-java -cp project/target CVDriver %sparse% data/%dataset%/%dataset%.data data/%dataset%/%dataset%.labels 5 1005 GA-ODT
+java -cp project/target CVDriver %sparse% data/%dataset%/%dataset%.data data/%dataset%/%dataset%.labels 5 484 GA-ODT
 
 REM python CART/main.py data/%dataset%/folds/5-folds/%dataset% 5 %sparse%
