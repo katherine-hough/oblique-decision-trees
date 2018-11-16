@@ -1,46 +1,45 @@
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.Collection;
-import java.util.TreeSet;
 import java.util.Random;
 
-public class GeneticAlgorithmSplitter {
-  // Selectiveness of the tournament selection
-  private static final int TOURNAMENT_SIZE = 4;
-  // The records being considered when making this split
-  List<Record> records;
-  // Maps each different class label found for a record to a different integer index
-  HashMap<String, Integer> classIndexMap;
-  // The features which are considered in the split in the order they are represented
-  // in individual's genes
-  int[] targetFeatures;
-  // Size of population
-  int populationSize;
-  // Random number generator
-  Random rand;
-  // Maximum number of buckets considered for splitting per attribute
-  int maxBuckets;
+/* Uses a genetic algorithm to determine the oblique split to be made on a list of
+ * records */
+public class GeneticSplitter {
 
-  public GeneticAlgorithmSplitter(List<Record> records, int[] targetFeatures, int populationSize, Random rand, int maxBuckets) {
-    if(populationSize%2!=0) {
-      throw new RuntimeException("Population size must be even.");
-    }
-    this.records = records;
-    this.classIndexMap = new HashMap<>();
-    for(Record record : records) {
-      classIndexMap.putIfAbsent(record.getClassLabel(), classIndexMap.size());
-    }
-    this.targetFeatures = targetFeatures;
-    this.populationSize = populationSize;
-    this.rand = rand;
-    this.maxBuckets = maxBuckets;
+  /* The records being considered when making this split */
+  private final List<Record> records;
+  /* Maps each different class label to a different integer index */
+  private final HashMap<String, Integer> classIndexMap;
+  /* The features which are considered in the split in the order they are represented
+   * in individual's genes */
+  private final int[] targetFeatures;
+  /* Random number generator */
+  private final Random rand;
+  /* Size of population */
+  private final int populationSize;
+  /* Maximum number of buckets considered for splitting per attribute */
+  private final int maxBuckets;
+  /* Selectiveness of the tournament selection */
+  private final int tournamentSize;
+  /* Maximum number of generations */
+  private final int maxGenerations;
+
+  /* Private constructor called by the builder */
+  private GeneticSplitter(GeneticSplitterBuilder builder) {
+    this.records = builder.records;
+    this.classIndexMap = builder.classIndexMap;
+    this.targetFeatures = builder.targetFeatures;
+    this.rand = builder.rand;
+    this.populationSize = builder.populationSize;
+    this.maxBuckets = builder.maxBuckets;
+    this.tournamentSize = builder.tournamentSize;
+    this.maxGenerations = builder.maxGenerations;
   }
 
-  /* Return the best split condition found after the specified maximum number of
+  /* Return the best split condition found after the maximum number of
    * generations */
-  public SplitCondition getBestSplitCondition(int maxGenerations) {
+  public SplitCondition getBestSplitCondition() {
     Individual[] population = initializePopulation();
     if(population == null) {
       return null;
@@ -121,7 +120,7 @@ public class GeneticAlgorithmSplitter {
   /* Selects a parent from the population using tournament selection */
   private Individual selectParent(Individual[] population) {
     Individual best = population[rand.nextInt(population.length)];
-    for(int i = 2; i <= TOURNAMENT_SIZE; i++) {
+    for(int i = 2; i <= tournamentSize; i++) {
       Individual next = population[rand.nextInt(population.length)];
       if(next.fitness > best.fitness) {
         best = next;
@@ -137,7 +136,7 @@ public class GeneticAlgorithmSplitter {
       population[p] = new Individual();
     }
     for(int i = 0; i < targetFeatures.length; i++) {
-      ArrayList<Double> buckets = AttributeSpace.getSplitBuckets(records, targetFeatures[i], maxBuckets);
+      List<Double> buckets = AttributeSpace.getSplitBuckets(records, targetFeatures[i], maxBuckets);
       if(buckets.size() == 0) {
         break;
       }
@@ -164,44 +163,9 @@ public class GeneticAlgorithmSplitter {
     return best;
   }
 
-  /* The weighted GINI impurity if the records are partitioned based on the
-   * specified condition */
-  private double getTotalGiniImpurity(SplitCondition splitCondition) {
-    int[] classFreqsLeft = new int[classIndexMap.size()];
-    int[] classFreqsRight = new int[classIndexMap.size()];
-    int totalLeft = 0;
-    int totalRight = 0;
-    for(Record record : records) {
-      int index = classIndexMap.get(record.getClassLabel());
-      if(splitCondition.test(record)) {
-        totalLeft++;
-        classFreqsLeft[index]++;
-      } else {
-        totalRight++;
-        classFreqsRight[index]++;
-      }
-    }
-    double giniLeft = getGiniImpurity(classFreqsLeft);
-    double giniRight = getGiniImpurity(classFreqsRight);
-    double probLeft = (1.0*totalLeft)/records.size();
-    double probRight = (1.0*totalRight)/records.size();
-    return giniLeft*probLeft + giniRight*probRight;
-  }
-
-  /* Calculates the GINI impurity based on the specified array of class frequencies*/
-  public static double getGiniImpurity(int[] classFreqs) {
-    int sum = 0;
-    int total = 0;
-    for(int classFreq : classFreqs) {
-      sum += classFreq*classFreq;
-      total += classFreq;
-    }
-    return (total == 0) ? 0.0 : (1.0 - sum/(1.0 * total * total));
-  }
-
   /* Represents an individual in the population, encode a splits condition for the
    * records */
-  class Individual {
+  private class Individual {
     double[] genes;
     double fitness;
 
@@ -226,7 +190,7 @@ public class GeneticAlgorithmSplitter {
     /* Calculates and stores the fitness of the individual. Returns the calculated
      * value */
     double calcFitness() {
-      this.fitness = 1 - getTotalGiniImpurity(this.toSplitCondition());
+      this.fitness = 1 - DecisionTree.getTotalGiniImpurity(records, this.toSplitCondition(), classIndexMap);
       return this.fitness;
     }
 
@@ -239,9 +203,69 @@ public class GeneticAlgorithmSplitter {
         }
         return sum - genes[genes.length-1] < 0;
       };
-      SplitCondition cond = new SplitCondition(toString(), pred);
+      SplitCondition cond = new SplitCondition(pred, toString());
       cond.setImpurity(1-fitness);
       return cond;
+    }
+  }
+
+  /* Nested builder class for creating GeneticSplitters */
+  public static class GeneticSplitterBuilder {
+    private List<Record> records;
+    private HashMap<String, Integer> classIndexMap;
+    private int[] targetFeatures;
+    private Random rand;
+    private int populationSize;
+    private int maxBuckets;
+    private int tournamentSize;
+    private int maxGenerations;
+
+    public GeneticSplitterBuilder records(List<Record> records) {
+      this.records = records;
+      return this;
+    }
+
+    public GeneticSplitterBuilder classIndexMap(HashMap<String, Integer> classIndexMap) {
+      this.classIndexMap = classIndexMap;
+      return this;
+    }
+
+    public GeneticSplitterBuilder targetFeatures(int[] targetFeatures) {
+      this.targetFeatures = targetFeatures;
+      return this;
+    }
+
+    public GeneticSplitterBuilder rand(Random rand) {
+      this.rand = rand;
+      return this;
+    }
+
+    public GeneticSplitterBuilder populationSize(int populationSize) {
+      if(populationSize%2 != 0) {
+        throw new RuntimeException("Genetic algorithm population size must be even.");
+      }
+      this.populationSize = populationSize;
+      return this;
+    }
+
+    public GeneticSplitterBuilder maxBuckets(int maxBuckets) {
+      this.maxBuckets = maxBuckets;
+      return this;
+    }
+
+    public GeneticSplitterBuilder tournamentSize(int tournamentSize) {
+      this.tournamentSize = tournamentSize;
+      return this;
+    }
+
+    public GeneticSplitterBuilder maxGenerations(int maxGenerations) {
+      this.maxGenerations = maxGenerations;
+      return this;
+    }
+
+    /* Returns a GeneticSplitter instance built from the builders parameters */
+    public GeneticSplitter build() {
+      return new GeneticSplitter(this);
     }
   }
 }

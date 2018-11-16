@@ -247,13 +247,11 @@ dmypy.json
 !data/breast-cancer/breast-cancer.names
 
 # Include for dermatology dataset
-!data/dermatology/dermatology_src.data
 !data/dermatology/dermatology.data
 !data/dermatology/dermatology.labels
 !data/dermatology/dermatology.names
 
 # Include for iris dataset
-!data/iris/iris_src.data
 !data/iris/iris.data
 !data/iris/iris.labels
 !data/iris/iris.names

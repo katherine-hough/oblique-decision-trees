@@ -1,18 +1,10 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.HashSet;
 import java.util.function.Predicate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 
 /* A DecisionTree that allows splits to be made that consider multiple features */
 public class ComplexDecisionTree extends DecisionTree {
 
-  private static final double MIN_SPARSE_FEATURE_PERCENT = 0.05;
   // Maximum number of buckets considered for splitting per attribute
   private static final int MAX_BUCKETS = 100;
 
@@ -26,25 +18,19 @@ public class ComplexDecisionTree extends DecisionTree {
     super(reachingRecords, root);
   }
 
-  /* Create the child nodes for the current node */
+  /* Creates a child node of the same class */
   @Override
-  protected void makeChildren() {
-    List<Record> trueRecords = new ArrayList<>(reachingRecords);
-    List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
-    DecisionTree r = (root == null) ? this : root;
-    leftChild = new ComplexDecisionTree(trueRecords, r);
-    rightChild = new ComplexDecisionTree(falseRecords, r);
+  protected ComplexDecisionTree makeChild(List<Record> records, DecisionTree root) {
+    return new ComplexDecisionTree(records, root);
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
    * records */
    @Override
   protected SplitCondition selectSplitCondition() {
-    double curImpurity = getGiniImpurity(reachingRecords); // GINI impurity of this node
     ArrayList<SplitCondition> conditions = getBaseConditions();
     int maxCond = Math.min(300, (int)(conditions.size()*.001)+100);
     conditions = mostPureConditions(maxCond, conditions);
-    conditions.removeIf((condition) -> condition.getImpurity() > curImpurity);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(maxCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
@@ -70,24 +56,5 @@ public class ComplexDecisionTree extends DecisionTree {
       }
     }
     return secondaryConditions;
-  }
-
-  /* Gets the basic set of initial conditions which split the feature space
-   * along the feature axes */
-  private ArrayList<SplitCondition> getBaseConditions() {
-    ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
-    HashMap<Integer, Integer> featureFreqs = DataMiningUtil.createFreqMap(reachingRecords, (record) -> record.keySet());
-    features.removeIf((feature) -> featureFreqs.get(feature) < MIN_SPARSE_FEATURE_PERCENT*reachingRecords.size());
-    ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
-    for(Integer feature : features) {
-      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, MAX_BUCKETS)) {
-        Predicate<Record> condition = (record) -> {
-          return record.getOrDefault(feature) < bucket;
-        };
-        String desc = String.format("[#%d]<%2.2f", feature, bucket);
-        conditions.add(new SplitCondition(desc, condition));
-      }
-    }
-    return conditions;
   }
 }

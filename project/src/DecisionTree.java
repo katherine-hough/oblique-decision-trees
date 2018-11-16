@@ -13,24 +13,79 @@ import java.util.concurrent.Executors;
 /* A trained decision tree used for classifying records. */
 public class DecisionTree extends Classifier {
 
-  // Maximum number of buckets considered for splitting per attribute
-  private static final int MAX_BUCKETS = 100;
-  // Number of threads in the thread pool
+  /* Number of threads used in the thread pool */
   private static final int NUM_THREADS = 4;
-  protected static final double MAX_NON_HOMOG_PERCENT = 0.01;
-  protected static final int MAX_NON_HOMOG = 4;
-  protected DecisionTree leftChild;
-  protected DecisionTree rightChild;
-  protected String leafLabel;
-  protected List<Record> reachingRecords;
-  protected DecisionTree root;
-  protected SplitCondition splitCondition;
-  protected String defaultClass;
+  /* Maximum number of buckets considered for splitting per attribute */
+  private static final int MAX_BUCKETS = 100;
+  /* Maximum percent of the total records that can be from a different class
+   * for the node to still be considered homogeneous */
+  protected static final double MAX_NON_HOMOG_PERCENT = 0.02;
 
+  /* This node's leftchild. leftChild is null for leaf nodes */
+  protected DecisionTree leftChild;
+  /* This node's right child. rightChild is null for leaf nodes */
+  protected DecisionTree rightChild;
+  /* The label associated with this node. leafLabel is null for non-leaf nodes */
+  protected String leafLabel;
+  /* The training records which reach this node */
+  protected List<Record> reachingRecords;
+  /* The root node of the decision tree that this node is in. root is null for the
+   * root node itself */
+  protected DecisionTree root;
+  /* Condition used to split the records at this node */
+  protected SplitCondition splitCondition;
+  /* Number of attributes for the entire dataset. Created by the root node and shared by
+   * all nodes in the same tree */
+  protected int numAttributes;
+  /* Class returned if a node is empty. Created by the root node and shared by
+   * all nodes in the same tree */
+  protected String defaultClass;
+  /* Maps each different class label to a different integer index. Created by the root
+   * node and shared by all nodes in the same tree */
+  protected HashMap<String, Integer> classIndexMap;
+  /* Maximum number of records reaching the node that can be from a different
+   * class for the node to still be considered homogeneous. Created by the root
+   * node and shared by all nodes in the same tree */
+  protected int maxNonHomogenuousRecords;
 
   /* Constructor for the root node calls two argument constructor*/
   public DecisionTree(List<Record> reachingRecords) {
     this(reachingRecords, null);
+  }
+
+  /* 2-arg Constructor called by all nodes */
+  protected DecisionTree(List<Record> reachingRecords, DecisionTree root) {
+    setBasicFields(reachingRecords, root);
+    if (reachingRecords.size() == 0) {
+      leafLabel = defaultClass;
+    } else if(homogeneous(reachingRecords)) {
+      leafLabel = getMostFrequentLabel(reachingRecords);
+    } else {
+      splitCondition = selectSplitCondition();
+      if(splitCondition == null) {
+        leafLabel = getMostFrequentLabel(reachingRecords);
+      } else {
+        System.out.println(this);
+        System.out.println(splitCondition);
+        // Make child nodes
+        List<Record> trueRecords = new ArrayList<>(reachingRecords);
+        List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
+        DecisionTree r = (root == null) ? this : root;
+        leftChild = makeChild(trueRecords, r);
+        rightChild = makeChild(falseRecords, r);
+      }
+    }
+  }
+
+  /* Sets the fields that are created by the root and shared between all nodes
+   * or are passed into the constructor*/
+  protected void setBasicFields(List<Record> reachingRecords, DecisionTree root) {
+    this.defaultClass = (root==null) ? getMostFrequentLabel(reachingRecords) : root.defaultClass;
+    this.classIndexMap = (root==null) ? createClassIndexMap(reachingRecords) : root.classIndexMap;
+    this.root = root;
+    this.reachingRecords = reachingRecords;
+    this.numAttributes = (root==null) ? Record.getAllFeatures(reachingRecords).size() : root.numAttributes;
+    this.maxNonHomogenuousRecords = (root==null) ? (int)(reachingRecords.size()*MAX_NON_HOMOG_PERCENT)+1 : maxNonHomogenuousRecords;
   }
 
   /* Classifies a single training instance and returns a string representation of
@@ -45,36 +100,22 @@ public class DecisionTree extends Classifier {
     }
   }
 
-  /* 2-arg Constructor */
-  protected DecisionTree(List<Record> reachingRecords, DecisionTree root) {
-    this.defaultClass = (root==null) ? getMostFrequentLabel(reachingRecords) : root.defaultClass;
-    this.root = root;
-    this.reachingRecords = reachingRecords;
-    if (reachingRecords.size() == 0) {
-      leafLabel = defaultClass;
-    } else if(mostlyHomogeneous(reachingRecords)) {
-      leafLabel = getMostFrequentLabel(reachingRecords);
-    } else {
-      splitCondition = selectSplitCondition();
-      if(splitCondition == null) {
-        leafLabel = getMostFrequentLabel(reachingRecords);
-      } else {
-        makeChildren();
-      }
+  /* Creates a maps from each different class label to a different integer index */
+  public static HashMap<String, Integer> createClassIndexMap(List<Record> records) {
+    HashMap<String, Integer> classIndexMap = new HashMap<>();
+    for(Record record : records) {
+      classIndexMap.putIfAbsent(record.getClassLabel(), classIndexMap.size());
     }
+    return classIndexMap;
   }
 
-  /* Create the child nodes for the current node */
-  protected void makeChildren() {
-    List<Record> trueRecords = new ArrayList<>(reachingRecords);
-    List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
-    DecisionTree r = (root == null) ? this : root;
-    leftChild = new DecisionTree(trueRecords, r);
-    rightChild = new DecisionTree(falseRecords, r);
+  /* Creates a child node of the same class */
+  protected DecisionTree makeChild(List<Record> records, DecisionTree root) {
+    return new DecisionTree(records, root);
   }
 
   /* Returns the most common label based on the specified frequency map */
-  protected static String getMostFrequentLabel(HashMap<String, Integer> classFreqs) {
+  public static String getMostFrequentLabel(HashMap<String, Integer> classFreqs) {
     String mostFrequentLabel = null;
     for(String label : classFreqs.keySet()) {
       if(mostFrequentLabel == null || classFreqs.get(label) > classFreqs.get(mostFrequentLabel)) {
@@ -85,26 +126,13 @@ public class DecisionTree extends Classifier {
   }
 
   /* Returns the most common label for the records in the specified list */
-  protected static String getMostFrequentLabel(List<Record> records) {
+  public static String getMostFrequentLabel(List<Record> records) {
     HashMap<String, Integer> classFreqs = DataMiningUtil.createFreqMap(records, (record) -> Collections.singleton(record.getClassLabel()));
     return getMostFrequentLabel(classFreqs);
   }
 
-  /* Returns whether every record in the specified list have the same class label */
-  protected static boolean homogeneous(List<Record> records) {
-    String first = null;
-    for(Record record : records) {
-      if(first == null) {
-        first = record.getClassLabel();
-      } else if (!first.equals(record.getClassLabel())) {
-          return false;
-      }
-    }
-    return true;
-  }
-
   /* Returns whether almost every record in the specified list have the same class label */
-  protected static boolean mostlyHomogeneous(List<Record> records) {
+  protected boolean homogeneous(List<Record> records) {
     HashMap<String, Integer> classFreqs = DataMiningUtil.createFreqMap(records, (record) -> Collections.singleton(record.getClassLabel()));
     String mostFreq = getMostFrequentLabel(classFreqs);
     int minTotal = 0;
@@ -113,24 +141,29 @@ public class DecisionTree extends Classifier {
         minTotal += classFreqs.get(key);
       }
     }
-    return (minTotal <= MAX_NON_HOMOG_PERCENT*records.size()) || (minTotal <= MAX_NON_HOMOG);
+    return minTotal <= maxNonHomogenuousRecords;
+  }
+
+  /* Gets the basic set of conditions which split the feature space along the
+   * feature axes */
+  protected ArrayList<SplitCondition> getBaseConditions() {
+    ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
+    ArrayList<SplitCondition> conditions = new ArrayList<>();
+    for(Integer feature : features) {
+      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, MAX_BUCKETS)) {
+        Predicate<Record> condition = (record) -> {
+          return record.getOrDefault(feature) < bucket;
+        };
+        conditions.add(new SplitCondition(condition, feature, bucket));
+      }
+    }
+    return conditions;
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
    * records */
   protected SplitCondition selectSplitCondition() {
-    ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
-    ArrayList<SplitCondition> conditions = new ArrayList<>(features.size());
-    for(Integer feature : features) {
-      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, MAX_BUCKETS)) {
-        Predicate<Record> condition = (record) -> {
-          return record.getOrDefault(feature, Record.DEFAULT_FEATURE_VALUE) < bucket;
-        };
-        String desc = String.format("[#%d]<%2.2f", feature, bucket);
-        conditions.add(new SplitCondition(desc, condition));
-      }
-    }
-    return resolveTiedConditions(mostPureConditions(1, conditions));
+    return resolveTiedConditions(mostPureConditions(1, getBaseConditions()));
   }
 
   /* Selected and returns a SplitCondition from the specified list of tied (with respected
@@ -162,7 +195,7 @@ public class DecisionTree extends Classifier {
         try {
           for(int j = i; j < Math.min(i+conditionsPerTask, conditions.size()); j++) {
             if(conditions.get(j).getImpurity() < 0) {
-              conditions.get(j).setImpurity(getTotalGiniImpurity(conditions.get(j)));
+              conditions.get(j).setImpurity(getTotalGiniImpurity(reachingRecords, conditions.get(j), classIndexMap));
             }
           }
           return true;
@@ -189,26 +222,39 @@ public class DecisionTree extends Classifier {
     return topConditions;
   }
 
-  /* The weighted GINI impurity if the records reaching this node are partitioned based on
-   * the condition */
-  protected double getTotalGiniImpurity(SplitCondition splitCondition) {
-    List<Record> containingRecords= new ArrayList<>(reachingRecords);
-    List<Record> omittingRecords = splitOnCondition(splitCondition, containingRecords);
-    double gini1 = getGiniImpurity(containingRecords);
-    double gini2 = getGiniImpurity(omittingRecords);
-    double prob1 = (1.0*containingRecords.size())/reachingRecords.size();
-    double prob2 = (1.0*omittingRecords.size())/reachingRecords.size();
-    return gini1*prob1 + gini2*prob2;
+  /* The weighted GINI impurity of the split formed by partitioning the specified
+   * list fo record based on the specified condition */
+  public static double getTotalGiniImpurity(List<Record> records, SplitCondition splitCondition, HashMap<String, Integer> classIndexMap) {
+    int[] classFreqsLeft = new int[classIndexMap.size()];
+    int[] classFreqsRight = new int[classIndexMap.size()];
+    int totalLeft = 0;
+    int totalRight = 0;
+    for(Record record : records) {
+      int index = classIndexMap.get(record.getClassLabel());
+      if(splitCondition.test(record)) {
+        totalLeft++;
+        classFreqsLeft[index]++;
+      } else {
+        totalRight++;
+        classFreqsRight[index]++;
+      }
+    }
+    double giniLeft = getGiniImpurity(classFreqsLeft);
+    double giniRight = getGiniImpurity(classFreqsRight);
+    double probLeft = (1.0*totalLeft)/records.size();
+    double probRight = (1.0*totalRight)/records.size();
+    return giniLeft*probLeft + giniRight*probRight;
   }
 
-  /* Gets the GINI impurity of the specified list of records */
-  protected static double getGiniImpurity(List<Record> records) {
-    HashMap<String, Integer> classFreqs = DataMiningUtil.createFreqMap(records, (record) -> Collections.singleton(record.getClassLabel()));
-    double sum = 0;
-    for(String label : classFreqs.keySet()) {
-      sum += (classFreqs.get(label)*classFreqs.get(label));
+  /* Calculates the GINI impurity based on the specified array of class frequencies*/
+  public static double getGiniImpurity(int[] classFreqs) {
+    int sum = 0;
+    int total = 0;
+    for(int classFreq : classFreqs) {
+      sum += classFreq*classFreq;
+      total += classFreq;
     }
-    return 1.0 - (sum/(records.size()*records.size()));
+    return (total == 0) ? 0.0 : (1.0 - sum/(1.0 * total * total));
   }
 
   /* Removes all records from the specified list that do not contain the specified feature

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.File;
 
 /* Performs n-folds cross validation on the classifier or creates the specified number of folds
- * Usage: CVDriver [sparse|dense] training_file_name training_label_file_name num_folds random_seed [-f]*/
+ * Usage: CVDriver [sparse|dense] training_file_name training_label_file_name num_folds random_seed [F|GA-ODT|C-DT|DT]]*/
 public class CVDriver {
 
   private static int NUM_FOLDS = 5;
@@ -22,23 +22,23 @@ public class CVDriver {
     boolean sparse = args[0].equals("sparse") ? true : false;
     timer.printElapsedTime("Reading in training records information from " + args[1]);
     ArrayList<Record> trainingRecords = Record.readRecords(args[1], args[2], sparse);
-    timer.printElapsedTime("Creating folds");
+    timer.printElapsedTime(String.format("Creating folds from %d records with %d attributes", trainingRecords.size(), Record.getAllFeatures(trainingRecords).size()));
     createFolds(trainingRecords, new Random(Integer.parseInt(args[4])));
-    if(args.length < 6) {
-      timer.printElapsedTime("Cross validating");
-      crossValidate();
-    } else {
+    if(args[5].equals("F")) {
       timer.printElapsedTime("Writing folds to files");
       writeFoldsToFiles(args[1], trainingRecords, sparse);
+    } else {
+      timer.printElapsedTime("Cross validating");
+      crossValidate(args[5]);
     }
     timer.printElapsedTime("Finished");
   }
 
   /* Performs cross validation on the created folds */
-  private static void crossValidate() {
+  private static void crossValidate(String method) {
     ArrayList<Double> accuracies = new ArrayList<>(NUM_FOLDS);
     for(int fold = 0; fold < NUM_FOLDS; fold++) {
-      ArrayList<String> predictedLabels = ClassificationDriver.calculateLabels(trainingFolds.get(fold), testFolds.get(fold));
+      ArrayList<String> predictedLabels = ClassificationDriver.calculateLabels(method, trainingFolds.get(fold), testFolds.get(fold));
       accuracies.add(calcAccuracy(predictedLabels, testFolds.get(fold)));
       System.out.printf("Fold #%d's Accuracy: %.5f\n", (fold+1), accuracies.get(fold));
     }

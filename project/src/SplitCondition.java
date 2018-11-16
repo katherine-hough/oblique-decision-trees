@@ -7,17 +7,38 @@ public class SplitCondition implements Comparable<SplitCondition> {
   private final Predicate<Record> condition;
   private double impurity;
   private int rank;
+  private int feature; // optional field, feature this split occurs on
+  private double bucket; // optional field, splitting value for feature
 
-  public SplitCondition(String desc, Predicate<Record> condition) {
-    this.desc = desc;
+  public SplitCondition(Predicate<Record> condition, String desc) {
     this.condition = condition;
+    this.desc = desc;
     this.rank = 1;
     this.impurity = -1;
   }
 
+  public SplitCondition(Predicate<Record> condition, int feature, double bucket) {
+    this.condition = condition;
+    this.desc = String.format("x[%d]<%2.2f", feature, bucket);
+    this.feature = feature;
+    this.bucket = bucket;
+    this.rank = 1;
+    this.impurity = -1;
+  }
+
+  /* Accessor for feature */
+  public int getFeature() {
+    return feature;
+  }
+
+  /* Accessor for bucket */
+  public double getBucket() {
+    return bucket;
+  }
+
   /* Returns a copy of this SplitCondition without its impurity set */
   public SplitCondition copy() {
-    SplitCondition copy = new SplitCondition(this.desc, this.condition);
+    SplitCondition copy = new SplitCondition(this.condition, this.desc);
     copy.rank = this.rank;
     return copy;
   }
@@ -56,7 +77,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
   /* Returns a condition that is the logical negation of this condition */
   public SplitCondition negate() {
     String newDesc = String.format("!(%s)", desc);
-    SplitCondition split = new SplitCondition(newDesc, condition.negate());
+    SplitCondition split = new SplitCondition(condition.negate(), newDesc);
     split.rank = this.rank;
     return split;
   }
@@ -64,7 +85,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
   /* Returns a condition that is the logical OR of this condition and the specified other condition */
   public SplitCondition or(SplitCondition other) {
     String newDesc = String.format("(%s)||(%s)", desc, other.desc);
-    SplitCondition split = new SplitCondition(newDesc, condition.or(other.condition));
+    SplitCondition split = new SplitCondition(condition.or(other.condition), newDesc);
     split.rank = this.rank + other.rank;
     return split;
   }
@@ -72,7 +93,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
   /* Returns a condition that is the logical AND of this condition and the specified other condition */
   public SplitCondition and(SplitCondition other) {
     String newDesc = String.format("(%s)&&(%s)", desc, other.desc);
-    SplitCondition split = new SplitCondition(newDesc, condition.and(other.condition));
+    SplitCondition split = new SplitCondition(condition.and(other.condition), newDesc);
     split.rank = this.rank + other.rank;
     return split;
   }
