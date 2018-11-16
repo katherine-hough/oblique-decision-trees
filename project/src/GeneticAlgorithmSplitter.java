@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class GeneticAlgorithmSplitter {
   // Selectiveness of the tournament selection
-  private static final int TOURNAMENT_SIZE = 7;
+  private static final int TOURNAMENT_SIZE = 4;
   // The records being considered when making this split
   List<Record> records;
   // Maps each different class label found for a record to a different integer index

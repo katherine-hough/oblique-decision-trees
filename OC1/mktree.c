@@ -42,7 +42,7 @@ char log_file[LINESIZE];
 int no_of_dimensions=0,no_of_coeffs,no_of_categories=0;
 int no_of_restarts=20,no_of_folds=0;
 int normalize = TRUE;
-int unlabeled = FALSE,verbose=FALSE,veryverbose = FALSE;
+int unlabeled = FALSE,verbose=FALSE,veryverbose = FALSE,no_file_output = FALSE;
 int order_of_perturbation = SEQUENTIAL;
 int oblique = TRUE;
 int axis_parallel = TRUE;
@@ -95,9 +95,7 @@ POINT **train_points=NULL,**test_points=NULL;
 /*			classify (classify.c)				*/
 /* Is called by modules : None.						*/
 /************************************************************************/
-main (argc, argv)
-     int argc;
-char *argv[];
+main (int argc, char *argv[])
 {
   extern char *optarg;
   extern int optind;
@@ -116,188 +114,200 @@ char *argv[];
 
   pname = argv[0];
   if (argc==1) usage(pname);
-  while ((c1 =
-	  getopt (argc, argv, "aA:b:Bc:d:D:i:j:Kl:m:M:n:Nop:r:R:s:t:T:uvV:"))
-         != EOF)
 
+  while ((c1 = getopt (argc, argv, "aA:b:Bc:d:D:i:j:Kl:m:M:n:Nop:r:R:s:t:T:uvV:z")) != EOF)
+  {
     switch (c1)
-     {
-      case 'a':			/*Axis parallel splits only */
-	oblique = FALSE;
-	break;
-      case 'A':			/*File into which all the locations of the
-				  hyperplanes considered by OC1 are output.
-				  The program "display" can be used to see an
-				  animation of the tree building process, using
-				  this output. */
-	strcpy(animation_file,optarg);
-	break;
-      case 'b': /* This option specifies the bias the user has
-		   toward axis parallel splits, denoted by ap_bias.
-		   ap_bias is a positive number greater than or equal
-                   to 1.0.  An oblique split will be preferred to an
-                   axis parallel split only if
-		   axis parallel impurity / oblique impurity > ap_bias */
-	ap_bias = atof(optarg);
-	if (ap_bias < 1.0) ap_bias = 1.0;
-	break;
+    {
+      /* Axis parallel splits only */
+      case 'a':
+        oblique = FALSE;
+        break;
+      /* File into which all the locations of the hyperplanes considered by OC1
+       * are output. The program "display" can * be used to see an animation of
+       * the tree building process, using this output. */
+      case 'A':
+        strcpy(animation_file,optarg);
+        break;
+      /* This option specifies the bias the user has toward axis parallel splits,
+       * denoted by ap_bias. ap_bias is a positive number greater than or equal
+       * to 1.0.  An oblique split will be preferred to an axis parallel split only if
+       * axis parallel impurity / oblique impurity > ap_bias */
+      case 'b':
+        ap_bias = atof(optarg);
+        if (ap_bias < 1.0) ap_bias = 1.0;
+        break;
+      /* Indicates that the coefficients will be perturbed in "best first" order */
       case 'B':
-	if (oblique == FALSE) usage(pname);
-	order_of_perturbation = BEST_FIRST;
-	break;
+        if (oblique == FALSE) usage(pname);
+        order_of_perturbation = BEST_FIRST;
+        break;
+      /* Number of categories or classes */
       case 'c':
-	no_of_categories = atoi (optarg);
-	if (no_of_categories <= 0) usage(pname);
-	break;
+        no_of_categories = atoi (optarg);
+        if (no_of_categories <= 0) usage(pname);
+        break;
+      /* Number of dimensions (attributes or features) */
       case 'd':
-	no_of_dimensions = atoi (optarg);
-	if (no_of_dimensions <= 0) usage(pname);
-	break;
-      case 'D':			/*The decision tree file.
-				  If OC1 is used in the training mode, the
-				  decision tree is output to this file.
-				  In testing mode, the decision tree is read
-				  from this file. */
-	strcpy(dt_file,optarg);
-	break;
-      case 'i':			/*No. of restarts at each node of the tree.
-				  Retained for compatibility with previous
-				  versions of OC1.*/
-	if (oblique == FALSE) usage(pname);
-	no_of_restarts = atoi (optarg);
-	if (no_of_restarts <= 0) usage(pname);
-	break;
-      case 'j':			/*Maximum number of random perturbations tried when
-				  stuck in a local minimum. */
-	if (oblique == FALSE) usage(pname);
-	max_no_of_random_perturbations = atoi(optarg);
-	if (max_no_of_random_perturbations < 0) usage(pname);
-	break;
-      case 'K':   /*Run in CART Multivariate mode */
-	cart_mode = TRUE;
-	break;
-      case 'l':			/*File into which a log of the running of
-				  OC1 is written. Default=oc1.log*/
-	strcpy(log_file,optarg);
-	break;
-      case 'm':			/*Maximum number of random perturbations tried when
-				  stuck in a local minimum. */
-	if (oblique == FALSE) usage(pname);
-	max_no_of_random_perturbations = atoi(optarg);
-	if (max_no_of_random_perturbations < 0) usage(pname);
-	break;
-      case 'M':			/*File into which the test instances on which the
-				  classifier fails are written. */
-	strcpy(misclassified_data,optarg);
-	break;
+        no_of_dimensions = atoi (optarg);
+        if (no_of_dimensions <= 0) usage(pname);
+        break;
+      /* The decision tree file. If OC1 is used in the training mode, the decision
+       * tree is output to this file. In testing mode, the decision tree is read
+       * from this file. */
+      case 'D':
+        strcpy(dt_file,optarg);
+        break;
+      /* No. of restarts at each node of the tree. Retained for compatibility
+       * with previous versions of OC1.*/
+      case 'i':
+        if (oblique == FALSE) usage(pname);
+        no_of_restarts = atoi (optarg);
+        if (no_of_restarts <= 0) usage(pname);
+        break;
+      /* Maximum number of random perturbations tried when stuck in a local minimum. */
+      case 'j':
+        if (oblique == FALSE) usage(pname);
+        max_no_of_random_perturbations = atoi(optarg);
+        if (max_no_of_random_perturbations < 0) usage(pname);
+        break;
+      /* Run in CART Multivariate mode */
+      case 'K':
+        cart_mode = TRUE;
+        break;
+      /* File into which a log of the running of OC1 is written. Default=oc1.log*/
+      case 'l':
+        strcpy(log_file,optarg);
+        break;
+      /* Maximum number of random perturbations tried when stuck in a local minimum. */
+      case 'm':
+        if (oblique == FALSE) usage(pname);
+        max_no_of_random_perturbations = atoi(optarg);
+        if (max_no_of_random_perturbations < 0) usage(pname);
+        break;
+      /* File into which the test instances on which the classifier fails are written. */
+      case 'M':
+        strcpy(misclassified_data,optarg);
+        break;
+      /* Number of training examples */
       case 'n':
-	no_of_train_points = atoi (optarg);
-	if (no_of_train_points < 0) usage(pname);
-	break;
-      case 'N':			/*Do not normalize attributes before inducing each
-				  oblique hyperplane. */
-	normalize = FALSE;
-	break;
-      case 'o':			/*Oblique splits only */
-	axis_parallel = FALSE;
-	break;
+        no_of_train_points = atoi (optarg);
+        if (no_of_train_points < 0) usage(pname);
+        break;
+      /* Do not normalize attributes before inducing each oblique hyperplane. */
+      case 'N':
+        normalize = FALSE;
+        break;
+      /* Oblique splits only */
+      case 'o':
+        axis_parallel = FALSE;
+        break;
+      /* Pruning portion */
       case 'p':
-	prune_portion = atof(optarg);
-	if (prune_portion < 0 ||
-	    prune_portion >= 1) usage(pname);
-	break;
-      case 'r':			/*Number of restarts at each node of the tree. */
-	if (oblique == FALSE) usage(pname);
-	no_of_restarts = atoi (optarg);
-	if (no_of_restarts <= 0) usage(pname);
-	break;
+        prune_portion = atof(optarg);
+        if (prune_portion < 0 || prune_portion >= 1) usage(pname);
+        break;
+      /* Number of restarts at each node of the tree. */
+      case 'r':
+        if (oblique == FALSE) usage(pname);
+        no_of_restarts = atoi (optarg);
+        if (no_of_restarts <= 0) usage(pname);
+        break;
+      /* The number of random coefficient perturbations */
       case 'R':
-	if (oblique == FALSE) usage(pname);
-	order_of_perturbation = RANDOM;
-	cycle_count = atoi(optarg);
-	break;
-      case 's':			/*Seed for the random number generator */
-	srand(atol(optarg));
-	break;
-      case 't':			/*Data for training. */
-	strcpy(train_data,optarg);
-	break;
-      case 'T':			/*Data for testing. */
-	strcpy(test_data,optarg);
-	break;
-      case 'u':			/*Test data is unlabeled. Classify it, and write*/
-	unlabeled = TRUE;   	/*the classified data to <test_data>.classified */
-	break;
+        if (oblique == FALSE) usage(pname);
+        order_of_perturbation = RANDOM;
+        cycle_count = atoi(optarg);
+        break;
+      /* Seed for the random number generator */
+      case 's':
+        srand(atol(optarg));
+        break;
+      /* Data for training. */
+      case 't':
+        strcpy(train_data,optarg);
+        break;
+      /* Data for testing. */
+      case 'T':
+        strcpy(test_data,optarg);
+        break;
+      /* Test data is unlabeled. Classify it, and write. The classified data to
+       * <test_data>.classified */
+      case 'u':
+        unlabeled = TRUE;
+        break;
+      /* Verbose */
       case 'v':
-	if (verbose == TRUE) veryverbose = TRUE;
-	else verbose = TRUE;
-	break;
+        if (verbose == TRUE) veryverbose = TRUE;
+        else verbose = TRUE;
+        break;
+      /* If this is nonzero, V-fold cross-validation is used for estimating the
+       * accuracy. Overrides the -T option. This number can be -1, denoting
+       * "leave-one-out" cross-validation. */
       case 'V':
-	no_of_folds = atoi (optarg);
-	/* If this is nonzero, V-fold cross-validation is used
-	   for estimating the accuracy.
-	   Overrides the -T option.
-	   This number can be -1, denoting "leave-one-out"
-	   cross-validation. */
-	break;
+        no_of_folds = atoi (optarg);
+        break;
+      /* If true the log file and decision tree files are not produced */
+      case 'z':
+        no_file_output = TRUE;
+        break;
       default :   usage(pname);
       }
+  }
 
   if (unlabeled == TRUE && !strlen(test_data)) usage(pname);
 
   if (strlen(train_data))
+  {
+    if (strlen(test_data) || no_of_folds != 0)
     {
-      if (strlen(test_data) || no_of_folds != 0)
-	{
-	  j = unlabeled;
-	  unlabeled = FALSE;
-	  read_data(train_data,0);
-	  unlabeled = j;
-	}
-      else
-	{
-	  i = no_of_train_points;
-	  j = unlabeled;
-	  unlabeled = FALSE;
-	  read_data(train_data,i);
-	  /*this call loads training, and test point sets.
-	    see the module header of read_data. */
-	  unlabeled = j;
-	}
+  	  j = unlabeled;
+  	  unlabeled = FALSE;
+  	  read_data(train_data,0);
+  	  unlabeled = j;
+	  } else
+	  {
+  	  i = no_of_train_points;
+  	  j = unlabeled;
+  	  unlabeled = FALSE;
+  	  read_data(train_data,i);
+  	  /*this call loads training, and test point sets.
+  	    see the module header of read_data. */
+  	  unlabeled = j;
+	   }
 
-      if (verbose)
-	{
-	  printf("%d training examples loaded from %s.\n",
-		 no_of_train_points,train_data);
-	  if (no_of_folds == 0 && no_of_test_points != 0)
-            printf("%d testing examples loaded from %s.\n",
-		   no_of_test_points,train_data);
-          if (no_of_missing_values)
-	    printf("%d missing values filled with respective attribute means.\n",
-		   no_of_missing_values);
-	  printf("Attributes = %d, Classes = %d\n",
-		 no_of_dimensions,no_of_categories);
-	}
-
-      allocate_structures(no_of_train_points);
-
-      if (no_of_folds == 0)	/* No cross validation. */
-	{
-	  if  (!strlen(dt_file)) sprintf(dt_file,"%s.dt",train_data);
-	  root = build_tree(train_points,no_of_train_points,dt_file);
-	}
-      else
-	{
-	  if (no_of_folds == -1) no_of_folds = no_of_train_points;
-	  if (no_of_folds <= 1 || no_of_folds > no_of_train_points) usage(pname);
-
-	  cross_validate(train_points,no_of_train_points);
-	}
-
-      deallocate_structures(no_of_train_points);
-
-      if (no_of_folds != 0) print_log_and_exit();
+    if (verbose)
+    {
+      printf("%d training examples loaded from %s.\n",
+       no_of_train_points,train_data);
+      if (no_of_folds == 0 && no_of_test_points != 0)
+              printf("%d testing examples loaded from %s.\n",
+         no_of_test_points,train_data);
+            if (no_of_missing_values)
+        printf("%d missing values filled with respective attribute means.\n",
+         no_of_missing_values);
+      printf("Attributes = %d, Classes = %d\n",
+       no_of_dimensions,no_of_categories);
     }
+
+    allocate_structures(no_of_train_points);
+
+    if (no_of_folds == 0)	/* No cross validation. */
+  	{
+  	  if  (!strlen(dt_file) && !no_file_output) sprintf(dt_file,"%s.dt",train_data);
+  	  root = build_tree(train_points,no_of_train_points,dt_file);
+  	}
+    else
+  	{
+  	  if (no_of_folds == -1) no_of_folds = no_of_train_points;
+  	  if (no_of_folds <= 1 || no_of_folds > no_of_train_points) usage(pname);
+  	  cross_validate(train_points,no_of_train_points);
+  	}
+
+    deallocate_structures(no_of_train_points);
+
+    if (no_of_folds != 0) print_log_and_exit();
+  }
 
   if (strlen(test_data))
     {
@@ -527,7 +537,7 @@ struct tree_node *build_tree(points,no_of_points,dt_file)
 	  char temp_str[LINESIZE];
 
 	  printf("Pruned decision tree written to %s.\n",dt_file);
-	  sprintf(temp_str,"%s.unpruned",dt_file);
+	  if(!no_file_output) sprintf(temp_str,"%s.unpruned",dt_file);
 	  write_tree(root,temp_str);
 	  printf("Unpruned decision tree written to %s.\n",temp_str);
 
@@ -1245,7 +1255,7 @@ cross_validate(points,no_of_points)
   test_points--;
   train_points--;
 
-  if  (!strlen(dt_file)) sprintf(dt_file,"%s.dt",train_data);
+  if  (!strlen(dt_file) && !no_file_output) sprintf(dt_file,"%s.dt",train_data);
   no_of_folds = 0;
   while(TRUE)
     {
@@ -1330,88 +1340,88 @@ cross_validate(points,no_of_points)
 print_log_and_exit()
 {
   FILE *logfile;
+  if(!no_file_output) {
+    if ((logfile = fopen(log_file,"w")) == NULL)
+      {
+        fprintf(stderr,"Mktree: Log file cannot be written to.\n");
+        exit(0);
+      }
 
-  if ((logfile = fopen(log_file,"w")) == NULL)
+    if (strlen(train_data)) fprintf(logfile,"Training data : %s\n",train_data);
+
+    if (no_of_folds)
+      fprintf(logfile,"%d-fold cross validation used to estimate accuracy.\n", no_of_folds);
+    else
+      if (strlen(test_data)) fprintf(logfile,"Testing data : %s\n",test_data);
+
+    fprintf(logfile,"Data is %d-dimensional, having %d classes.\n",
+      no_of_dimensions,no_of_categories);
+
+    if (axis_parallel == FALSE)
+      fprintf(logfile,"No axis-parallel splits considered.\n");
+    if (oblique == FALSE)
+      fprintf(logfile,"No oblique splits considered.\n");
+    else
+      {
+        fprintf(logfile,"Parameters for finding oblique splits at each node :\n");
+        fprintf(logfile,"\tNumber of restarts = %d\n",no_of_restarts);
+        if (order_of_perturbation == BEST_FIRST)
+    fprintf(logfile,"\tOrder of coefficient perturbation = Best First\n");
+        else if (order_of_perturbation == RANDOM)
+    fprintf(logfile,"\tOrder of coefficient perturbation = Random-%d\n",
+      cycle_count);
+        else fprintf(logfile,"\tOrder of coefficient perturbation = Sequential\n");
+        fprintf(logfile,"\tMaximum number of random perturbations tried at each ");
+        fprintf(logfile,"local minimum = %d\n",max_no_of_random_perturbations);
+        if (normalize == FALSE)
+    fprintf(logfile,"No normalization was used.\n");
+      }
+
+    if (strlen(train_data))
+      {
+        if (no_of_folds == 0)
     {
-      fprintf(stderr,"Mktree: Log file cannot be written to.\n");
-      exit(0);
-    }
-
-  if (strlen(train_data)) fprintf(logfile,"Training data : %s\n",train_data);
-
-  if (no_of_folds)
-    fprintf(logfile,"%d-fold cross validation used to estimate accuracy.\n",
-            no_of_folds);
-  else
-    if (strlen(test_data)) fprintf(logfile,"Testing data : %s\n",test_data);
-
-  fprintf(logfile,"Data is %d-dimensional, having %d classes.\n",
-	  no_of_dimensions,no_of_categories);
-
-  if (axis_parallel == FALSE)
-    fprintf(logfile,"No axis-parallel splits considered.\n");
-  if (oblique == FALSE)
-    fprintf(logfile,"No oblique splits considered.\n");
-  else
-    {
-      fprintf(logfile,"Parameters for finding oblique splits at each node :\n");
-      fprintf(logfile,"\tNumber of restarts = %d\n",no_of_restarts);
-      if (order_of_perturbation == BEST_FIRST)
-	fprintf(logfile,"\tOrder of coefficient perturbation = Best First\n");
-      else if (order_of_perturbation == RANDOM)
-	fprintf(logfile,"\tOrder of coefficient perturbation = Random-%d\n",
-		cycle_count);
-      else fprintf(logfile,"\tOrder of coefficient perturbation = Sequential\n");
-      fprintf(logfile,"\tMaximum number of random perturbations tried at each ");
-      fprintf(logfile,"local minimum = %d\n",max_no_of_random_perturbations);
-      if (normalize == FALSE)
-	fprintf(logfile,"No normalization was used.\n");
-    }
-
-  if (strlen(train_data))
-    {
-      if (no_of_folds == 0)
-	{
-	  if (prune_portion != 0)
-	    {
-	      fprintf(logfile,"Pruned decision tree written to %s.\n",dt_file);
-	      fprintf(logfile,"Unpruned decision tree written to %s.unpruned.\n",
-		      dt_file);
-	    }
-	  else
-	      fprintf(logfile,"Unpruned decision tree written to %s.\n",dt_file);
-	}
+      if (prune_portion != 0)
+        {
+          fprintf(logfile,"Pruned decision tree written to %s.\n",dt_file);
+          fprintf(logfile,"Unpruned decision tree written to %s.unpruned.\n",
+            dt_file);
+        }
       else
-	{
-	  if (prune_portion != 0)
-	    {
-	      fprintf(logfile,"Pruned tree for the first fold written to %s.\n",
-		      dt_file);
-	      fprintf(logfile,
-		      "Unpruned tree for the first fold written to %s.unpruned.\n",
-		      dt_file);
-	    }
-	  else
-	      fprintf(logfile,
-		      "Unpruned tree of the first fold written to %s.\n",dt_file);
-	}
+          fprintf(logfile,"Unpruned decision tree written to %s.\n",dt_file);
     }
-  else if (strlen(test_data))
-    fprintf(logfile,"Decision tree read from %s.\n",dt_file);
-
-  if (strlen(animation_file) && no_of_dimensions == 2)
+        else
     {
-      fprintf(logfile,"All intermediate hyperplane locations tried are \n");
-      fprintf(logfile,"output to %s.",animation_file);
-      fprintf(logfile,"Use the Display program with -A option to see animation.\n");
+      if (prune_portion != 0)
+        {
+          fprintf(logfile,"Pruned tree for the first fold written to %s.\n",
+            dt_file);
+          fprintf(logfile,
+            "Unpruned tree for the first fold written to %s.unpruned.\n",
+            dt_file);
+        }
+      else
+          fprintf(logfile,
+            "Unpruned tree of the first fold written to %s.\n",dt_file);
     }
+      }
+    else if (strlen(test_data))
+      fprintf(logfile,"Decision tree read from %s.\n",dt_file);
 
-  if (strlen(misclassified_data) && no_of_folds != 0)
-    fprintf(logfile,"Misclassified points written to %s.\n",misclassified_data);
+    if (strlen(animation_file) && no_of_dimensions == 2)
+      {
+        fprintf(logfile,"All intermediate hyperplane locations tried are \n");
+        fprintf(logfile,"output to %s.",animation_file);
+        fprintf(logfile,"Use the Display program with -A option to see animation.\n");
+      }
 
-  fprintf(logfile,"\n");
+    if (strlen(misclassified_data) && no_of_folds != 0)
+      fprintf(logfile,"Misclassified points written to %s.\n",misclassified_data);
 
-  fclose(logfile);
+    fprintf(logfile,"\n");
+
+    fclose(logfile);
+  }
   exit(0);
 }
 

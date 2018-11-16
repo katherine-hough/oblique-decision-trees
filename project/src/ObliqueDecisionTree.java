@@ -13,7 +13,7 @@ public class ObliqueDecisionTree extends DecisionTree {
   // Size of population in the genetic algorithm
   private static final int POP_SIZE = 264;
   // Maximum number of generations run in the genetic algorithm
-  private static final int MAX_GENS = 200;
+  private static final int MAX_GENS = 250;
   // Used to generate random numbers
   private static final Random RAND = new Random(848);
   // Maximum number of buckets considered for splitting per attribute
