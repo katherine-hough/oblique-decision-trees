@@ -32,6 +32,7 @@ public class ObliqueDecisionTree extends DecisionTree {
   /* Create the child nodes for the current node */
   @Override
   protected void makeChildren() {
+    System.out.println(this);
     System.out.println(splitCondition);
     List<Record> trueRecords = new ArrayList<>(reachingRecords);
     List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);

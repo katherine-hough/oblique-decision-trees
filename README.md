@@ -14,3 +14,4 @@ Datasets:
 * Dermatology: http://archive.ics.uci.edu/ml/datasets/Dermatology
 * Multiple Features: http://archive.ics.uci.edu/ml/datasets/Multiple+Features
 * Farm Ads: http://archive.ics.uci.edu/ml/datasets/Farm+Ads
+* Wine: http://archive.ics.uci.edu/ml/datasets/Wine

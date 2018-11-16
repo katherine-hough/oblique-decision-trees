@@ -277,3 +277,8 @@ dmypy.json
 # Include for farm-ads
 !data/farm-ads/farm-ads.data
 !data/farm-ads/farm-ads.labels
+
+# Include for wine
+!data/wine/wine.names
+!data/wine/wine.data
+!data/wine/wine.labels
