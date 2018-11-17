@@ -19,8 +19,7 @@ public class DecisionTree extends Classifier {
   private static final int MAX_BUCKETS = 100;
   /* Maximum percent of the total records that can be from a different class
    * for the node to still be considered homogeneous */
-  protected static final double MAX_NON_HOMOG_PERCENT = 0.02;
-
+  private static final double MAX_NON_HOMOG_PERCENT = 0.02;
   /* This node's leftchild. leftChild is null for leaf nodes */
   protected DecisionTree leftChild;
   /* This node's right child. rightChild is null for leaf nodes */
@@ -49,8 +48,8 @@ public class DecisionTree extends Classifier {
   protected int maxNonHomogenuousRecords;
 
   /* Constructor for the root node calls two argument constructor*/
-  public DecisionTree(List<Record> reachingRecords) {
-    this(reachingRecords, null);
+  public DecisionTree(List<Record> trainingRecords) {
+    this(trainingRecords, null);
   }
 
   /* 2-arg Constructor called by all nodes */
@@ -65,8 +64,8 @@ public class DecisionTree extends Classifier {
       if(splitCondition == null) {
         leafLabel = getMostFrequentLabel(reachingRecords);
       } else {
-        System.out.println(this);
-        System.out.println(splitCondition);
+        // System.out.println(this);
+        // System.out.println(splitCondition);
         // Make child nodes
         List<Record> trueRecords = new ArrayList<>(reachingRecords);
         List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
@@ -84,7 +83,6 @@ public class DecisionTree extends Classifier {
     this.classIndexMap = (root==null) ? createClassIndexMap(reachingRecords) : root.classIndexMap;
     this.root = root;
     this.reachingRecords = reachingRecords;
-    this.numAttributes = (root==null) ? Record.getAllFeatures(reachingRecords).size() : root.numAttributes;
     this.maxNonHomogenuousRecords = (root==null) ? (int)(reachingRecords.size()*MAX_NON_HOMOG_PERCENT)+1 : root.maxNonHomogenuousRecords;
   }
 
@@ -418,7 +416,7 @@ public class DecisionTree extends Classifier {
   }
 
   /* Creates lists containing the nodes at each level of the tree for up to the
-   * specified maximum number of levels */
+   * specified maximum number of levels. */
   private ArrayList<ArrayList<DecisionTree>> breadthFirstTraversal(int maxLevels) {
     ArrayList<ArrayList<DecisionTree>> levels = new ArrayList<>();
     levels.add(new ArrayList<DecisionTree>());
@@ -449,5 +447,23 @@ public class DecisionTree extends Classifier {
       }
     }
     return levels;
+  }
+
+  /* Makes this node into a leaf by setting its leafLabel*/
+  public void prune() {
+    if (reachingRecords.size() == 0) {
+      leafLabel = defaultClass;
+    } else {
+      leafLabel = getMostFrequentLabel(reachingRecords);
+    }
+  }
+
+  /* If this node has children, restore its status as a non-leaf by setting its
+   * leafLabel to null. Throws an exception if the node lacks children */
+  public void unprune() {
+    if(rightChild == null || leftChild == null) {
+      throw new RuntimeException("Cannot unprune childless node.");
+    }
+    leafLabel = null;
   }
 }

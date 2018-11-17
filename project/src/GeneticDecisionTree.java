@@ -17,8 +17,8 @@ public class GeneticDecisionTree extends DecisionTree {
   private GeneticSplitter.GeneticSplitterBuilder builder;
 
   /* Constructor for the root node calls two argument constructor*/
-  public GeneticDecisionTree(List<Record> reachingRecords) {
-    super(reachingRecords);
+  public GeneticDecisionTree(List<Record> trainingRecords) {
+    super(trainingRecords);
   }
 
   /* 2-arg Constructor */

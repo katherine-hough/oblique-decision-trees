@@ -1,4 +1,4 @@
-import sys, subprocess, re, time
+import sys, subprocess, re, time, os
 import cart.classify
 import numpy as np
 
@@ -11,8 +11,10 @@ def main():
     num_folds = 5 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
 
+    datasets = datasets[5:6]
+
     # Compile the java code for the project
-    compile_java = ['javac', '-Xlint:unchecked', '-d', 'project/target', 'project/src/*.java']
+    compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
     ret_code = subprocess.call(compile_java, stdout=subprocess.DEVNULL)
     assert (ret_code==0),'Java code failed to compile.'
 
@@ -22,9 +24,10 @@ def main():
     assert (ret_code==0),'Failed to build OC1.'
 
     # Create folds for the dataset
-    # make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-    # ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
-    # assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
+    for dataset in datasets:
+        make_folds = create_folds_cmd(num_folds, random_seed, dataset)
+        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
+        assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
     for dataset in datasets:
         print(f'-------+-------------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
@@ -84,7 +87,7 @@ def run_oc1(num_folds, random_seed, dataset):
 
 # Runs cross validation for the CART implementation
 def run_cart(num_folds, random_seed, dataset):
-    path = f'data/{dataset[0]}/folds/{num_folds}-folds/{dataset[0]}'
+    path = os.path.join('data', dataset[0], 'folds', f'{num_folds}-folds', dataset[0])
     start_time = time.perf_counter()
     accuracies = cart.classify.cross_validate(path, num_folds, dataset[1], random_seed)
     elapsed_time = time.perf_counter()-start_time
@@ -92,23 +95,23 @@ def run_cart(num_folds, random_seed, dataset):
 
 # Creates the list of arguments used to generate folds
 def create_folds_cmd(num_folds, random_seed, dataset):
-    data_file = f'data/{dataset[0]}/{dataset[0]}.data'
-    label_file = f'data/{dataset[0]}/{dataset[0]}.labels'
+    data_file = os.path.join('data', dataset[0], f'{dataset[0]}.data')
+    label_file = os.path.join('data', dataset[0], f'{dataset[0]}.labels')
     sparse_str = 'sparse' if dataset[1] else 'dense'
-    return ['java', '-cp', 'project/target', 'CVDriver', sparse_str, data_file, label_file, str(num_folds), str(random_seed), 'F']
+    return ['java', '-cp', os.path.join('project', 'target'), 'CVDriver', sparse_str, data_file, label_file, str(num_folds), str(random_seed), 'F']
 
 # Creates the list of arguments used to run CVDriver
 def create_project_DT_cmd(num_folds, random_seed, dataset, method):
-    data_file = f'data/{dataset[0]}/{dataset[0]}.data'
-    label_file = f'data/{dataset[0]}/{dataset[0]}.labels'
+    data_file = os.path.join('data', dataset[0], f'{dataset[0]}.data')
+    label_file = os.path.join('data', dataset[0], f'{dataset[0]}.labels')
     sparse_str = 'sparse' if dataset[1] else 'dense'
-    return ['java', '-cp', 'project/target', 'CVDriver', sparse_str, data_file, label_file, str(num_folds), str(random_seed), method]
+    return ['java', '-cp', os.path.join('project', 'target'), 'CVDriver', sparse_str, data_file, label_file, str(num_folds), str(random_seed), method]
 
 # Creates the list of arguments used to run OC1 on a single fold
 def create_OC1_cmd(num_folds, random_seed, dataset, cur_fold):
-    training_file = f'-tdata/{dataset[0]}/folds/{num_folds}-folds/{dataset[0]}{cur_fold}-train.data'
-    test_file = f'-Tdata/{dataset[0]}/folds/{num_folds}-folds/{dataset[0]}{cur_fold}-test.data'
-    return ['OC1/mktree', training_file, test_file, f'-s{random_seed}', '-z']
+    training_file = os.path.join('-tdata', dataset[0], 'folds', f'{num_folds}-folds', f'{dataset[0]}{cur_fold}-train.data')
+    test_file = os.path.join('-Tdata', dataset[0], 'folds', f'{num_folds}-folds', f'{dataset[0]}{cur_fold}-test.data')
+    return [os.path.join('.', 'OC1', 'mktree'), training_file, test_file, f'-s{random_seed}', '-z']
 
 if __name__ == '__main__':
     main()

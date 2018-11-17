@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.File;
@@ -86,18 +87,18 @@ public class CVDriver {
   }
 
   private static void writeFoldsToFiles(String trainFilename, ArrayList<Record> trainingRecords, boolean sparse) {
-    String[] dataPath = trainFilename.split("\\/");
+    String[] dataPath = trainFilename.split(Pattern.quote(java.io.File.separator));
     String[] dataFile = (dataPath[dataPath.length-1]).split("\\.");
     TreeSet<Integer> features = new TreeSet<>(Record.getAllFeatures(trainingRecords));
     String directoryPath = "";
     for(int i = 0; i<dataPath.length-1;i++) {
-      directoryPath += dataPath[i] + "/";
+      directoryPath += dataPath[i] + java.io.File.separator;
     }
-    directoryPath += "folds/" + NUM_FOLDS + "-folds";
+    directoryPath += "folds" + java.io.File.separator + NUM_FOLDS + "-folds";
     DataMiningUtil.makeDirectoryPath(directoryPath);
     for(int i = 0; i < NUM_FOLDS; i++) {
-      String testFile = directoryPath + "/" + dataFile[0] + (i+1) + "-test." + dataFile[1];
-      String trainFile = directoryPath + "/" + dataFile[0] + (i+1) + "-train." + dataFile[1];
+      String testFile = directoryPath + java.io.File.separator + dataFile[0] + (i+1) + "-test." + dataFile[1];
+      String trainFile = directoryPath + java.io.File.separator + dataFile[0] + (i+1) + "-train." + dataFile[1];
       try {
         PrintWriter pw = new PrintWriter(testFile);
         for(Record record : testFolds.get(i)) {
@@ -118,6 +119,7 @@ public class CVDriver {
         }
         pw2.close();
       } catch (IOException e) {
+        e.printStackTrace();
         System.err.println("Error occurred writing folds to files.");
       }
     }
