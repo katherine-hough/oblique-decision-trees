@@ -14,11 +14,10 @@ public class PrunedTreeCreator {
    * portion of the training data. Prunes that tree and return it. */
   public static <T extends DecisionTree> T createTree(Class<T> treeClass, List<Record> trainingRecords, int reservePortionDenom, Random rand)
   throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    List<Record> reservedRecords = selectReservedRecords(trainingRecords, reservePortionDenom, rand);
-    trainingRecords.removeAll(reservedRecords);
-    System.out.println("Reserved Records: " + reservedRecords.size());
+    // List<Record> reservedRecords = selectReservedRecords(trainingRecords, reservePortionDenom, rand);
+    // trainingRecords.removeAll(reservedRecords);
     T decisionTree = treeClass.getConstructor(List.class).newInstance(trainingRecords);
-    pruneTree(decisionTree, reservedRecords);
+    // pruneTree(decisionTree, reservedRecords);
     return decisionTree;
   }
 
@@ -38,7 +37,6 @@ public class PrunedTreeCreator {
       node.unprune();
     }
     if(bestPruneCandidate != null) {
-      System.out.println("Pruned: " + bestPruneCandidate);
       bestPruneCandidate.prune();
     }
   }
