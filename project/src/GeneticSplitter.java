@@ -54,8 +54,19 @@ public class GeneticSplitter {
         best = member;
       }
     }
+    double prevAvgFitness = -1;
     for(int gen = 0; gen < maxGenerations; gen++) {
+      double curAvgFitness = getAverageFitness(population);
+      if(curAvgFitness <= prevAvgFitness) {
+        System.out.printf("Converged after %d/%d generations\n", gen+1, maxGenerations);
+        return best.toSplitCondition();
+      }
+      prevAvgFitness = curAvgFitness;
       for(int c = 0; c < populationSize; c+=2) {
+        if(best != null && best.fitness == 1.0) {
+          // Optimal split was found
+          return best.toSplitCondition();
+        }
         Individual parent1 = selectParent(population);
         Individual parent2 = selectParent(population);
         Individual[] children = intermediateRecombination(parent1, parent2);
@@ -71,6 +82,15 @@ public class GeneticSplitter {
       }
     }
     return best!= null ? best.toSplitCondition() : null;
+  }
+
+  /* Returns the average fitness of a member of the population */
+  private double getAverageFitness(Individual[] population) {
+    double sum = 0;
+    for(Individual member : population) {
+      sum += member.fitness;
+    }
+    return sum/population.length;
   }
 
   /* Selects to members of the specified population and replaces them with the

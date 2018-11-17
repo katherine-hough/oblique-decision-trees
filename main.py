@@ -4,12 +4,13 @@ import numpy as np
 
 def main():
     # List of tuples of the form (dataset_name, is_sparse?, num_instances, num_attributes, num_classes)
-    datasets = [('arcene', False), ('breast-cancer', False, 286, 15, 2), ('dermatology', False),
-        ('dorothea', True), ('farm-ads', True), ('iris', False), ('multiple-features', False),
-        ('wine', False, 178, 13)]
+    datasets = [('arcene', False, 200, 9961, 2), ('breast-cancer', False, 286, 15, 2),
+        ('dermatology', False, 366, 34, 6), ('dorothea', True, 1150, 91598, 2),
+        ('farm-ads', True, 4143, 54877, 2), ('iris', False, 150, 4, 3),
+        ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
     num_folds = 5 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
-    dataset = datasets[-1]
+    dataset = datasets[5]
 
     # Compile the java code for the project
     compile_java = ['javac', '-Xlint:unchecked', '-d', 'project/target', 'project/src/*.java']
@@ -26,26 +27,32 @@ def main():
     # ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
     # assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
-    # Run the CART implementation
-    accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
-    print(f'CART --- {dataset[0]}')
-    print(f'Accuracy: mean = {np.average(accuracies):.5}, std.dev = {np.std(accuracies):.5}')
-    print(f'Elapsed Time (seconds): {elapsed_time}')
+    for dataset in datasets:
+        print(f'-------+-------------------------{center_string(dataset[0], 13, "-")}-------+--------------------------')
+        # Run the CART implementation
+        accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
+        print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
-    # Run the GA-ODT implementation
-    accuracies, elapsed_time = run_project_DT(num_folds, random_seed, dataset, 'GA-ODT')
-    print(f'GA-ODT --- {dataset[0]}')
-    print(f'Accuracy: mean = {np.average(accuracies):.5}, std.dev = {np.std(accuracies):.5}')
-    print(f'Elapsed Time (seconds): {elapsed_time}')
+        # Run the GA-ODT implementation
+        accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
+        print(f'GA-ODT | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
-    # Run the OC1 implementation
-    accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-    print(f'OC1 --- {dataset[0]}')
-    print(f'Accuracy: mean = {np.average(accuracies):.5}, std.dev = {np.std(accuracies):.5}')
-    print(f'Elapsed Time (seconds): {elapsed_time}')
+        # Run the OC1 implementation
+        if not dataset[1]:
+            accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+            print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
+def center_string(str, width, symbol):
+    if len(str) >= width:
+        return str
+    left_padding = (width-len(str)+1)//2
+    right_padding = (width-len(str))//2
+    chars = [symbol for i in range(0, left_padding)]
+    chars.extend([c for c in str])
+    chars.extend([symbol for i in range(0, right_padding)])
+    return ''.join(chars)
 # Runs cross validation for the java implementations
-def run_project_DT(num_folds, random_seed, dataset, method):
+def run_project_dt(num_folds, random_seed, dataset, method):
     cmd = create_project_DT_cmd(num_folds, random_seed, dataset, method)
     start_time = time.perf_counter()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -70,7 +77,7 @@ def run_oc1(num_folds, random_seed, dataset):
     elapsed_time = time.perf_counter()-start_time
     accuracies = []
     for output in outputs:
-        accuracies.append(float(re.match('accuracy = ([0-9]*\\.[0-9]*)', output).group(1)))
+        accuracies.append(float(re.match('accuracy = ([0-9]*\\.[0-9]*)', output).group(1))/100.0)
     return accuracies, elapsed_time
 
 # Runs cross validation for the CART implementation

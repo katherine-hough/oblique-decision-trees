@@ -1,5 +1,5 @@
 @echo off
-set dataset=breast-cancer
+set dataset=multiple-features
 set sparse=dense
 
 REM FOR /l %%n IN (1,1,5) DO (
