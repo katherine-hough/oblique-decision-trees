@@ -10,7 +10,6 @@ def main():
         ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
     num_folds = 5 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
-    dataset = datasets[5]
 
     # Compile the java code for the project
     compile_java = ['javac', '-Xlint:unchecked', '-d', 'project/target', 'project/src/*.java']
@@ -28,7 +27,7 @@ def main():
     # assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
     for dataset in datasets:
-        print(f'-------+-------------------------{center_string(dataset[0], 13, "-")}-------+--------------------------')
+        print(f'-------+-------------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
         # Run the CART implementation
         accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
         print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
@@ -42,6 +41,8 @@ def main():
             accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
             print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
+# Centers the specified string to the specified width by padding it with the specified
+# symbol
 def center_string(str, width, symbol):
     if len(str) >= width:
         return str
@@ -51,6 +52,7 @@ def center_string(str, width, symbol):
     chars.extend([c for c in str])
     chars.extend([symbol for i in range(0, right_padding)])
     return ''.join(chars)
+
 # Runs cross validation for the java implementations
 def run_project_dt(num_folds, random_seed, dataset, method):
     cmd = create_project_DT_cmd(num_folds, random_seed, dataset, method)
