@@ -1,14 +1,14 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+
 /* Classifies the test instances using the training instances. Writes the
  * calculated classes out to a file.
-
  * Usage: ClassificationDriver [sparse|dense] test_file_name training_file_name training_label_file_name output_file_name [GA-ODT|C-DT|DT]*/
 public class ClassificationDriver {
 
   public static final Random rand = new Random(848);
-  
+
   public static void main(String[] args) {
     Timer timer = new Timer();
     timer.start();

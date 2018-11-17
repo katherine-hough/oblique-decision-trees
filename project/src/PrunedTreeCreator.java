@@ -1,7 +1,8 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
+import java.util.HashSet;
+import java.lang.reflect.InvocationTargetException;
 
 /* Creates a decision tree that reserves a portion of the training instances
  * before creating the tree to use in pruning. */
@@ -23,14 +24,65 @@ public class PrunedTreeCreator {
 
   /* Prunes leaves from the decision tree. */
   private static void pruneTree(DecisionTree decisionTree, List<Record> reservedRecords) {
-    int hits = 0;
+    double bestPredict = calculateCorrectPredictions(decisionTree, reservedRecords);
+    if(bestPredict == reservedRecords.size()) return;
+    DecisionTree bestPruneCandidate = null;
+    HashSet<DecisionTree> candidateNodes =  getCandidateNodes(decisionTree);
+    for(DecisionTree node : candidateNodes) {
+      node.prune();
+      double predict = calculateCorrectPredictions(decisionTree, reservedRecords);
+      if(predict > bestPredict) {
+        bestPredict = predict;
+        bestPruneCandidate = node;
+      }
+      node.unprune();
+    }
+    if(bestPruneCandidate != null) {
+      System.out.println("Pruned: " + bestPruneCandidate);
+      bestPruneCandidate.prune();
+    }
+  }
+
+  /* Returns every non-root node that is a parent of at least one leaf nodes. */
+  private static HashSet<DecisionTree> getCandidateNodes(DecisionTree decisionTree) {
+    HashSet<DecisionTree> candidateNodes = new HashSet<>();
+    ArrayList<DecisionTree> nodesToVisit = new ArrayList<>();
+    nodesToVisit.add(decisionTree);
+    while(!nodesToVisit.isEmpty()) {
+      DecisionTree cur= nodesToVisit.remove(0);
+      if(cur.getLeftChild() != null) {
+        if(cur.getLeftChild().getLeftChild() == null && cur.getLeftChild().getRightChild() == null) {
+          if(cur != decisionTree) {
+            candidateNodes.add(cur);
+          }
+        } else {
+          nodesToVisit.add(cur.getLeftChild());
+        }
+      }
+      if(cur.getRightChild() != null) {
+        if(cur.getRightChild().getLeftChild() == null && cur.getRightChild().getRightChild() == null) {
+          if(cur != decisionTree) {
+            candidateNodes.add(cur);
+          }
+        } else {
+          nodesToVisit.add(cur.getRightChild());
+        }
+      }
+    }
+    return candidateNodes;
+  }
+
+  /* Returns the number of records that the specified decision tree correct classifies
+   * from the specified records */
+  private static int calculateCorrectPredictions(DecisionTree decisionTree, List<Record> reservedRecords) {
+    int correctPredictions = 0;
     for(Record reservedRecord : reservedRecords) {
       String prediction = decisionTree.classify(reservedRecord);
       if(prediction.equals(reservedRecord.getClassLabel())) {
-        hits++;
+        correctPredictions++;
       }
     }
-    System.out.printf("Tree correctly classified %d/%d=%f reserved instances\n", hits, reservedRecords.size(), (1.0*hits)/reservedRecords.size());
+    return correctPredictions;
   }
 
   /* Returns a portion of specified records to reserve */
