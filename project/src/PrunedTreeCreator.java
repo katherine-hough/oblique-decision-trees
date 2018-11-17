@@ -16,10 +16,22 @@ public class PrunedTreeCreator {
     List<Record> reservedRecords = selectReservedRecords(trainingRecords, reservePortionDenom, rand);
     trainingRecords.removeAll(reservedRecords);
     System.out.println("Reserved Records: " + reservedRecords.size());
-    return treeClass.getConstructor(List.class).newInstance(trainingRecords);
+    T decisionTree = treeClass.getConstructor(List.class).newInstance(trainingRecords);
+    pruneTree(decisionTree, reservedRecords);
+    return decisionTree;
   }
 
-  private static 
+  /* Prunes leaves from the decision tree. */
+  private static void pruneTree(DecisionTree decisionTree, List<Record> reservedRecords) {
+    int hits = 0;
+    for(Record reservedRecord : reservedRecords) {
+      String prediction = decisionTree.classify(reservedRecord);
+      if(prediction.equals(reservedRecord.getClassLabel())) {
+        hits++;
+      }
+    }
+    System.out.printf("Tree correctly classified %d/%d=%f reserved instances\n", hits, reservedRecords.size(), (1.0*hits)/reservedRecords.size());
+  }
 
   /* Returns a portion of specified records to reserve */
   private static List<Record> selectReservedRecords(List<Record> records, int reservePortionDenom, Random rand) {
