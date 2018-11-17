@@ -1,11 +1,14 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 /* Classifies the test instances using the training instances. Writes the
  * calculated classes out to a file.
 
  * Usage: ClassificationDriver [sparse|dense] test_file_name training_file_name training_label_file_name output_file_name [GA-ODT|C-DT|DT]*/
 public class ClassificationDriver {
 
+  public static final Random rand = new Random(848);
+  
   public static void main(String[] args) {
     Timer timer = new Timer();
     timer.start();
@@ -24,15 +27,23 @@ public class ClassificationDriver {
   /* Returns a list of the labels calculated for the specified training and test
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
-    DecisionTree classifier;
+    Class<? extends DecisionTree> treeClass;
+    int reservePortionDenom = 20;
     if(method.equals("GA-ODT")) {
-      classifier = new GeneticDecisionTree(trainingData);
+      treeClass = GeneticDecisionTree.class;
     } else if(method.equals("C-DT")) {
-      classifier = new ComplexDecisionTree(trainingData);
+      treeClass = ComplexDecisionTree.class;
     } else if(method.equals("DT")) {
-      classifier = new DecisionTree(trainingData);
+      treeClass = DecisionTree.class;
     } else {
       throw new RuntimeException("Invalid decision tree method: " + method);
+    }
+    DecisionTree classifier;
+    try {
+      classifier = PrunedTreeCreator.createTree(treeClass, trainingData, reservePortionDenom, rand);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e.getMessage());
     }
     return classifier.classifyAll(testData);
   }

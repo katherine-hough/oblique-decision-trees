@@ -9,8 +9,8 @@ public class ComplexDecisionTree extends DecisionTree {
   private static final int MAX_BUCKETS = 100;
 
   /* Constructor for the root node calls two argument constructor*/
-  public ComplexDecisionTree(List<Record> reachingRecords) {
-    super(reachingRecords);
+  public ComplexDecisionTree(List<Record> trainingRecords) {
+    super(trainingRecords);
   }
 
   /* 2-arg Constructor */

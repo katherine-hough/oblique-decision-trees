@@ -20,7 +20,6 @@ public class DecisionTree extends Classifier {
   /* Maximum percent of the total records that can be from a different class
    * for the node to still be considered homogeneous */
   protected static final double MAX_NON_HOMOG_PERCENT = 0.02;
-
   /* This node's leftchild. leftChild is null for leaf nodes */
   protected DecisionTree leftChild;
   /* This node's right child. rightChild is null for leaf nodes */
@@ -49,8 +48,8 @@ public class DecisionTree extends Classifier {
   protected int maxNonHomogenuousRecords;
 
   /* Constructor for the root node calls two argument constructor*/
-  public DecisionTree(List<Record> reachingRecords) {
-    this(reachingRecords, null);
+  public DecisionTree(List<Record> trainingRecords) {
+    this(trainingRecords, null);
   }
 
   /* 2-arg Constructor called by all nodes */
