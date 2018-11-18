@@ -62,7 +62,7 @@
 #define	TEST			2
 
 #define LINESIZE 		80
-#define MISSING_VALUE           -1.0 * HUGE
+#define MISSING_VALUE           -1.0 * HUGE_VALF
 
 #define translatex(x) ((x - xmin) * (pmaxx - pminx) / (xmax - xmin) + pminx)
 #define translatey(y) ((y - ymin) * (pmaxy - pminy) / (ymax - ymin) + pminy)

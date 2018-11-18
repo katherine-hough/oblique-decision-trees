@@ -23,7 +23,7 @@
 /*			attribute space used by OC1.		*/
 /*                7/28/95: load_points routine is corrected to  */
 /*                      read in missing values correctly.       */
-/****************************************************************/		
+/****************************************************************/
 
 #include "oc1.h"
 
@@ -51,7 +51,7 @@ int *category_array = NULL;
 /* Is called by modules :	read_data (mktree.c)			*/
 /*				main (display.c)			*/
 /* Remarks :	Assumes that the no_of_dimensions and no_of_categories 	*/
-/* 		are set.		 				*/ 
+/* 		are set.		 				*/
 /************************************************************************/
 int load_points(infile,points_ptr)
      FILE *infile;
@@ -63,31 +63,31 @@ int load_points(infile,points_ptr)
   char c,delim[10];
   POINT **allocate_point_array();
   POINT **array_name = NULL;
-  
+
   no_of_missing_values = 0;
-  if (!unlabeled && !no_of_categories) 
+  if (!unlabeled && !no_of_categories)
     {
-      categories_unknown = TRUE; 
+      categories_unknown = TRUE;
       no_of_categories = 1;
       category_array = (int *)malloc(no_of_categories * sizeof(int));
       category_array -= 1;
     }
   else if (category_array != NULL) training_set = FALSE;
-  
+
   if (!no_of_dimensions) no_of_dimensions = MAX_NO_OF_ATTRIBUTES;
-  
+
   point_count = 0;
   while (TRUE)
     {
       point_count++;
       if (point_count > points_allocated)
 	{
-	  if (points_allocated == 0) 
+	  if (points_allocated == 0)
 	    {
 	      array_name = allocate_point_array(array_name,10,0);
 	      points_allocated = 10;
 	    }
-	  else 
+	  else
 	    {
 	      array_name = allocate_point_array(array_name,points_allocated*2,
 						points_allocated);
@@ -95,23 +95,23 @@ int load_points(infile,points_ptr)
 	    }
 	}
 
-      if (point_count == 1 && 
+      if (point_count == 1 &&
 	  no_of_dimensions == MAX_NO_OF_ATTRIBUTES)
 	/*count the number of dimensions of the first line in the datafile,
 	  and set it as the no_of_dimensions. Use this value for reading in
 	  the subsequent lines. The last entry of any line is taken as the
 	  category value, unless unlabeled is TRUE. */
 	{
-	  float temp = HUGE;
+	  float temp = HUGE_VALF;
 	  int dim=0;
-	  
+
 	  while (TRUE)
 	    {
 	      c = (char)getc(infile);
 	      if (c == '\n')
 		{
-		  if (temp != HUGE)
-		    { 
+		  if (temp != HUGE_VALF)
+		    {
 		      if (unlabeled == TRUE)
 			array_name[1]->dimension[++dim] = temp;
 		      else
@@ -123,17 +123,17 @@ int load_points(infile,points_ptr)
 			    category_array[1] = array_name[1]->category;
 			  else if (category_array != NULL)
 			    for (i=1;i<=no_of_categories;i++)
-			      if (temp == category_array[i]) 
+			      if (temp == category_array[i])
 				{ array_name[i]->category = i; break; }
 			      else if (i < 1 || i > no_of_categories)
-				{ 
+				{
 				  printf ("Load_Points: Classes should be integers in [1,%d].\n",
 					  no_of_categories);
 				  error("");
 				}
 			}
-		      
-		      no_of_dimensions = dim; 
+
+		      no_of_dimensions = dim;
 		      for (i=1;i<=points_allocated;i++)
 			{
 			  array_name[i]->dimension += 1;
@@ -146,9 +146,9 @@ int load_points(infile,points_ptr)
 		    }
 		}
 	      if (c == ',' || isspace(c)) continue;
-	      if (isalpha(c)) 
+	      if (isalpha(c))
 		error("Load_Points: Alphabetic character in datafile.");
-	      if (temp != HUGE)
+	      if (temp != HUGE_VALF)
 		{
 		  if (++dim > no_of_dimensions)
 		    {
@@ -159,8 +159,8 @@ int load_points(infile,points_ptr)
 		    }
 		  array_name[point_count]->dimension[dim] = temp;
 		}
-	      
-	      if (c == '?')  
+
+	      if (c == '?')
 		{
 		  temp = MISSING_VALUE;
 		  no_of_missing_values++;
@@ -178,7 +178,7 @@ int load_points(infile,points_ptr)
 	    {
 	      c = (char)getc(infile);
 	      while (c == ',' || isspace(c)) c = (char)getc(infile);
-	      if (c == '?') 
+	      if (c == '?')
 		{
 		  array_name[point_count]->dimension[j] = MISSING_VALUE;
 		  no_of_missing_values++;
@@ -202,7 +202,7 @@ int load_points(infile,points_ptr)
 	      array_name[point_count]->val = (double)0.0;
 	      continue;
 	    }
-	  
+
 	  c = (char) getc(infile);
 	  if (!isspace(c) && c != ',') ungetc(c,infile);
 	  if (fscanf(infile,"%d",&i) != 1)
@@ -222,7 +222,7 @@ int load_points(infile,points_ptr)
 		}
 	    }
 	  else if (i<1 || i>no_of_categories)
-	    { 
+	    {
 	      printf ("Load_Points: Classes should be integers in [1,%d].\n",
 		      no_of_categories);
 	      error("");
@@ -235,7 +235,7 @@ int load_points(infile,points_ptr)
   point_count--;
   if (point_count != points_allocated)
     array_name = allocate_point_array(array_name,point_count,points_allocated);
-  
+
   if ( (!unlabeled && categories_unknown && training_set) ||
       (!training_set && category_array))
     {
@@ -245,7 +245,7 @@ int load_points(infile,points_ptr)
       for (i=1;i<=no_of_categories;i++)
 	if (category_array[i] < 1 || category_array[i] > no_of_categories)
 	  break;
-      
+
       if (i <= no_of_categories)
 	{
 	  if (training_set)
@@ -257,7 +257,7 @@ int load_points(infile,points_ptr)
 	    }
 	  for (i=1;i<=point_count;i++)
 	    for (j=1;j<=no_of_categories;j++)
-	      if (category_array[j] == array_name[i]->category) 
+	      if (category_array[j] == array_name[i]->category)
 		{
 		  array_name[i]->category = j;
 		  break;
@@ -266,14 +266,14 @@ int load_points(infile,points_ptr)
     }
 
   fill_missing_values(array_name,point_count);
-  
+
   *points_ptr = array_name;
   return(point_count);
 }
 
 
 /************************************************************************/
-/* Module name : allocate_point_array					*/ 
+/* Module name : allocate_point_array					*/
 /* Functionality :	Allocates or reallocates "array_name" to be an	*/
 /*			array of pointers (to POINT structures), of	*/
 /*			size "size". Fully allocates all the POINT	*/
@@ -292,26 +292,26 @@ POINT **allocate_point_array(array_name,size,prev_size)
      int size,prev_size;
 {
   int i;
-  
+
   if (prev_size == 0)
     {
-      if (array_name != NULL) 
-	free((char *)(array_name+1)); 
-      
+      if (array_name != NULL)
+	free((char *)(array_name+1));
+
       array_name = (struct point **)malloc
-	((unsigned)size * sizeof(struct point *)); 
+	((unsigned)size * sizeof(struct point *));
       if (!array_name)
 	error("Allocate_Point_Array: Memory Allocation Failure 1.");
-      
+
       array_name -= 1; /* All indices start from 1*/
-      
+
       for (i=1;i<=size;i++)
 	{
-	  array_name[i] = (struct point *)malloc((unsigned) sizeof(struct point)); 
+	  array_name[i] = (struct point *)malloc((unsigned) sizeof(struct point));
 	  if (!array_name[i])
 	    error("Allocate_Point_Array : Memory Allocation failure 2.");
 	}
-      
+
       for (i=1;i<=size;i++)
 	array_name[i]->dimension = vector(1,no_of_dimensions);
     }
@@ -319,36 +319,36 @@ POINT **allocate_point_array(array_name,size,prev_size)
     {
       array_name += 1;
       array_name = (struct point **)realloc
-	(array_name, (unsigned)size * sizeof(struct point *)); 
+	(array_name, (unsigned)size * sizeof(struct point *));
       if (!array_name)
 	error("Allocate_Point_Array: Memory Allocation Failure 3.");
-      
+
       array_name -= 1; /* All indices start from 1*/
-      
+
       if (prev_size >= size) return(array_name);
-      
+
       for (i=prev_size+1;i<=size;i++)
 	{
-	  array_name[i] = (struct point *)malloc((unsigned) sizeof(struct point)); 
+	  array_name[i] = (struct point *)malloc((unsigned) sizeof(struct point));
 	  if (!array_name[i])
 	    error("Allocate_Point_Array : Memory Allocation failure 4.");
 	}
-      
+
       for (i=prev_size+1;i<=size;i++)
 	array_name[i]->dimension = vector(1,no_of_dimensions);
     }
-  
+
   return(array_name);
 }
 
 
 /************************************************************************/
-/* Module name :	shuffle_points					*/ 
+/* Module name :	shuffle_points					*/
 /* Functionality :	Pseudo-randomly shuffles the points in the	*/
 /*			array "array_name". 				*/
 /*			for i = 1 to n, do				*/
 /*			  swap point i with the point at a random 	*/
-/*			  position between 1 and n.			*/ 
+/*			  position between 1 and n.			*/
 /* Parameters :	array_name : Point array which is to be shuffled.	*/
 /*		count	: Number of entries in the array.		*/
 /* Returns : Nothing.							*/
@@ -363,12 +363,12 @@ shuffle_points(array_name,count)
 {
   int i,newposition;
   POINT *temp_point;
-  
+
   for (i=1;i<=count;i++)
     {
       newposition = (int)myrandom(1.0,(float)count);
       /* shuffle position "i" with "newposition" */
-      
+
       temp_point = array_name[i];
       array_name[i] = array_name[newposition];
       array_name[newposition] = temp_point;
@@ -376,7 +376,7 @@ shuffle_points(array_name,count)
 }
 
 /************************************************************************/
-/* Module name : fill_missing_values                                    */ 
+/* Module name : fill_missing_values                                    */
 /* Functionality : This module fills in the missing values to be the    */
 /*                 mean values of the respective attributes.            */
 /* Parameters :    points: array of points to be filled.                */
@@ -396,17 +396,17 @@ fill_missing_values(points,no_of_points)
 {
   int i,j,count;
   float avg,average(),*temp;
-  
+
   temp = vector(1,no_of_points);
-  
+
   for (j=1;j<=no_of_dimensions;j++)
     {
       count = 0;
       for (i=1;i<=no_of_points;i++)
-	if (points[i]->dimension[j] == MISSING_VALUE) 
+	if (points[i]->dimension[j] == MISSING_VALUE)
 	  { count++; temp[i] = 0;}
 	else temp[i] = points[i]->dimension[j];
-      
+
       if (count)
 	{
 	  avg = average(temp,no_of_points);
@@ -415,7 +415,7 @@ fill_missing_values(points,no_of_points)
 	      {count--; points[i]->dimension[j] = avg;}
 	}
     }
-  
+
   free_vector(temp,1,no_of_points);
 }
 

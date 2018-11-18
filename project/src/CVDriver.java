@@ -9,17 +9,17 @@ import java.io.IOException;
 import java.io.File;
 
 /* Performs n-folds cross validation on the classifier or creates the specified number of folds
- * Usage: CVDriver [sparse|dense] training_file_name training_label_file_name num_folds random_seed [F|GA-ODT|C-DT|DT]]*/
+ * Usage: CVDriver [sparse|dense] training_file_name training_label_file_name numFolds random_seed [F|GA-ODT|C-DT|DT]]*/
 public class CVDriver {
 
-  private static int NUM_FOLDS = 5;
-  private static final ArrayList<ArrayList<Record>> trainingFolds = new ArrayList<>(NUM_FOLDS);
-  private static final ArrayList<ArrayList<Record>> testFolds = new ArrayList<>(NUM_FOLDS);
+  private static int numFolds;
+  private static final ArrayList<ArrayList<Record>> trainingFolds = new ArrayList<>(numFolds);
+  private static final ArrayList<ArrayList<Record>> testFolds = new ArrayList<>(numFolds);
   private static final Timer timer = new Timer();
 
   public static void main(String[] args) {
     timer.start();
-    NUM_FOLDS = Integer.parseInt(args[3]);
+    numFolds = Integer.parseInt(args[3]);
     boolean sparse = args[0].equals("sparse") ? true : false;
     timer.printElapsedTime("Reading in training records information from " + args[1]);
     ArrayList<Record> trainingRecords = Record.readRecords(args[1], args[2], sparse);
@@ -37,8 +37,8 @@ public class CVDriver {
 
   /* Performs cross validation on the created folds */
   private static void crossValidate(String method) {
-    ArrayList<Double> accuracies = new ArrayList<>(NUM_FOLDS);
-    for(int fold = 0; fold < NUM_FOLDS; fold++) {
+    ArrayList<Double> accuracies = new ArrayList<>(numFolds);
+    for(int fold = 0; fold < numFolds; fold++) {
       ArrayList<String> predictedLabels = ClassificationDriver.calculateLabels(method, trainingFolds.get(fold), testFolds.get(fold));
       accuracies.add(calcAccuracy(predictedLabels, testFolds.get(fold)));
       System.out.printf("Fold #%d's Accuracy: %.5f\n", (fold+1), accuracies.get(fold));
@@ -66,14 +66,14 @@ public class CVDriver {
     return (1.0*hits)/(misses+hits);
   }
 
-  /* Splits the training set into NUM_FOLDS number of folds. Uses those
+  /* Splits the training set into numFolds number of folds. Uses those
    * splits to create a training set and a testing set for each fold. */
   private static void createFolds(ArrayList<Record> trainingRecords, Random rand) {
     ArrayList<String> classLabels = new ArrayList<>();
     for(Record record : trainingRecords) {
       classLabels.add(record.getClassLabel());
     }
-    ArrayList<ArrayList<Record>> groups = DataMiningUtil.getStratifiedGroups(trainingRecords, NUM_FOLDS, classLabels, rand);
+    ArrayList<ArrayList<Record>> groups = DataMiningUtil.getStratifiedGroups(trainingRecords, numFolds, classLabels, rand);
     for(int i = 0; i < groups.size(); i++) {
       ArrayList<Record> trainingFold = new ArrayList<>();
       for(int j = 0; j < groups.size(); j++) {
@@ -94,9 +94,9 @@ public class CVDriver {
     for(int i = 0; i<dataPath.length-1;i++) {
       directoryPath += dataPath[i] + java.io.File.separator;
     }
-    directoryPath += "folds" + java.io.File.separator + NUM_FOLDS + "-folds";
+    directoryPath += "folds" + java.io.File.separator + numFolds + "-folds";
     DataMiningUtil.makeDirectoryPath(directoryPath);
-    for(int i = 0; i < NUM_FOLDS; i++) {
+    for(int i = 0; i < numFolds; i++) {
       String testFile = directoryPath + java.io.File.separator + dataFile[0] + (i+1) + "-test." + dataFile[1];
       String trainFile = directoryPath + java.io.File.separator + dataFile[0] + (i+1) + "-train." + dataFile[1];
       try {
