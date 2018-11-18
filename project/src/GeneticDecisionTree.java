@@ -21,8 +21,8 @@ public class GeneticDecisionTree extends DecisionTree {
     super(trainingRecords);
   }
 
-  /* 2-arg Constructor */
-  protected GeneticDecisionTree(List<Record> reachingRecords, DecisionTree root) {
+  /* 2-arg Constructor called by all nodes */
+  public GeneticDecisionTree(List<Record> reachingRecords, DecisionTree root) {
     super(reachingRecords, root);
   }
 
@@ -43,12 +43,6 @@ public class GeneticDecisionTree extends DecisionTree {
     } else {
       this.builder = ((GeneticDecisionTree)root).builder;
     }
-  }
-
-  /* Creates a child node of the same class */
-  @Override
-  protected GeneticDecisionTree makeChild(List<Record> records, DecisionTree root) {
-    return new GeneticDecisionTree(records, root);
   }
 
   /* Returns the split condition that produces the purest partition of the reaching

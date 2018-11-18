@@ -64,8 +64,8 @@ public class DecisionTree extends Classifier {
       if(splitCondition == null) {
         leafLabel = getMostFrequentLabel(reachingRecords);
       } else {
-        // System.out.println(this);
-        // System.out.println(splitCondition);
+        System.out.println(this);
+        System.out.println(splitCondition);
         // Make child nodes
         List<Record> trueRecords = new ArrayList<>(reachingRecords);
         List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
@@ -109,7 +109,12 @@ public class DecisionTree extends Classifier {
 
   /* Creates a child node of the same class */
   protected DecisionTree makeChild(List<Record> records, DecisionTree root) {
-    return new DecisionTree(records, root);
+    try {
+      return this.getClass().getConstructor(List.class, DecisionTree.class).newInstance(records, root);
+    } catch(Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("Failed to create child node.");
+    }
   }
 
   /* Returns the most common label based on the specified frequency map */

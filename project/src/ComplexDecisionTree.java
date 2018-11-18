@@ -13,15 +13,9 @@ public class ComplexDecisionTree extends DecisionTree {
     super(trainingRecords);
   }
 
-  /* 2-arg Constructor */
-  protected ComplexDecisionTree(List<Record> reachingRecords, DecisionTree root) {
+  /* 2-arg Constructor called by all nodes */
+  public ComplexDecisionTree(List<Record> reachingRecords, DecisionTree root) {
     super(reachingRecords, root);
-  }
-
-  /* Creates a child node of the same class */
-  @Override
-  protected ComplexDecisionTree makeChild(List<Record> records, DecisionTree root) {
-    return new ComplexDecisionTree(records, root);
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
