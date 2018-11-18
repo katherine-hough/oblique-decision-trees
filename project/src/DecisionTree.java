@@ -53,7 +53,7 @@ public class DecisionTree extends Classifier {
   }
 
   /* 2-arg Constructor called by all nodes */
-  protected DecisionTree(List<Record> reachingRecords, DecisionTree root) {
+  public DecisionTree(List<Record> reachingRecords, DecisionTree root) {
     setBasicFields(reachingRecords, root);
     if (reachingRecords.size() == 0) {
       leafLabel = defaultClass;
@@ -64,8 +64,8 @@ public class DecisionTree extends Classifier {
       if(splitCondition == null) {
         leafLabel = getMostFrequentLabel(reachingRecords);
       } else {
-        System.out.println(this);
-        System.out.println(splitCondition);
+        // System.out.println(this);
+        // System.out.println(splitCondition);
         // Make child nodes
         List<Record> trueRecords = new ArrayList<>(reachingRecords);
         List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
@@ -134,8 +134,8 @@ public class DecisionTree extends Classifier {
     return getMostFrequentLabel(classFreqs);
   }
 
-  /* Returns whether almost every record in the specified list have the same class label */
-  protected boolean homogeneous(List<Record> records) {
+  /* Returns the number of records not from the majority class in the specified list */
+  public static int numberOfMisclassified(List<Record> records) {
     HashMap<String, Integer> classFreqs = DataMiningUtil.createFreqMap(records, (record) -> Collections.singleton(record.getClassLabel()));
     String mostFreq = getMostFrequentLabel(classFreqs);
     int minTotal = 0;
@@ -144,6 +144,12 @@ public class DecisionTree extends Classifier {
         minTotal += classFreqs.get(key);
       }
     }
+    return minTotal;
+  }
+
+  /* Returns whether almost every record in the specified list have the same class label */
+  public boolean homogeneous(List<Record> records) {
+    int minTotal = numberOfMisclassified(records);
     return minTotal <= maxNonHomogenuousRecords;
   }
 
@@ -470,5 +476,55 @@ public class DecisionTree extends Classifier {
       throw new RuntimeException("Cannot unprune childless node.");
     }
     leafLabel = null;
+  }
+
+  /* Returns the training error for this node without considering its children */
+  public double nodeTrainingError() {
+    int totalRecords = root==null ? reachingRecords.size() : root.reachingRecords.size();
+    return (numberOfMisclassified(reachingRecords)*1.0)/totalRecords;
+  }
+
+  /* Returns every descendant of this node that is a leaf node */
+  public ArrayList<DecisionTree> getAllLeaves() {
+    HashSet<DecisionTree> leaves = new HashSet<>();
+    ArrayList<DecisionTree> nodesToVisit = new ArrayList<>();
+    nodesToVisit.add(this);
+    while(!nodesToVisit.isEmpty()) {
+      DecisionTree cur = nodesToVisit.remove(0);
+      if(cur.getLeafLabel() == null) {
+        nodesToVisit.add(cur.getLeftChild());
+        nodesToVisit.add(cur.getRightChild());
+      } else {
+        leaves.add(cur);
+      }
+    }
+    return new ArrayList<DecisionTree>(leaves);
+  }
+
+  /* Returns every descendant of this node that is not a leaf node plus this node if
+   * this node is not a leaf */
+  public ArrayList<DecisionTree> getAllNonLeaves() {
+    HashSet<DecisionTree> nonLeaves = new HashSet<>();
+    ArrayList<DecisionTree> nodesToVisit = new ArrayList<>();
+    nodesToVisit.add(this);
+    while(!nodesToVisit.isEmpty()) {
+      DecisionTree cur = nodesToVisit.remove(0);
+      if(cur.getLeafLabel() == null) {
+        nonLeaves.add(cur);
+        nodesToVisit.add(cur.getLeftChild());
+        nodesToVisit.add(cur.getRightChild());
+      }
+    }
+    return new ArrayList<DecisionTree>(nonLeaves);
+  }
+
+  /* Returns the sum of the training errors of all leaf descendants of this node */
+  public double subtreeTrainingError() {
+    ArrayList<DecisionTree> leaves = getAllLeaves();
+    double sum = 0;
+    for(DecisionTree leaf : leaves) {
+      sum += leaf.nodeTrainingError();
+    }
+    return sum;
   }
 }

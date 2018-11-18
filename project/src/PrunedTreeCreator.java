@@ -14,63 +14,52 @@ public class PrunedTreeCreator {
    * portion of the training data. Prunes that tree and return it. */
   public static <T extends DecisionTree> T createTree(Class<T> treeClass, List<Record> trainingRecords, int reservePortionDenom, Random rand)
   throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    // List<Record> reservedRecords = selectReservedRecords(trainingRecords, reservePortionDenom, rand);
-    // trainingRecords.removeAll(reservedRecords);
+    List<Record> reservedRecords = selectReservedRecords(trainingRecords, reservePortionDenom, rand);
+    trainingRecords.removeAll(reservedRecords);
     T decisionTree = treeClass.getConstructor(List.class).newInstance(trainingRecords);
-    // pruneTree(decisionTree, reservedRecords);
+    pruneTree(decisionTree, reservedRecords);
     return decisionTree;
   }
 
   /* Prunes leaves from the decision tree. */
   private static void pruneTree(DecisionTree decisionTree, List<Record> reservedRecords) {
-    double bestPredict = calculateCorrectPredictions(decisionTree, reservedRecords);
-    if(bestPredict == reservedRecords.size()) return;
-    DecisionTree bestPruneCandidate = null;
-    HashSet<DecisionTree> candidateNodes =  getCandidateNodes(decisionTree);
-    for(DecisionTree node : candidateNodes) {
-      node.prune();
-      double predict = calculateCorrectPredictions(decisionTree, reservedRecords);
-      if(predict > bestPredict) {
-        bestPredict = predict;
-        bestPruneCandidate = node;
+    int unprunedCorrectPredictions = calculateCorrectPredictions(decisionTree, reservedRecords);
+    ArrayList<DecisionTree> pruneNodes = new ArrayList<>();
+    ArrayList<Integer> correctPredictions = new ArrayList<>();
+    while(decisionTree.getLeafLabel() == null) {
+      double minAlpha = -1;
+      DecisionTree pruneNode = null;
+      ArrayList<DecisionTree> candidateNodes =  decisionTree.getAllNonLeaves();
+      for(DecisionTree node : candidateNodes) {
+        double nodeError = node.nodeTrainingError();
+        double subtreeError = node.subtreeTrainingError();
+        int leavesToPrune = node.getAllLeaves().size() - 1;
+        double alpha = (nodeError-subtreeError)/leavesToPrune;
+        if(pruneNode == null || minAlpha > alpha) {
+          minAlpha = alpha;
+          pruneNode = node;
+        }
       }
-      node.unprune();
+      pruneNodes.add(pruneNode);
+      correctPredictions.add(calculateCorrectPredictions(decisionTree, reservedRecords));
+      pruneNode.prune();
     }
-    if(bestPruneCandidate != null) {
-      bestPruneCandidate.prune();
+    int bestIndex = -1;
+    for(int i = 0; i < correctPredictions.size(); i++) {
+      if(bestIndex == -1 || correctPredictions.get(i) > correctPredictions.get(bestIndex)) {
+        bestIndex = i;
+      }
+    }
+    if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
+      bestIndex = -1;
+    }
+    System.out.println("Selected prune index: " + bestIndex);
+    for(int i = bestIndex+1; i < correctPredictions.size(); i++) {
+      pruneNodes.get(i).unprune();
     }
   }
 
-  /* Returns every non-root node that is a parent of at least one leaf nodes. */
-  private static HashSet<DecisionTree> getCandidateNodes(DecisionTree decisionTree) {
-    HashSet<DecisionTree> candidateNodes = new HashSet<>();
-    ArrayList<DecisionTree> nodesToVisit = new ArrayList<>();
-    nodesToVisit.add(decisionTree);
-    while(!nodesToVisit.isEmpty()) {
-      DecisionTree cur= nodesToVisit.remove(0);
-      if(cur.getLeftChild() != null) {
-        if(cur.getLeftChild().getLeftChild() == null && cur.getLeftChild().getRightChild() == null) {
-          if(cur != decisionTree) {
-            candidateNodes.add(cur);
-          }
-        } else {
-          nodesToVisit.add(cur.getLeftChild());
-        }
-      }
-      if(cur.getRightChild() != null) {
-        if(cur.getRightChild().getLeftChild() == null && cur.getRightChild().getRightChild() == null) {
-          if(cur != decisionTree) {
-            candidateNodes.add(cur);
-          }
-        } else {
-          nodesToVisit.add(cur.getRightChild());
-        }
-      }
-    }
-    return candidateNodes;
-  }
-
-  /* Returns the number of records that the specified decision tree correct classifies
+  /* Returns the number of records that the specified decision tree correctly classifies
    * from the specified records */
   private static int calculateCorrectPredictions(DecisionTree decisionTree, List<Record> reservedRecords) {
     int correctPredictions = 0;
