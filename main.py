@@ -11,38 +11,43 @@ def main():
     num_folds = 5 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
 
-    # datasets = datasets[5:]
+    datasets = datasets[5:6]
 
     # Compile the java code for the project
-    compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
-    ret_code = subprocess.call(compile_java, stdout=subprocess.DEVNULL, shell=True)
+    if(os.name == 'nt'):
+        compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
+    else:
+        find_java_srcs = ['find', '-name', '"*.java"', '>', 'sources.txt']
+        subprocess.call(find_java_srcs, stdout=subprocess.DEVNULL)
+        compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), '@sources.txt']
+    ret_code = subprocess.call(compile_java, stdout=subprocess.DEVNULL)
     assert (ret_code==0),'Java code failed to compile.'
 
     # Build OC1
     build_oc1 = ['make', '-C', 'OC1', 'mktree']
-    ret_code = subprocess.call(build_oc1, stdout=subprocess.DEVNULL, shell=True)
+    ret_code = subprocess.call(build_oc1, stdout=subprocess.DEVNULL)
     assert (ret_code==0),'Failed to build OC1.'
 
     # Create folds for the dataset
     for dataset in datasets:
         make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL, shell=True)
+        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
         assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
     for dataset in datasets:
         print(f'-------+-------------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
         # Run the CART implementation
-        # accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
-        # print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
+        accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
+        print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the GA-ODT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
         print(f'GA-ODT | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the OC1 implementation
-        # if not dataset[1]:
-        #     accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-        #     print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
+        if not dataset[1]:
+            accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+            print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
 # Centers the specified string to the specified width by padding it with the specified
 # symbol
@@ -60,7 +65,7 @@ def center_string(str, width, symbol):
 def run_project_dt(num_folds, random_seed, dataset, method):
     cmd = create_project_DT_cmd(num_folds, random_seed, dataset, method)
     start_time = time.perf_counter()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output, errs = p.communicate()
     elapsed_time = time.perf_counter()-start_time
     accuracies = []
@@ -76,7 +81,7 @@ def run_oc1(num_folds, random_seed, dataset):
     outputs = []
     for cur_fold in range(1, num_folds+1):
         cmd = create_OC1_cmd(num_folds, random_seed, dataset, cur_fold)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, errs = p.communicate()
         outputs.append(output.decode('utf-8').split('\n')[0])
     elapsed_time = time.perf_counter()-start_time

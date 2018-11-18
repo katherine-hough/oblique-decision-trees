@@ -19,7 +19,7 @@ public class DecisionTree extends Classifier {
   private static final int MAX_BUCKETS = 100;
   /* Maximum percent of the total records that can be from a different class
    * for the node to still be considered homogeneous */
-  private static final double MAX_NON_HOMOG_PERCENT = 0.02;
+  private static final double MAX_NON_HOMOG_PERCENT = 0.01;
   /* This node's leftchild. leftChild is null for leaf nodes */
   protected DecisionTree leftChild;
   /* This node's right child. rightChild is null for leaf nodes */
