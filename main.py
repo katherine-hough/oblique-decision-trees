@@ -15,18 +15,18 @@ def main():
 
     # Compile the java code for the project
     compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
-    ret_code = subprocess.call(compile_java, stdout=subprocess.DEVNULL)
+    ret_code = subprocess.call(compile_java, stdout=subprocess.DEVNULL, shell=True)
     assert (ret_code==0),'Java code failed to compile.'
 
     # Build OC1
     build_oc1 = ['make', '-C', 'OC1', 'mktree']
-    ret_code = subprocess.call(build_oc1, stdout=subprocess.DEVNULL)
+    ret_code = subprocess.call(build_oc1, stdout=subprocess.DEVNULL, shell=True)
     assert (ret_code==0),'Failed to build OC1.'
 
     # Create folds for the dataset
     for dataset in datasets:
         make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
+        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL, shell=True)
         assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
     for dataset in datasets:
@@ -60,7 +60,7 @@ def center_string(str, width, symbol):
 def run_project_dt(num_folds, random_seed, dataset, method):
     cmd = create_project_DT_cmd(num_folds, random_seed, dataset, method)
     start_time = time.perf_counter()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     output, errs = p.communicate()
     elapsed_time = time.perf_counter()-start_time
     accuracies = []
@@ -76,7 +76,7 @@ def run_oc1(num_folds, random_seed, dataset):
     outputs = []
     for cur_fold in range(1, num_folds+1):
         cmd = create_OC1_cmd(num_folds, random_seed, dataset, cur_fold)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         output, errs = p.communicate()
         outputs.append(output.decode('utf-8').split('\n')[0])
     elapsed_time = time.perf_counter()-start_time
