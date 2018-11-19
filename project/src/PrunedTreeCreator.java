@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.lang.reflect.InvocationTargetException;
 
 /* Creates a decision tree that reserves a portion of the training instances
- * before creating the tree to use in pruning. */
+ * before creating the tree to use in pruning. Determines an alpha value from the
+ * this partial tree and uses it to prune a tree created on the full training set */
 public class PrunedTreeCreator {
 
   /* Randomly (based on the specified Random instance) reserves 1 divided by the
@@ -14,32 +15,66 @@ public class PrunedTreeCreator {
    * portion of the training data. Prunes that tree and return it. */
   public static <T extends DecisionTree> T createTree(Class<T> treeClass, List<Record> trainingRecords, int reservePortionDenom, Random rand)
   throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    T fullTree = treeClass.getConstructor(List.class).newInstance(new ArrayList<>(trainingRecords));
     List<Record> reservedRecords = selectReservedRecords(trainingRecords, reservePortionDenom, rand);
     trainingRecords.removeAll(reservedRecords);
-    T decisionTree = treeClass.getConstructor(List.class).newInstance(trainingRecords);
-    pruneTree(decisionTree, reservedRecords);
-    return decisionTree;
+    T alphaSelectTree = treeClass.getConstructor(List.class).newInstance(trainingRecords);
+    double alpha = selectAlpha(alphaSelectTree, reservedRecords);
+    pruneTree(fullTree, alpha);
+    return fullTree;
   }
 
-  /* Prunes leaves from the decision tree. */
-  private static void pruneTree(DecisionTree decisionTree, List<Record> reservedRecords) {
-    int unprunedCorrectPredictions = calculateCorrectPredictions(decisionTree, reservedRecords);
+  /* Prunes leaves from the decision tree select the split based on the specified alpha value */
+  private static void pruneTree(DecisionTree decisionTree, double selectedAlpha) {
     ArrayList<DecisionTree> pruneNodes = new ArrayList<>();
-    ArrayList<Integer> correctPredictions = new ArrayList<>();
+    ArrayList<Double> alphas = new ArrayList<>();
     while(decisionTree.getLeafLabel() == null) {
       double minAlpha = -1;
       DecisionTree pruneNode = null;
-      ArrayList<DecisionTree> candidateNodes =  decisionTree.getAllNonLeaves();
-      for(DecisionTree node : candidateNodes) {
-        double nodeError = node.nodeTrainingError();
-        double subtreeError = node.subtreeTrainingError();
-        int leavesToPrune = node.getAllLeaves().size() - 1;
-        double alpha = (nodeError-subtreeError)/leavesToPrune;
+      for(DecisionTree node : decisionTree.getAllNonLeaves()) {
+        double alpha = (node.nodeTrainingError()-node.subtreeTrainingError())/(node.getAllLeaves().size() - 1);
         if(pruneNode == null || minAlpha > alpha) {
           minAlpha = alpha;
           pruneNode = node;
         }
       }
+      alphas.add(minAlpha);
+      pruneNodes.add(pruneNode);
+      pruneNode.prune();
+    }
+    int bestIndex = -1;
+    for(int i = 0; i < alphas.size(); i++) {
+      if(alphas.get(i) > selectedAlpha) {
+        break;
+      }
+      bestIndex = i;
+    }
+    for(int i = bestIndex+1; i < pruneNodes.size(); i++) {
+      pruneNodes.get(i).unprune();
+    }
+    if(bestIndex != -1) {
+      System.out.println(alphas);
+      System.out.println("Selected prune index: " + bestIndex);
+    }
+  }
+
+  /* Prunes leaves from the decision tree. Returns the alpha value of the best prune. */
+  private static double selectAlpha(DecisionTree decisionTree, List<Record> reservedRecords) {
+    int unprunedCorrectPredictions = calculateCorrectPredictions(decisionTree, reservedRecords);
+    ArrayList<DecisionTree> pruneNodes = new ArrayList<>();
+    ArrayList<Integer> correctPredictions = new ArrayList<>();
+    ArrayList<Double> alphas = new ArrayList<>();
+    while(decisionTree.getLeafLabel() == null) {
+      double minAlpha = -1;
+      DecisionTree pruneNode = null;
+      for(DecisionTree node : decisionTree.getAllNonLeaves()) {
+        double alpha = (node.nodeTrainingError()-node.subtreeTrainingError())/(node.getAllLeaves().size() - 1);
+        if(pruneNode == null || minAlpha > alpha) {
+          minAlpha = alpha;
+          pruneNode = node;
+        }
+      }
+      alphas.add(minAlpha);
       pruneNodes.add(pruneNode);
       correctPredictions.add(calculateCorrectPredictions(decisionTree, reservedRecords));
       pruneNode.prune();
@@ -53,10 +88,16 @@ public class PrunedTreeCreator {
     if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
       bestIndex = -1;
     }
-    System.out.println("Selected prune index: " + bestIndex);
     for(int i = bestIndex+1; i < correctPredictions.size(); i++) {
       pruneNodes.get(i).unprune();
     }
+    if(bestIndex != -1) {
+      System.out.println(correctPredictions);
+      System.out.println(unprunedCorrectPredictions);
+      System.out.println(alphas);
+      System.out.println("Selected prune index: " + bestIndex);
+    }
+    return bestIndex == -1 ? -1 : alphas.get(bestIndex);
   }
 
   /* Returns the number of records that the specified decision tree correctly classifies
