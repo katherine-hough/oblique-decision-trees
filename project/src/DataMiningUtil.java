@@ -169,7 +169,7 @@ public class DataMiningUtil {
     return getStratifiedGroups(instances, numGroups, classes, rand);
   }
 
-  public static double getMedian(List<Double> values) {
+  public static double median(List<Double> values) {
     List<Double> copy = new ArrayList<>(values);
     Collections.sort(copy);
     if(copy.size()%2==0) {

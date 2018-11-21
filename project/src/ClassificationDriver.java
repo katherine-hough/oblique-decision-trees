@@ -28,7 +28,7 @@ public class ClassificationDriver {
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
     Class<? extends DecisionTree> treeClass;
-    int reservePortionDenom = 15;
+    int reservePortionDenom = 5;
     if(method.equals("GA-ODT")) {
       treeClass = GeneticDecisionTree.class;
     } else if(method.equals("C-DT")) {

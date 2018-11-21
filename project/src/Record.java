@@ -60,6 +60,38 @@ public class Record extends HashMap<Integer, Double> {
     return classLabel;
   }
 
+  /* Standardizes each of the features of each of the specified sets of training and
+   * test records */
+  public static void standardize(Iterable<Record> trainingRecords, Iterable<Record> testRecords) {
+    HashSet<Integer> features = getAllFeatures(trainingRecords);
+    features.addAll(getAllFeatures(testRecords));
+    for(int feature : features) {
+      ArrayList<Double> values = new ArrayList<>();
+      for(Record record : trainingRecords) {
+        values.add(record.getOrDefault(feature));
+      }
+      for(Record record : testRecords) {
+        values.add(record.getOrDefault(feature));
+      }
+      double mean = DataMiningUtil.mean(values);
+      double stdDev = DataMiningUtil.sampleStandardDeviation(values);
+      for(Record record : trainingRecords) {
+        if(stdDev == 0) {
+          record.put(feature, 0.0);
+        } else {
+          record.put(feature, (record.getOrDefault(feature)-mean)/stdDev);
+        }
+      }
+      for(Record record : testRecords) {
+        if(stdDev == 0) {
+          record.put(feature, 0.0);
+        } else {
+          record.put(feature, (record.getOrDefault(feature)-mean)/stdDev);
+        }
+      }
+    }
+  }
+
   /* Returns record instances read in from the specified file with labels assigned
    * based on the contents of the second specified file. If sparse is true then
    * it is assumed that the records are represented sparsely in the first specified
@@ -122,10 +154,10 @@ public class Record extends HashMap<Integer, Double> {
           values.add(record.get(feature));
         }
       }
-      double overallMedian = values.size()> 0 ? DataMiningUtil.getMedian(values) : -1;
+      double overallMedian = values.size()> 0 ? DataMiningUtil.median(values) : -1;
       HashMap<String, Double> medians = new HashMap<>();
       for(String key : classValuesMap.keySet()) {
-        medians.put(key, DataMiningUtil.getMedian(classValuesMap.get(key)));
+        medians.put(key, DataMiningUtil.median(classValuesMap.get(key)));
       }
       for(Record record : records) {
         if(record.containsKey(feature) && record.get(feature)==null) {

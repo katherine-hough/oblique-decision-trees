@@ -53,7 +53,6 @@ public class PrunedTreeCreator {
       pruneNodes.get(i).unprune();
     }
     if(bestIndex != -1) {
-      System.out.println(alphas);
       System.out.println("Selected prune index: " + bestIndex);
     }
   }
@@ -85,17 +84,11 @@ public class PrunedTreeCreator {
         bestIndex = i;
       }
     }
-    if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
+    if(unprunedCorrectPredictions+1 >= correctPredictions.get(bestIndex)) {
       bestIndex = -1;
     }
     for(int i = bestIndex+1; i < correctPredictions.size(); i++) {
       pruneNodes.get(i).unprune();
-    }
-    if(bestIndex != -1) {
-      System.out.println(correctPredictions);
-      System.out.println(unprunedCorrectPredictions);
-      System.out.println(alphas);
-      System.out.println("Selected prune index: " + bestIndex);
     }
     return bestIndex == -1 ? -1 : alphas.get(bestIndex);
   }
