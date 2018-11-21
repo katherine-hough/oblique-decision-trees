@@ -1,4 +1,8 @@
 import sys, subprocess, re, time, os
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import imp
 import cart.classify
 import numpy as np
 
@@ -11,14 +15,15 @@ def main():
     num_folds = 10 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
 
-    datasets = datasets[5:]
+    datasets = datasets[5:6]
 
     # Compile the java code for the project
     if(os.name == 'nt'):
         compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
     else:
-        find_java_srcs = ['find', '-name', '"*.java"', '>', 'sources.txt']
-        subprocess.call(find_java_srcs, stdout=subprocess.DEVNULL)
+        srcs_file = open("sources.txt", "w")
+        find_java_srcs = ['find', '-name', '*.java']
+        subprocess.call(find_java_srcs, stdout=srcs_file)
         compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), '@sources.txt']
     ret_code = subprocess.call(compile_java, stdout=subprocess.DEVNULL)
     assert (ret_code==0),'Java code failed to compile.'
@@ -29,10 +34,10 @@ def main():
     assert (ret_code==0),'Failed to build OC1.'
 
     # Create folds for the dataset
-    # for dataset in datasets:
-    #     make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-    #     ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
-    #     assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
+    for dataset in datasets:
+        make_folds = create_folds_cmd(num_folds, random_seed, dataset)
+        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
+        assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
     for dataset in datasets:
         print(f'-------+---------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
@@ -53,9 +58,9 @@ def main():
         # print(f'C-DT   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the OC1 implementation
-        # if not dataset[1]:
-        #     accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-        #     print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
+        if not dataset[1]:
+            accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+            print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
 # Centers the specified string to the specified width by padding it with the specified
 # symbol
