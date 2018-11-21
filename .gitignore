@@ -224,6 +224,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#Visualization files
+visualization/
+
 # Derived data files
 *.unpruned
 *.dt
