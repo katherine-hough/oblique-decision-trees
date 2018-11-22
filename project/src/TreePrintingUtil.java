@@ -5,15 +5,18 @@ public class TreePrintingUtil {
 
   /* Returns a string representation of the specified number of levels of the
    * specified decision tree */
-  public static String getTreeString(DecisionTree root, int maxLevels) {
-    ArrayList<ArrayList<DecisionTree>> levels = breadthFirstTraversal(root, maxLevels);
+  public static String getTreeString(DecisionTree tree, int maxLevels) {
+    ArrayList<ArrayList<ArrayList<String>>> levels = tree.getBFSStrings();
+    if(levels.size() > maxLevels) {
+      levels = new ArrayList<>(levels.subList(0, maxLevels));
+    }
     int[] longest = getLongestStringPerLevel(levels);
+    String[][][] levelLines = getLevelLines(levels, longest);
     int numLines = 3*(levels.get(levels.size()-1).size()*2-1);
     String[] lines = new String[numLines];
     for(int i = 0; i < lines.length; i++) {
       lines[i] = "";
     }
-    String[][][] levelLines = getLevelLines(levels, longest);
     for(int l = levels.size()-1; l>=0; l--) {
       int target = (int)Math.pow(2, levels.size()-1-l);
       int offset = 2*target;
@@ -34,7 +37,7 @@ public class TreePrintingUtil {
           String end2 = " ";
           if(l != 0) {
             if(((i/3)>= bandTarget-bandHeight) && ((i/3)<= bandTarget+bandHeight)) {
-              if(n > 0 && n < levels.get(l).size() && levels.get(l).get(n-1) != null && levels.get(l).get(n) != null) {
+              if(n > 0 && n < levels.get(l).size() && levels.get(l).get(n-1).get(0) != null && levels.get(l).get(n).get(0) != null) {
                 end = "|";
                 end2 = "|";
                 if(i/3 == bandTarget) {
@@ -60,25 +63,23 @@ public class TreePrintingUtil {
   }
 
   /* Returns the lines for each node on each level */
-  private static String[][][] getLevelLines(ArrayList<ArrayList<DecisionTree>> levels, int[] longest) {
+  private static String[][][] getLevelLines(ArrayList<ArrayList<ArrayList<String>>> levels, int[] longest) {
     String[][][] levelLines = new String[levels.size()][][];
     for(int l = 0; l< levels.size(); l++) {
-      ArrayList<DecisionTree> level = levels.get(l);
+      ArrayList<ArrayList<String>> level = levels.get(l);
       levelLines[l] = new String[level.size()][3];
       for(int n = 0; n < level.size(); n++) {
-        DecisionTree node = level.get(n);
+        ArrayList<String> node = level.get(n);
         String cond = "";
         String freqs = "";
         String divide = " ";
-        if(node!=null) {
+        if(node.get(0) != null && node.get(0).length() > 0) {
           divide = "-";
-          freqs = node.toString();
-          if(node.getSplitCondition() != null) {
-            cond = node.getSplitCondition().toString();
-          }
+          freqs = node.get(0);
+          cond = node.get(1);
         }
-        String end1 = (l==0 || node == null) ? " " : "|";
-        String end2 = (l==0 || node == null)? " " : "+";
+        String end1 = (l==0 || node.get(0) == null) ? " " : "|";
+        String end2 = (l==0 || node.get(0)== null)? " " : "+";
         levelLines[l][n][0] = centerStringAtWidth(freqs, longest[l], " ") + (n%2==0 ? " " : end1);
         levelLines[l][n][1] = centerStringAtWidth("", longest[l], divide) + end2;
         levelLines[l][n][2] = centerStringAtWidth(cond, longest[l], " ") + (n%2==0 ? end1 : " ");
@@ -88,15 +89,13 @@ public class TreePrintingUtil {
   }
 
   /* Returns the longest string length at each level of the tree. */
-  private static int[] getLongestStringPerLevel(ArrayList<ArrayList<DecisionTree>> levels) {
+  private static int[] getLongestStringPerLevel(ArrayList<ArrayList<ArrayList<String>>> levels) {
     int[] longest = new int[levels.size()];
     for(int i = 0; i < levels.size(); i++) {
-      for(DecisionTree tree : levels.get(i)) {
-        if(tree != null) {
-          longest[i] = Math.max(longest[i], tree.toString().length());
-          if(tree.getSplitCondition() != null) {
-            longest[i] = Math.max(longest[i], tree.getSplitCondition().toString().length());
-          }
+      for(ArrayList<String> node : levels.get(i)) {
+        if(node.get(0) != null) {
+          longest[i] = Math.max(longest[i], node.get(0).length());
+          longest[i] = Math.max(longest[i], node.get(1).length());
         }
       }
     }
@@ -123,36 +122,4 @@ public class TreePrintingUtil {
     return ret;
   }
 
-  /* Creates lists containing the nodes at each level of the tree for up to the
-   * specified maximum number of levels. */
-  private static ArrayList<ArrayList<DecisionTree>> breadthFirstTraversal(DecisionTree root, int maxLevels) {
-    ArrayList<ArrayList<DecisionTree>> levels = new ArrayList<>();
-    levels.add(new ArrayList<DecisionTree>());
-    levels.get(0).add(root);
-    int i = 0;
-    while(levels.size() > i) {
-      ArrayList<DecisionTree> nextLevel = new ArrayList<>();
-      boolean nonNullChild = false;
-      for(DecisionTree tree : levels.get(i)) {
-        if(tree != null) {
-          nextLevel.add(tree.getLeftChild());
-          nextLevel.add(tree.getRightChild());
-          if(tree.getLeftChild() != null || tree.getRightChild() != null) {
-            nonNullChild = true;
-          }
-        } else {
-          nextLevel.add(null);
-          nextLevel.add(null);
-        }
-      }
-      if(nonNullChild) {
-        levels.add(nextLevel);
-      }
-      i++;
-      if(i > maxLevels) {
-        return levels;
-      }
-    }
-    return levels;
-  }
 }

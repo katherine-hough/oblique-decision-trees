@@ -211,7 +211,7 @@ public class GeneticSplitter {
 
     /* Recalculates the individual's fitness */
     double updateFitness() {
-      this.fitness = 1 - DecisionTree.getTotalGiniImpurity(records, this.toSplitCondition(), classIndexMap);
+      this.fitness = 1 - SplitStrategy.getTotalGiniImpurity(records, this.toSplitCondition(), classIndexMap);
       return this.fitness;
     }
 

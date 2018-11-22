@@ -27,23 +27,27 @@ public class ClassificationDriver {
   /* Returns a list of the labels calculated for the specified training and test
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
-    Class<? extends DecisionTree> treeClass;
     int reservePortionDenom = 5;
+    int numThreads = 4;
+    int maxBuckets = 100;
+    double maxNonHomogenuousPercent = 0.01;
+    int maxBaseConditions = 300;
+    int minBaseConditions = 100;
+    double baseConditionsPercent = 0.001;
+    boolean prune = true;
+    SplitStrategy splitStrategy;
     if(method.equals("GA-ODT")) {
-      treeClass = GeneticDecisionTree.class;
+      splitStrategy = new GeneticSplitStrategy();
     } else if(method.equals("C-DT")) {
-      treeClass = ComplexDecisionTree.class;
+      splitStrategy = new ComplexSplitStrategy(numThreads, maxBuckets, maxBaseConditions, minBaseConditions, baseConditionsPercent);
     } else if(method.equals("DT")) {
-      treeClass = DecisionTree.class;
+       splitStrategy = new SplitStrategy(numThreads, maxBuckets);
     } else {
-      throw new RuntimeException("Invalid decision tree method: " + method);
+      throw new RuntimeException("Invalid splitting method name: " + method);
     }
-    DecisionTree classifier;
-    try {
-      classifier = PrunedTreeCreator.createTree(treeClass, trainingData, reservePortionDenom, rand);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e.getMessage());
+    DecisionTree classifier = new DecisionTree(trainingData, maxNonHomogenuousPercent, splitStrategy);
+    if(prune) {
+      classifier.pruneTree(5, rand);
     }
     // System.out.println(TreePrintingUtil.getTreeString(classifier, 5));
     return classifier.classifyAll(testData);
