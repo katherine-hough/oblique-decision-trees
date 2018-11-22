@@ -62,7 +62,6 @@ public class DecisionTree extends Classifier {
         leafLabel = getMostFrequentLabel(reachingRecords);
       } else {
         // Make child nodes
-        System.out.println(splitCondition);
         List<Record> trueRecords = new ArrayList<>(reachingRecords);
         List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
         DecisionTree r = (root == null) ? this : root;
