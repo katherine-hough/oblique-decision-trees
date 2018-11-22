@@ -39,7 +39,7 @@ public class GeneticDecisionTree extends DecisionTree {
                       .classIndexMap(classIndexMap)
                       .rand(new Random(848))
                       .populationSize(264)
-                      .maxBuckets(MAX_BUCKETS)
+                      .maxBuckets(maxBuckets)
                       .tournamentSize(4)
                       .replacementTournamentSize(7)
                       .maxGenerations(250);

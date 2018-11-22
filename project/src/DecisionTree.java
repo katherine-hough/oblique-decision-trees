@@ -14,12 +14,12 @@ import java.util.concurrent.Executors;
 public class DecisionTree extends Classifier {
 
   /* Number of threads used in the thread pool */
-  private static final int NUM_THREADS = 4;
+  private final int numThreads = 4;
   /* Maximum number of buckets considered for splitting per attribute */
-  protected static final int MAX_BUCKETS = 100;
+  protected final int maxBuckets = 100;
   /* Maximum percent of the total records that can be from a different class
    * for the node to still be considered homogeneous */
-  private static final double MAX_NON_HOMOG_PERCENT = 0.01;
+  private final double maxNonHomogenuousPercent = 0.01;
   /* This node's leftchild. leftChild is null for leaf nodes */
   protected DecisionTree leftChild;
   /* This node's right child. rightChild is null for leaf nodes */
@@ -74,11 +74,11 @@ public class DecisionTree extends Classifier {
   /* Sets the fields that are created by the root and shared between all nodes
    * or are passed into the constructor*/
   protected void setBasicFields(List<Record> reachingRecords, DecisionTree root) {
-    this.defaultClass = (root==null) ? getMostFrequentLabel(reachingRecords) : root.defaultClass;
-    this.classIndexMap = (root==null) ? createClassIndexMap(reachingRecords) : root.classIndexMap;
     this.root = root;
     this.reachingRecords = reachingRecords;
-    this.maxNonHomogenuousRecords = (root==null) ? (int)(reachingRecords.size()*MAX_NON_HOMOG_PERCENT)+1 : root.maxNonHomogenuousRecords;
+    this.defaultClass = (root==null) ? getMostFrequentLabel(reachingRecords) : root.defaultClass;
+    this.classIndexMap = (root==null) ? createClassIndexMap(reachingRecords) : root.classIndexMap;
+    this.maxNonHomogenuousRecords = (root==null) ? calcMaxNonHomogenuousRecords(reachingRecords, maxNonHomogenuousPercent) : root.maxNonHomogenuousRecords;
   }
 
   /* Classifies a single training instance and returns a string representation of
@@ -91,6 +91,12 @@ public class DecisionTree extends Classifier {
     } else {
       return rightChild.classify(record);
     }
+  }
+
+  /* Determines the maximum number of records reaching the node that can be from a different
+   * class for the node to still be considered homogeneous */
+  private int calcMaxNonHomogenuousRecords(List<Record> reachingRecords, double maxNonHomogenuousPercent) {
+    return (int)(reachingRecords.size()*maxNonHomogenuousPercent)+1;
   }
 
   /* Creates a maps from each different class label to a different integer index */
@@ -154,7 +160,7 @@ public class DecisionTree extends Classifier {
     ArrayList<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(reachingRecords));
     ArrayList<SplitCondition> conditions = new ArrayList<>();
     for(Integer feature : features) {
-      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, MAX_BUCKETS)) {
+      for(double bucket : AttributeSpace.getSplitBuckets(reachingRecords, feature, maxBuckets)) {
         Predicate<Record> condition = (record) -> {
           return record.getOrDefault(feature) < bucket;
         };
@@ -172,7 +178,7 @@ public class DecisionTree extends Classifier {
 
   /* Selected and returns a SplitCondition from the specified list of tied (with respected
    * to their impurities) conditions. */
-  protected SplitCondition resolveTiedConditions(ArrayList<SplitCondition> ties) {
+  public SplitCondition resolveTiedConditions(List<SplitCondition> ties) {
     if(ties.size() == 0) {
       return null;
     } else if(ties.size() == 1 || this.root==null) {
@@ -189,8 +195,8 @@ public class DecisionTree extends Classifier {
 
   /* Return a list of the specified number of conditions with the lowest impurity.
    * Includes any additional conditions that are tied for lowest impurity */
-  protected ArrayList<SplitCondition> mostPureConditions(int numConditions, ArrayList<SplitCondition> conditions) {
-    ExecutorService taskExecutor = Executors.newFixedThreadPool(NUM_THREADS);
+  public ArrayList<SplitCondition> mostPureConditions(int numConditions, List<SplitCondition> conditions) {
+    ExecutorService taskExecutor = Executors.newFixedThreadPool(numThreads);
     final int conditionsPerTask = 100;
     ArrayList<Callable<Boolean>> tasks = new ArrayList<>(conditions.size());
     for(int x = 0; x < conditions.size(); x+=conditionsPerTask) {

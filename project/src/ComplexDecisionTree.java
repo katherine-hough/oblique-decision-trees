@@ -1,6 +1,5 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.function.Predicate;
 
 /* A DecisionTree that allows splits to be made that consider multiple features */
 public class ComplexDecisionTree extends DecisionTree {
@@ -26,7 +25,7 @@ public class ComplexDecisionTree extends DecisionTree {
    * records */
    @Override
   protected SplitCondition selectSplitCondition() {
-    ArrayList<SplitCondition> conditions = getBaseConditions();
+    List<SplitCondition> conditions = getBaseConditions();
     int numCond = Math.min(maxBaseConditions, (int)(conditions.size()*baseConditionsPercent)+minBaseConditions);
     conditions = mostPureConditions(numCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
@@ -36,9 +35,9 @@ public class ComplexDecisionTree extends DecisionTree {
     return resolveTiedConditions(conditions);
   }
 
-  /*Creates conditions which are combinations of the specified conditions */
-  protected ArrayList<SplitCondition> getSecondaryConditions(ArrayList<SplitCondition> conditions) {
-    ArrayList<SplitCondition> secondaryConditions = new ArrayList<>();
+  /* Creates conditions which are combinations of the specified conditions */
+  protected List<SplitCondition> getSecondaryConditions(List<SplitCondition> conditions) {
+    List<SplitCondition> secondaryConditions = new ArrayList<>();
     for(int i = 0; i < conditions.size(); i++) {
       for(int j = i+1; j < conditions.size(); j++) {
         SplitCondition condition1 = conditions.get(i);
