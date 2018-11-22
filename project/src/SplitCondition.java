@@ -19,7 +19,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
 
   public SplitCondition(Predicate<Record> condition, int feature, double bucket) {
     this.condition = condition;
-    this.desc = String.format("x[%d]<%2.2f", feature, bucket);
+    this.desc = String.format("x[%d] < %2.2f", feature, bucket);
     this.feature = feature;
     this.bucket = bucket;
     this.rank = 1;

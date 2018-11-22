@@ -5,8 +5,12 @@ import java.util.function.Predicate;
 /* A DecisionTree that allows splits to be made that consider multiple features */
 public class ComplexDecisionTree extends DecisionTree {
 
-  // Maximum number of buckets considered for splitting per attribute
-  private static final int MAX_BUCKETS = 100;
+  /* Maximum number of conditions used to create secondary conditions */
+  private final int maxBaseConditions = 300;
+  /* Minimum number of conditions used to create secondary conditions */
+  private final int minBaseConditions = 100;
+  /* Percentage of total records added to the minimum number of conditions */
+  private final double baseConditionsPercent = 0.001;
 
   /* Constructor for the root node calls two argument constructor*/
   public ComplexDecisionTree(List<Record> trainingRecords) {
@@ -23,10 +27,10 @@ public class ComplexDecisionTree extends DecisionTree {
    @Override
   protected SplitCondition selectSplitCondition() {
     ArrayList<SplitCondition> conditions = getBaseConditions();
-    int maxCond = Math.min(300, (int)(conditions.size()*.001)+100);
-    conditions = mostPureConditions(maxCond, conditions);
+    int numCond = Math.min(maxBaseConditions, (int)(conditions.size()*baseConditionsPercent)+minBaseConditions);
+    conditions = mostPureConditions(numCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
-    conditions = mostPureConditions(maxCond, conditions);
+    conditions = mostPureConditions(numCond, conditions);
     conditions.addAll(getSecondaryConditions(conditions));
     conditions = mostPureConditions(1, conditions);
     return resolveTiedConditions(conditions);

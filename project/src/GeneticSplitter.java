@@ -226,7 +226,7 @@ public class GeneticSplitter {
       String desc = "";
       for(int i = 0; i < genes.length-1; i++) {
         if(genes[i] != 0) {
-          desc += String.format("%.5f*x[%d] + ", genes[i], targetFeatures[i]);
+          desc += String.format("%.5f x[%d] + ", genes[i], targetFeatures[i]);
         }
       }
       desc += String.format("-%.5f < 0", genes[genes.length-1]);

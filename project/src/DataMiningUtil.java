@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.Collections;
 import java.util.List;
 
-/* Utility Class that contains methods that help with solving data mining problems */
+/* Utility class that contains methods that help with solving data mining problems */
 public class DataMiningUtil {
 
   /* Tries to create all the necessary directories along the specified path */

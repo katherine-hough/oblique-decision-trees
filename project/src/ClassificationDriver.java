@@ -45,6 +45,7 @@ public class ClassificationDriver {
       e.printStackTrace();
       throw new RuntimeException(e.getMessage());
     }
+    // System.out.println(TreePrintingUtil.getTreeString(classifier, 5));
     return classifier.classifyAll(testData);
   }
 }

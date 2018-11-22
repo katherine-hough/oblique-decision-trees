@@ -8,10 +8,13 @@ import java.util.Random;
 /* A DecisionTree that allows splits to be made on oblique axes */
 public class GeneticDecisionTree extends DecisionTree {
 
-  /* Maximum number of most pure base conditions considered */
-  private static final int MAX_BASE_CONDITIONS = 50;
-  /* Maximum number of buckets considered for splitting per attribute */
-  private static final int MAX_BUCKETS = 100;
+  /* Maximum number of conditions considered in the genetic algorithm */
+  private final int maxBaseConditions = 50;
+  /* Minimum number of conditions considered in the genetic algorithm */
+  private final int minBaseConditions = 1;
+  /* Percentage of total records added to the minimum number of conditions */
+  private final double baseConditionsPercent = 0.3;
+
   /* Used to build genetic algorithm splitter. Created by the root node and shared by
    * all nodes in the same tree */
   private GeneticSplitter.GeneticSplitterBuilder builder;
@@ -59,8 +62,8 @@ public class GeneticDecisionTree extends DecisionTree {
    * These feature are the features that would have resulted in the purest traditional
    * decision tree split. */
   private int[] targetFeatures() {
-    int maxBaseConditions = Math.min(reachingRecords.size()/3 + 1, MAX_BASE_CONDITIONS);
-    ArrayList<SplitCondition> conditions = mostPureConditions(maxBaseConditions, getBaseConditions());
+    int numCond = (int)Math.min(reachingRecords.size()*baseConditionsPercent + minBaseConditions, maxBaseConditions);
+    ArrayList<SplitCondition> conditions = mostPureConditions(numCond, getBaseConditions());
     TreeSet<Integer> features = new TreeSet<>();
     for(SplitCondition condition : conditions) {
       features.add(condition.getFeature());

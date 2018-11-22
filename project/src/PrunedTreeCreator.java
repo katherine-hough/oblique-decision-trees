@@ -84,7 +84,7 @@ public class PrunedTreeCreator {
         bestIndex = i;
       }
     }
-    if(unprunedCorrectPredictions+1 >= correctPredictions.get(bestIndex)) {
+    if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
       bestIndex = -1;
     }
     for(int i = bestIndex+1; i < correctPredictions.size(); i++) {
