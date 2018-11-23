@@ -122,4 +122,40 @@ public class TreePrintingUtil {
     return ret;
   }
 
+  public static void printGraphRepresentationToFile(DecisionTree tree, String filename) {
+    ArrayList<String> lines = new ArrayList<>();
+    ArrayList<ArrayList<ArrayList<String>>> levels = tree.getBFSStrings();
+    int nodeNum = 0;
+    lines.add("Nodes:");
+    ArrayList<ArrayList<Integer>> nodeNums = new ArrayList<>();
+    for(int level = 0; level < levels.size(); level++) {
+      nodeNums.add(new ArrayList<>());
+      for(int node = 0; node < levels.get(level).size(); node++) {
+        ArrayList<String> nodeStrs = levels.get(level).get(node);
+        if(nodeStrs.get(0) != null && nodeStrs.get(0).length() > 0) {
+          lines.add(String.format("%d|%s|%s", nodeNum, nodeStrs.get(0) , nodeStrs.get(1)));
+          nodeNums.get(level).add(nodeNum++);
+        } else {
+          nodeNums.get(level).add(-1);
+        }
+      }
+    }
+    lines.add("Edges:");
+    for(int level = 0; level < nodeNums.size()-1; level++) {
+      for(int node = 0; node < nodeNums.get(level).size(); node++) {
+        int src = nodeNums.get(level).get(node);
+        if(src > -1) {
+          int left = nodeNums.get(level+1).get(node*2);
+          int right = nodeNums.get(level+1).get(node*2+1);
+          if(left > -1) {
+            lines.add(String.format("%d -> %d", src, left));
+          }
+          if(right > -1) {
+            lines.add(String.format("%d -> %d", src, right));
+          }
+        }
+      }
+    }
+    DataMiningUtil.writeToFile(lines, filename);
+  }
 }
