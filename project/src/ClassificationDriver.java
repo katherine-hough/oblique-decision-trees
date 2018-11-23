@@ -25,24 +25,23 @@ public class ClassificationDriver {
   /* Returns a list of the labels calculated for the specified training and test
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
-    // DecisionTreeBuilder builder = new DecisionTreeBuilder()
-    //                   .reservePortionDenom(5)
-    //                   .prune(true)
-    //                   .rand(new Random(484))
-    //                   .numThreads(4)
-    //                   .maxBuckets(100)
-    //                   .maxNonHomogenuousPercent(0.0)
-    //                   .maxBaseConditions(300)
-    //                   .minBaseConditions(100)
-    //                   .baseConditionsPercent(0.01)
-    //                   .maxGeneConditions(50)
-    //                   .minGeneConditions(1)
-    //                   .geneConditionsPercent(0.3)
-    //                   .populationSize(264)
-    //                   .tournamentSize(4)
-    //                   .replacementTournamentSize(7)
-    //                   .maxGenerations(250);
-    DecisionTreeBuilder builder = new DecisionTreeBuilder();
+    DecisionTreeBuilder builder = new DecisionTreeBuilder()
+                      .reservePortionDenom(5)
+                      .prune(true)
+                      .rand(new Random(484))
+                      .numThreads(4)
+                      .maxBuckets(100)
+                      .maxNonHomogenuousPercent(0.0)
+                      .maxBaseConditions(300)
+                      .minBaseConditions(100)
+                      .baseConditionsPercent(0.01)
+                      .maxGeneConditions(50)
+                      .minGeneConditions(1)
+                      .geneConditionsPercent(0.3)
+                      .populationSize(264)
+                      .tournamentSize(4)
+                      .replacementTournamentSize(7)
+                      .maxGenerations(250);
     Class<? extends SplitStrategy> strategyClass;
     if(method.equals("GA-ODT")) {
       strategyClass = GeneticSplitStrategy.class;
