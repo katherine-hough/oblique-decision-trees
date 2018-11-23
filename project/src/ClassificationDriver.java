@@ -7,8 +7,6 @@ import java.util.Random;
  * Usage: ClassificationDriver [sparse|dense] test_file_name training_file_name training_label_file_name output_file_name [GA-ODT|C-DT|DT]*/
 public class ClassificationDriver {
 
-  public static final Random rand = new Random(848);
-
   public static void main(String[] args) {
     Timer timer = new Timer();
     timer.start();
@@ -27,24 +25,35 @@ public class ClassificationDriver {
   /* Returns a list of the labels calculated for the specified training and test
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
-    Class<? extends DecisionTree> treeClass;
-    int reservePortionDenom = 5;
+    // DecisionTreeBuilder builder = new DecisionTreeBuilder()
+    //                   .reservePortionDenom(5)
+    //                   .prune(true)
+    //                   .rand(new Random(484))
+    //                   .numThreads(4)
+    //                   .maxBuckets(100)
+    //                   .maxNonHomogenuousPercent(0.0)
+    //                   .maxBaseConditions(300)
+    //                   .minBaseConditions(100)
+    //                   .baseConditionsPercent(0.01)
+    //                   .maxGeneConditions(50)
+    //                   .minGeneConditions(1)
+    //                   .geneConditionsPercent(0.3)
+    //                   .populationSize(264)
+    //                   .tournamentSize(4)
+    //                   .replacementTournamentSize(7)
+    //                   .maxGenerations(250);
+    DecisionTreeBuilder builder = new DecisionTreeBuilder();
+    Class<? extends SplitStrategy> strategyClass;
     if(method.equals("GA-ODT")) {
-      treeClass = GeneticDecisionTree.class;
+      strategyClass = GeneticSplitStrategy.class;
     } else if(method.equals("C-DT")) {
-      treeClass = ComplexDecisionTree.class;
+      strategyClass = ComplexSplitStrategy.class;
     } else if(method.equals("DT")) {
-      treeClass = DecisionTree.class;
+      strategyClass = SplitStrategy.class;
     } else {
-      throw new RuntimeException("Invalid decision tree method: " + method);
+      throw new RuntimeException("Invalid splitting method name: " + method);
     }
-    DecisionTree classifier;
-    try {
-      classifier = PrunedTreeCreator.createTree(treeClass, trainingData, reservePortionDenom, rand);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e.getMessage());
-    }
+    DecisionTree classifier = builder.build(trainingData, strategyClass);
     // System.out.println(TreePrintingUtil.getTreeString(classifier, 5));
     return classifier.classifyAll(testData);
   }
