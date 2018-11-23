@@ -30,7 +30,7 @@ public class ClassificationDriver {
     int reservePortionDenom = 5;
     int numThreads = 4;
     int maxBuckets = 100;
-    double maxNonHomogenuousPercent = 0.01;
+    double maxNonHomogenuousPercent = 0.0;
     int maxBaseConditions = 300;
     int minBaseConditions = 100;
     double baseConditionsPercent = 0.001;
