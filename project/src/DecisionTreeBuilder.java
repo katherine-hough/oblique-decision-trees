@@ -45,13 +45,13 @@ public class DecisionTreeBuilder {
     this.rand = new Random(484);
     this.numThreads = 4;
     this.maxBuckets = 100;
-    this.maxNonHomogenuousPercent = 0.00;
+    this.maxNonHomogenuousPercent = 0.005;
     this.maxBaseConditions = 300;
     this.minBaseConditions = 100;
     this.baseConditionsPercent = 0.01;
     this.maxGeneConditions = 50;
     this.minGeneConditions = 1;
-    this.geneConditionsPercent = 0.3;
+    this.geneConditionsPercent = 0.4;
     this.geneticBuilder = new GeneticSplitter.GeneticSplitterBuilder()
                       .rand(rand)
                       .populationSize(264)

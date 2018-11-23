@@ -39,7 +39,7 @@ def main():
         # ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
         # assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
-    for dataset in datasets:
+    # for dataset in datasets:
         print(f'-------+---------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
         # Run the CART implementation
         accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
