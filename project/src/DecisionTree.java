@@ -29,12 +29,7 @@ public class DecisionTree extends Classifier {
   private final DecisionTree tree;
 
   /* Constructor */
-  public DecisionTree(List<Record> records, double maxNonHomogenuousPercent, SplitStrategy splitStrategy) {
-    this(records, (int)(records.size()*maxNonHomogenuousPercent)+1, splitStrategy);
-  }
-
-  /* Constructor */
-  private DecisionTree(List<Record> records, int maxNonHomogenuousRecords, SplitStrategy splitStrategy) {
+  public DecisionTree(List<Record> records, int maxNonHomogenuousRecords, SplitStrategy splitStrategy) {
     this.tree = this;
     this.trainingRecords = records;
     this.classIndexMap = new HashMap<>();
@@ -292,9 +287,6 @@ public class DecisionTree extends Classifier {
         if(splitCondition == null) {
           leafLabel = getMostFrequentLabel(reachingRecords);
         } else {
-          ArrayList<String> strs = getStrings();
-          System.out.println(strs.get(0));
-          System.out.println(strs.get(1));
           List<Record> trueRecords = new ArrayList<>(reachingRecords);
           List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
           leftChild = new DecisionNode(trueRecords);

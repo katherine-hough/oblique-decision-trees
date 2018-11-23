@@ -13,19 +13,11 @@ public class ComplexSplitStrategy extends SplitStrategy {
   private final double baseConditionsPercent;
 
   /* Default Constructor */
-  public ComplexSplitStrategy() {
-    super();
-    this.maxBaseConditions = 300;
-    this.minBaseConditions = 100;
-    this.baseConditionsPercent = 0.001;
-  }
-
-  /* 2-arg Constructor */
-  public ComplexSplitStrategy(int numThreads, int maxBuckets, int maxBaseConditions, int minBaseConditions, double baseConditionsPercent) {
-    super(numThreads, maxBuckets);
-    this.maxBaseConditions = maxBaseConditions;
-    this.minBaseConditions = minBaseConditions;
-    this.baseConditionsPercent = baseConditionsPercent;
+  public ComplexSplitStrategy(DecisionTreeBuilder builder) {
+    super(builder);
+    this.maxBaseConditions = builder.maxBaseConditions;
+    this.minBaseConditions = builder.minBaseConditions;
+    this.baseConditionsPercent = builder.baseConditionsPercent;
   }
 
   /* Returns the split condition that produces the purest partition of the reaching

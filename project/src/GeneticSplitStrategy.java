@@ -1,50 +1,34 @@
 import java.util.List;
 import java.util.TreeSet;
-import java.util.Random;
 
 /* Splits decision trees on conditions that consider boolean combinations of multiple
  * features */
 public class GeneticSplitStrategy extends SplitStrategy {
 
   /* Maximum number of conditions considered in the genetic algorithm */
-  private final int maxBaseConditions;
+  private final int maxGeneConditions;
   /* Minimum number of conditions considered in the genetic algorithm */
-  private final int minBaseConditions;
-  /* Percentage of total records added to the minimum number of conditions */
-  private final double baseConditionsPercent;
-  /* Used to build genetic algorithm splitter. Created by the root node and shared by
-   * all nodes in the same tree */
-  private final GeneticSplitter.GeneticSplitterBuilder builder;
+  private final int minGeneConditions;
+  /* Percentage of total records added to the minimum number of conditions in the
+   * genetic algorithm */
+  private final double geneConditionsPercent;
+  /* Used to build genetic algorithm splitter. */
+  private final GeneticSplitter.GeneticSplitterBuilder geneticBuilder;
 
   /* Default Constructor */
-  public GeneticSplitStrategy() {
-    super();
-    this.maxBaseConditions = 50;
-    this.minBaseConditions = 1;
-    this.baseConditionsPercent = 0.3;
-    this.builder = new GeneticSplitter.GeneticSplitterBuilder()
-                      .rand(new Random(848))
-                      .populationSize(264)
-                      .tournamentSize(4)
-                      .replacementTournamentSize(7)
-                      .maxBuckets(maxBuckets)
-                      .maxGenerations(250);
-  }
-
-  /* 2-arg Constructor */
-  public GeneticSplitStrategy(int numThreads, int maxBuckets, int maxBaseConditions, int minBaseConditions, double baseConditionsPercent, GeneticSplitter.GeneticSplitterBuilder builder) {
-    super(numThreads, maxBuckets);
-    this.maxBaseConditions = maxBaseConditions;
-    this.minBaseConditions = minBaseConditions;
-    this.baseConditionsPercent = baseConditionsPercent;
-    this.builder = builder.maxBuckets(maxBuckets);
+  public GeneticSplitStrategy(DecisionTreeBuilder builder) {
+    super(builder);
+    this.maxGeneConditions = builder.maxGeneConditions;
+    this.minGeneConditions = builder.minGeneConditions;
+    this.geneConditionsPercent = builder.geneConditionsPercent;
+    this.geneticBuilder = builder.geneticBuilder;
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
    * records */
    @Override
   public SplitCondition selectSplitCondition(List<Record> records, DecisionTree tree) {
-    GeneticSplitter GASplitter = builder.records(records)
+    GeneticSplitter GASplitter = geneticBuilder.records(records)
                                         .targetFeatures(targetFeatures(records, tree))
                                         .classIndexMap(tree.getClassIndexMap())
                                         .build();
@@ -55,7 +39,7 @@ public class GeneticSplitStrategy extends SplitStrategy {
    * These feature are the features that would have resulted in the purest traditional
    * decision tree split. */
   private int[] targetFeatures(List<Record> records, DecisionTree tree) {
-    int numCond = (int)Math.min(records.size()*baseConditionsPercent + minBaseConditions, maxBaseConditions);
+    int numCond = (int)Math.min(records.size()*geneConditionsPercent + minGeneConditions, maxGeneConditions);
     List<SplitCondition> conditions = mostPureConditions(numCond, getBaseConditions(records), records, tree);
     TreeSet<Integer> features = new TreeSet<>();
     for(SplitCondition condition : conditions) {

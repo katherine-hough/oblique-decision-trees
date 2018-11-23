@@ -7,8 +7,6 @@ import java.util.Random;
  * Usage: ClassificationDriver [sparse|dense] test_file_name training_file_name training_label_file_name output_file_name [GA-ODT|C-DT|DT]*/
 public class ClassificationDriver {
 
-  public static final Random rand = new Random(848);
-
   public static void main(String[] args) {
     Timer timer = new Timer();
     timer.start();
@@ -27,28 +25,35 @@ public class ClassificationDriver {
   /* Returns a list of the labels calculated for the specified training and test
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
-    int reservePortionDenom = 5;
-    int numThreads = 4;
-    int maxBuckets = 100;
-    double maxNonHomogenuousPercent = 0.0;
-    int maxBaseConditions = 300;
-    int minBaseConditions = 100;
-    double baseConditionsPercent = 0.001;
-    boolean prune = true;
-    SplitStrategy splitStrategy;
+    // DecisionTreeBuilder builder = new DecisionTreeBuilder()
+    //                   .reservePortionDenom(5)
+    //                   .prune(true)
+    //                   .rand(new Random(484))
+    //                   .numThreads(4)
+    //                   .maxBuckets(100)
+    //                   .maxNonHomogenuousPercent(0.0)
+    //                   .maxBaseConditions(300)
+    //                   .minBaseConditions(100)
+    //                   .baseConditionsPercent(0.01)
+    //                   .maxGeneConditions(50)
+    //                   .minGeneConditions(1)
+    //                   .geneConditionsPercent(0.3)
+    //                   .populationSize(264)
+    //                   .tournamentSize(4)
+    //                   .replacementTournamentSize(7)
+    //                   .maxGenerations(250);
+    DecisionTreeBuilder builder = new DecisionTreeBuilder();
+    Class<? extends SplitStrategy> strategyClass;
     if(method.equals("GA-ODT")) {
-      splitStrategy = new GeneticSplitStrategy();
+      strategyClass = GeneticSplitStrategy.class;
     } else if(method.equals("C-DT")) {
-      splitStrategy = new ComplexSplitStrategy(numThreads, maxBuckets, maxBaseConditions, minBaseConditions, baseConditionsPercent);
+      strategyClass = ComplexSplitStrategy.class;
     } else if(method.equals("DT")) {
-       splitStrategy = new SplitStrategy(numThreads, maxBuckets);
+      strategyClass = SplitStrategy.class;
     } else {
       throw new RuntimeException("Invalid splitting method name: " + method);
     }
-    DecisionTree classifier = new DecisionTree(trainingData, maxNonHomogenuousPercent, splitStrategy);
-    if(prune) {
-      classifier.pruneTree(5, rand);
-    }
+    DecisionTree classifier = builder.build(trainingData, strategyClass);
     // System.out.println(TreePrintingUtil.getTreeString(classifier, 5));
     return classifier.classifyAll(testData);
   }

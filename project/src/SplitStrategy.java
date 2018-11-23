@@ -11,20 +11,14 @@ import java.util.concurrent.Executors;
 public class SplitStrategy {
 
   /* Number of threads used in the thread pool */
-  protected final int numThreads;
+  private final int numThreads;
   /* Maximum number of buckets considered for splitting per attribute */
-  protected final int maxBuckets;
+  private final int maxBuckets;
 
   /* Default Constructor */
-  public SplitStrategy() {
-    this.numThreads = 4;
-    this.maxBuckets = 100;
-  }
-
-  /* 2-arg Constructor */
-  public SplitStrategy(int numThreads, int maxBuckets) {
-    this.numThreads = numThreads;
-    this.maxBuckets = maxBuckets;
+  public SplitStrategy(DecisionTreeBuilder builder) {
+    this.numThreads = builder.numThreads;
+    this.maxBuckets = builder.maxBuckets;
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
