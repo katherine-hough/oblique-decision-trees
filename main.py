@@ -12,8 +12,8 @@ def main():
         ('dermatology', False, 366, 34, 6), ('dorothea', True, 1150, 91598, 2),
         ('farm-ads', True, 4143, 54877, 2), ('iris', False, 150, 4, 3),
         ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
-    num_folds = 10 # Number of folds made for cross-validation
-    random_seed = 484 # Seed used for the random number generator
+    num_folds = 30 # Number of folds made for cross-validation
+    random_seed = 888 # Seed used for the random number generator
 
     # datasets = datasets[5:6]
 
@@ -45,22 +45,19 @@ def main():
         accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
         print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
-        # Run the GA-ODT implementation
-        accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
-        print(f'GA-ODT | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
-
-        # Run the DT implementation
-        accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'DT')
-        print(f'DT     | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
+        # Run the OC1 implementation
+        if not dataset[1]:
+            accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+            print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the C-DT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
         print(f'C-DT   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
-        # Run the OC1 implementation
-        if not dataset[1]:
-            accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-            print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
+
+        # Run the GA-ODT implementation
+        accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
+        print(f'GA-ODT | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
 # Centers the specified string to the specified width by padding it with the specified
 # symbol
