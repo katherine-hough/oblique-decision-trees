@@ -30,18 +30,18 @@ public class ClassificationDriver {
                       .prune(true)
                       .rand(new Random(484))
                       .numThreads(4)
-                      .maxBuckets(100)
+                      .maxBuckets(50)
                       .maxNonHomogenuousPercent(0.005)
                       .maxBaseConditions(300)
                       .minBaseConditions(100)
                       .baseConditionsPercent(0.01)
                       .maxGeneConditions(50)
                       .minGeneConditions(1)
-                      .geneConditionsPercent(0.4)
-                      .populationSize(264)
+                      .geneConditionsPercent(0.1)
+                      .populationSize(256)
                       .tournamentSize(4)
-                      .replacementTournamentSize(7)
-                      .maxGenerations(250);
+                      .replacementTournamentSize(6)
+                      .maxGenerations(100);
     Class<? extends SplitStrategy> strategyClass;
     if(method.equals("GA-ODT")) {
       strategyClass = GeneticSplitStrategy.class;

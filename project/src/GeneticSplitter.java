@@ -180,18 +180,21 @@ public class GeneticSplitter {
   /* Initializes the population. */
   private Individual[] initializePopulation() {
     Individual[] population = new Individual[populationSize];
+    int lastGene = targetFeatures.length;
     for(int p = 0; p < population.length; p++) {
       population[p] = new Individual();
+      population[p].genes[rand.nextInt(targetFeatures.length)] = 1.0;
     }
     for(int i = 0; i < targetFeatures.length; i++) {
+      int selected = rand.nextInt(population.length);
+      population[selected].genes[i] = 1.0;
       List<Double> buckets = AttributeSpace.getSplitBuckets(records, targetFeatures[i], maxBuckets);
-      if(buckets.size() == 0) {
-        break;
-      }
       for(int p = 0; p < population.length; p++) {
-        if(rand.nextInt(4) == 0) {
+        if(rand.nextInt(3) == 0) {
           population[p].genes[i] = 1.0;
-          population[p].genes[population[p].genes.length-1]+= buckets.get(rand.nextInt(buckets.size()));
+        }
+        if(population[p].genes[i] != 0) {
+          population[p].genes[lastGene]+= buckets.get(rand.nextInt(buckets.size()));
         }
       }
     }
