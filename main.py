@@ -12,7 +12,7 @@ def main():
         ('dermatology', False, 366, 34, 6), ('dorothea', True, 1150, 91598, 2),
         ('farm-ads', True, 4143, 54877, 2), ('iris', False, 150, 4, 3),
         ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
-    num_folds = 10 # Number of folds made for cross-validation
+    num_folds = 20 # Number of folds made for cross-validation
     random_seed = 1005 # Seed used for the random number generator
 
     # datasets = datasets[5:]
@@ -39,7 +39,7 @@ def main():
         ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
         assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
-    # for dataset in datasets:
+    for dataset in datasets:
         print(f'-------+---------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
         # Run the CART implementation
         accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)

@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.Random;
 import java.util.PriorityQueue;
@@ -27,6 +28,8 @@ public class GeneticSplitter {
   private final int replacementTournamentSize;
   /* Maximum number of generations */
   private final int maxGenerations;
+  /* Top conditions used to initialize the population */
+  private final List<SplitCondition> topConditions;
 
   /* Private constructor called by the builder */
   private GeneticSplitter(GeneticSplitterBuilder builder) {
@@ -39,6 +42,7 @@ public class GeneticSplitter {
     this.tournamentSize = builder.tournamentSize;
     this.replacementTournamentSize = builder.replacementTournamentSize;
     this.maxGenerations = builder.maxGenerations;
+    this.topConditions = builder.topConditions;
   }
 
   /* Return the best split condition found after the maximum number of
@@ -57,7 +61,7 @@ public class GeneticSplitter {
     double prevAvgFitness = -1;
     for(int gen = 0; gen < maxGenerations; gen++) {
       double curAvgFitness = getAverageFitness(population);
-      if(curAvgFitness <= prevAvgFitness) {
+      if(curAvgFitness <= prevAvgFitness && gen >= 5) {
         return best.toSplitCondition();
       }
       prevAvgFitness = curAvgFitness;
@@ -185,12 +189,17 @@ public class GeneticSplitter {
       population[p] = new Individual();
       population[p].genes[rand.nextInt(targetFeatures.length)] = 1.0;
     }
+    HashMap<Integer, List<Double>> featureBucketsMap = new HashMap<>();
+    for(SplitCondition condition : topConditions) {
+      featureBucketsMap.putIfAbsent(condition.getFeature(), new ArrayList<>());
+      featureBucketsMap.get(condition.getFeature()).add(condition.getBucket());
+    }
     for(int i = 0; i < targetFeatures.length; i++) {
       int selected = rand.nextInt(population.length);
       population[selected].genes[i] = 1.0;
-      List<Double> buckets = AttributeSpace.getSplitBuckets(records, targetFeatures[i], maxBuckets);
+      List<Double> buckets = featureBucketsMap.get(targetFeatures[i]);
       for(int p = 0; p < population.length; p++) {
-        if(rand.nextInt(3) == 0) {
+        if(rand.nextInt(buckets.size()) != 0) {
           population[p].genes[i] = 1.0;
         }
         if(population[p].genes[i] != 0) {
@@ -262,6 +271,7 @@ public class GeneticSplitter {
     private int tournamentSize;
     private int replacementTournamentSize;
     private int maxGenerations;
+    private List<SplitCondition> topConditions;
 
     public GeneticSplitterBuilder records(List<Record> records) {
       this.records = records;
@@ -308,6 +318,11 @@ public class GeneticSplitter {
 
     public GeneticSplitterBuilder maxGenerations(int maxGenerations) {
       this.maxGenerations = maxGenerations;
+      return this;
+    }
+
+    public GeneticSplitterBuilder topConditions(List<SplitCondition> topConditions) {
+      this.topConditions = topConditions;
       return this;
     }
 
