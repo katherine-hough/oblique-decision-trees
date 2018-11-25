@@ -12,11 +12,11 @@ def main():
         ('dermatology', False, 366, 34, 6), ('dorothea', True, 1150, 91598, 2),
         ('farm-ads', True, 4143, 54877, 2), ('iris', False, 150, 4, 3),
         ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
-    num_folds = 20 # Number of folds made for cross-validation
-    random_seed = 1005 # Seed used for the random number generator
+    num_folds = 10 # Number of folds made for cross-validation
+    random_seed = 484 # Seed used for the random number generator
 
-    # datasets = datasets[5:]
-
+    # datasets = datasets[7:]
+    
     # Compile the java code for the project
     if(os.name == 'nt'):
         compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
@@ -33,7 +33,7 @@ def main():
     ret_code = subprocess.call(build_oc1, stdout=subprocess.DEVNULL)
     assert (ret_code==0),'Failed to build OC1.'
 
-    # Create folds for the dataset
+    # Create folds for the datasets
     for dataset in datasets:
         make_folds = create_folds_cmd(num_folds, random_seed, dataset)
         ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)

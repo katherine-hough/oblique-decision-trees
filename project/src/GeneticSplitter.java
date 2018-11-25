@@ -61,7 +61,7 @@ public class GeneticSplitter {
     double prevAvgFitness = -1;
     for(int gen = 0; gen < maxGenerations; gen++) {
       double curAvgFitness = getAverageFitness(population);
-      if(curAvgFitness <= prevAvgFitness && gen >= 5) {
+      if(curAvgFitness <= prevAvgFitness && gen >= 3) {
         return best.toSplitCondition();
       }
       prevAvgFitness = curAvgFitness;

@@ -229,7 +229,7 @@ public class DecisionTree extends Classifier {
         bestIndex = i;
       }
     }
-    if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
+    if(unprunedCorrectPredictions+1 >= correctPredictions.get(bestIndex)) {
       bestIndex = -1;
     }
     for(int i = bestIndex+1; i < correctPredictions.size(); i++) {
