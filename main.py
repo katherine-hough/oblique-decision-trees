@@ -8,15 +8,15 @@ import numpy as np
 
 def main():
     # List of tuples of the form (dataset_name, is_sparse?, num_instances, num_attributes, num_classes)
-    datasets = [('arcene', False, 200, 9961, 2), ('breast-cancer', False, 286, 15, 2),
-        ('dermatology', False, 366, 34, 6), ('dorothea', True, 1150, 91598, 2),
-        ('farm-ads', True, 4143, 54877, 2), ('iris', False, 150, 4, 3),
-        ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
+    datasets = [('iris', False, 150, 4, 3), ('wine', False, 178, 13, 3),
+        ('breast-cancer', False, 286, 15, 2), ('dermatology', False, 366, 34, 6),
+        ('multiple-features', False, 2000, 649, 10), ('arcene', False, 200, 9961, 2),
+        ('farm-ads', True, 4143, 54877, 2), ('dorothea', True, 1150, 91598, 2)]
     num_folds = 10 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
 
     # datasets = datasets[7:]
-    
+
     # Compile the java code for the project
     if(os.name == 'nt'):
         compile_java = ['javac', '-Xlint:unchecked', '-d', os.path.join('project', 'target'), os.path.join('project', 'src', '*.java')]
@@ -34,10 +34,10 @@ def main():
     assert (ret_code==0),'Failed to build OC1.'
 
     # Create folds for the datasets
-    for dataset in datasets:
-        make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-        ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
-        assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
+    # for dataset in datasets:
+    #     make_folds = create_folds_cmd(num_folds, random_seed, dataset)
+    #     ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
+    #     assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
 
     for dataset in datasets:
         print(f'-------+---------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
