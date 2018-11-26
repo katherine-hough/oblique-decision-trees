@@ -8,14 +8,14 @@ import numpy as np
 
 def main():
     # List of tuples of the form (dataset_name, is_sparse?, num_instances, num_attributes, num_classes)
-    datasets = [('arcene', False, 200, 9961, 2), ('breast-cancer', False, 286, 15, 2),
-        ('dermatology', False, 366, 34, 6), ('dorothea', True, 1150, 91598, 2),
-        ('farm-ads', True, 4143, 54877, 2), ('iris', False, 150, 4, 3),
-        ('multiple-features', False, 2000, 649, 10), ('wine', False, 178, 13, 3)]
-    num_folds = 30 # Number of folds made for cross-validation
-    random_seed = 888 # Seed used for the random number generator
+    datasets = [('iris', False, 150, 4, 3), ('wine', False, 178, 13, 3),
+        ('breast-cancer', False, 286, 15, 2), ('dermatology', False, 366, 34, 6),
+        ('multiple-features', False, 2000, 649, 10), ('arcene', False, 200, 9961, 2),
+        ('farm-ads', True, 4143, 54877, 2), ('dorothea', True, 1150, 91598, 2)]
+    num_folds = 10 # Number of folds made for cross-validation
+    random_seed = 484 # Seed used for the random number generator
 
-    # datasets = datasets[5:6]
+    # datasets = datasets[7:]
 
     # Compile the java code for the project
     if(os.name == 'nt'):
@@ -33,13 +33,13 @@ def main():
     ret_code = subprocess.call(build_oc1, stdout=subprocess.DEVNULL)
     assert (ret_code==0),'Failed to build OC1.'
 
-    # Create folds for the dataset
-    for dataset in datasets:
-        # make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-        # ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
-        # assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
-
+    # Create folds for the datasets
     # for dataset in datasets:
+    #     make_folds = create_folds_cmd(num_folds, random_seed, dataset)
+    #     ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
+    #     assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
+
+    for dataset in datasets:
         print(f'-------+---------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
         # Run the CART implementation
         accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
@@ -53,7 +53,6 @@ def main():
         # Run the C-DT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
         print(f'C-DT   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
-
 
         # Run the GA-ODT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')

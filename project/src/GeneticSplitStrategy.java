@@ -13,7 +13,7 @@ public class GeneticSplitStrategy extends SplitStrategy {
    * genetic algorithm */
   private final double geneConditionsPercent;
   /* Used to build genetic algorithm splitter. */
-  private final GeneticSplitter.GeneticSplitterBuilder geneticBuilder;
+  private GeneticSplitter.GeneticSplitterBuilder geneticBuilder;
 
   /* Default Constructor */
   public GeneticSplitStrategy(DecisionTreeBuilder builder) {
@@ -28,17 +28,17 @@ public class GeneticSplitStrategy extends SplitStrategy {
    * records */
    @Override
   public SplitCondition selectSplitCondition(List<Record> records, DecisionTree tree) {
+    setTargetFeatures(records, tree);
     GeneticSplitter GASplitter = geneticBuilder.records(records)
-                                        .targetFeatures(targetFeatures(records, tree))
                                         .classIndexMap(tree.getClassIndexMap())
                                         .build();
     return GASplitter.getBestSplitCondition();
   }
 
-  /* Returns an array of features to be considered by the genetic algorithm.
-   * These feature are the features that would have resulted in the purest traditional
+  /* Sets the targets features and top conditions used by the splitter. These features
+   * and conditions are the ones that would have resulted in the purest traditional
    * decision tree split. */
-  private int[] targetFeatures(List<Record> records, DecisionTree tree) {
+  private void setTargetFeatures(List<Record> records, DecisionTree tree) {
     int numCond = (int)Math.min(records.size()*geneConditionsPercent + minGeneConditions, maxGeneConditions);
     List<SplitCondition> conditions = mostPureConditions(numCond, getBaseConditions(records), records, tree);
     TreeSet<Integer> features = new TreeSet<>();
@@ -49,6 +49,6 @@ public class GeneticSplitStrategy extends SplitStrategy {
     for(int i = 0; i < targetFeatures.length; i++) {
       targetFeatures[i] = features.pollFirst();
     }
-    return targetFeatures;
+    geneticBuilder = geneticBuilder.targetFeatures(targetFeatures).topConditions(conditions);
   }
 }
