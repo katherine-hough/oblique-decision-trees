@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -40,13 +41,34 @@ public class CVDriver {
     ArrayList<Double> accuracies = new ArrayList<>(numFolds);
     for(int fold = 0; fold < numFolds; fold++) {
       ArrayList<String> predictedLabels = ClassificationDriver.calculateLabels(method, trainingFolds.get(fold), testFolds.get(fold));
-      accuracies.add(calcAccuracy(predictedLabels, testFolds.get(fold)));
+      accuracies.add(calcBalancedAccuracy(predictedLabels, testFolds.get(fold)));
       System.out.printf("Fold #%d's Accuracy: %.5f\n", (fold+1), accuracies.get(fold));
     }
     double mean = DataMiningUtil.mean(accuracies);
     double stdDev = DataMiningUtil.sampleStandardDeviation(accuracies);
     System.out.printf("Accuracies: %s\n", accuracies);
     System.out.printf("Accuracy: mean = %f, std.dev = %f\n", mean, stdDev);
+  }
+
+  /* Returns macro-average of recall scores per class */
+  private static double calcBalancedAccuracy(ArrayList<String> predictedLabels, ArrayList<Record> testRecords) {
+    ArrayList<String> classes = new ArrayList<>(Record.getAllClasses(testRecords));
+    int[] truePositives = new int[classes.size()];
+    int[] positives = new int[classes.size()];
+    for(int i = 0; i < predictedLabels.size(); i++) {
+      String prediction = predictedLabels.get(i).trim();
+      String expected = testRecords.get(i).getClassLabel().trim();
+      int index = classes.indexOf(expected);
+      if(prediction.equals(expected)) {
+        truePositives[index]++;
+      }
+      positives[index]++;
+    }
+    double balancedAccuracy = 0;
+    for(int i = 0; i < positives.length; i++) {
+      balancedAccuracy += (1.0*truePositives[i])/positives[i];
+    }
+    return balancedAccuracy/positives.length;
   }
 
   /* Returns the percentage of predictedLabels that match the label for the corresponding

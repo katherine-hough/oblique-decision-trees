@@ -1,8 +1,9 @@
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import balanced_accuracy_score
 from scipy.sparse import coo_matrix
 
 def cross_validate(folds_base_path, num_folds, sparse, random_seed):
-    accuracies = []
+    balanced_accuracies = []
     for i in range(1, num_folds+1):
         clf = DecisionTreeClassifier(random_state = random_seed)
         test_lines = [line for line in read_file(f'{folds_base_path}{i}-test.data') if len(line) > 0]
@@ -12,8 +13,8 @@ def cross_validate(folds_base_path, num_folds, sparse, random_seed):
         if sparse:
             training_data, test_data = create_sparse_matrices(training_data, test_data)
         clf.fit(training_data, training_labels)
-        accuracies.append(clf.score(test_data, test_labels))
-    return accuracies
+        balanced_accuracies.append(balanced_accuracy_score(test_labels, clf.predict(test_data)))
+    return balanced_accuracies
 
 
  # Extracts labels and feature vectors from the specified lines
