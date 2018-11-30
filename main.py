@@ -15,7 +15,7 @@ def main():
     num_folds = 10 # Number of folds made for cross-validation
     random_seed = 484 # Seed used for the random number generator
 
-    # datasets = datasets[7:]
+    # datasets = datasets[:5]
 
     # Compile the java code for the project
     if(os.name == 'nt'):
@@ -43,19 +43,23 @@ def main():
         print(f'-------+---------------------{center_string(dataset[0], 17, "-")}-------+--------------------------')
         # Run the CART implementation
         accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
+        print(accuracies)
         print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the OC1 implementation
         if not dataset[1]:
             accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+            print(accuracies)
             print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the C-DT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
+        print(accuracies)
         print(f'C-DT   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the GA-ODT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
+        print(accuracies)
         print(f'GA-ODT | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
 # Centers the specified string to the specified width by padding it with the specified
@@ -87,17 +91,41 @@ def run_project_dt(num_folds, random_seed, dataset, method):
 # Runs cross validation for the OC1 implementation
 def run_oc1(num_folds, random_seed, dataset):
     start_time = time.perf_counter()
-    outputs = []
     for cur_fold in range(1, num_folds+1):
         cmd = create_OC1_cmd(num_folds, random_seed, dataset, cur_fold)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, errs = p.communicate()
-        outputs.append(output.decode('utf-8').split('\n')[0])
+        ret_code = subprocess.call(cmd, stdout=subprocess.DEVNULL)
+        assert (ret_code==0),'Failed to run OC1.'
     elapsed_time = time.perf_counter()-start_time
     accuracies = []
-    for output in outputs:
-        accuracies.append(float(re.match('accuracy = ([0-9]*\\.[0-9]*)', output).group(1))/100.0)
+    test_file = os.path.join('data', dataset[0], 'folds', f'{num_folds}-folds', f'{dataset[0]}{cur_fold}-test.data')
+    for cur_fold in range(1, num_folds+1):
+        accuracies.append(calc_balanced_accuracy(os.path.join('data', 'temp', f'oc1-{cur_fold}.txt'), test_file))
     return accuracies, elapsed_time
+
+# Calculated the balanced accuracy for the specfied misclassification file and testing file
+def calc_balanced_accuracy(misclas_file, test_file):
+    misclas_lines = [line for line in cart.classify.read_file(misclas_file) if len(line) > 0]
+    test_lines = [line for line in cart.classify.read_file(test_file) if len(line) > 0]
+    positives = {}
+    misses = {}
+    for line in test_lines:
+        label = line.split()[-1]
+        if label in positives:
+            positives[label]+=1
+        else:
+            positives[label]=1
+    for line in misclas_lines:
+        label = line.split()[-1]
+        if label in misses:
+            misses[label]+=1
+        else:
+            misses[label]=1
+    bal_acc = 0
+    for positive in positives:
+        total = positives[positive]
+        miss = misses[positive] if positive in misses else 0
+        bal_acc += (total-miss)/total
+    return bal_acc/len(positives)
 
 # Runs cross validation for the CART implementation
 def run_cart(num_folds, random_seed, dataset):
@@ -125,7 +153,8 @@ def create_project_DT_cmd(num_folds, random_seed, dataset, method):
 def create_OC1_cmd(num_folds, random_seed, dataset, cur_fold):
     training_file = os.path.join('-tdata', dataset[0], 'folds', f'{num_folds}-folds', f'{dataset[0]}{cur_fold}-train.data')
     test_file = os.path.join('-Tdata', dataset[0], 'folds', f'{num_folds}-folds', f'{dataset[0]}{cur_fold}-test.data')
-    return [os.path.join('.', 'OC1', 'mktree'), training_file, test_file, f'-s{random_seed}', '-z']
+    temp_file = os.path.join('-Mdata', 'temp', f'oc1-{cur_fold}.txt')
+    return [os.path.join('.', 'OC1', 'mktree'), training_file, test_file, temp_file, f'-s{random_seed}', '-z']
 
 if __name__ == '__main__':
     main()

@@ -27,7 +27,7 @@ public class ClassificationDriver {
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
     DecisionTreeBuilder builder = new DecisionTreeBuilder()
                       .reservePortionDenom(2)
-                      .prune(true)
+                      .prune(false)
                       .rand(new Random(484))
                       .numThreads(4)
                       .maxBuckets(200)
