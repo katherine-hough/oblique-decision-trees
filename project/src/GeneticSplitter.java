@@ -241,7 +241,7 @@ public class GeneticSplitter {
           desc += String.format("%.5f x[%d] + ", genes[i], targetFeatures[i]);
         }
       }
-      desc += String.format("-%.5f < 0", genes[genes.length-1]);
+      desc += String.format("%.5f < 0", -1 * genes[genes.length-1]);
       return desc;
     }
 
