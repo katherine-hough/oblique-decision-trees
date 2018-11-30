@@ -46,7 +46,7 @@ public class ClassificationDriver {
     if(method.equals("GA-ODT")) {
       strategyClass = GeneticSplitStrategy.class;
     } else if(method.equals("C-DT")) {
-      strategyClass = ComplexSplitStrategy.class;
+      strategyClass = CompoundSplitStrategy.class;
     } else if(method.equals("DT")) {
       strategyClass = SplitStrategy.class;
     } else {

@@ -18,13 +18,13 @@ public class DecisionTreeBuilder {
    * class for the node to still be considered homogeneous.*/
   public double maxNonHomogenuousPercent;
   /* Maximum number of conditions used to create secondary conditions. Used by
-   * ComplexSplitStrategy. */
+   * CompoundSplitStrategy. */
   public int maxBaseConditions;
   /* Minimum number of conditions used to create secondary conditions. Used by
-   * ComplexSplitStrategy. */
+   * CompoundSplitStrategy. */
   public int minBaseConditions;
   /* Percentage of total records added to the minimum number of conditions. Used by
-   * ComplexSplitStrategy. */
+   * CompoundSplitStrategy. */
   public double baseConditionsPercent;
   /* Maximum number of conditions considered in the genetic algorithm. Used by
    * GeneticSplitStrategy*/

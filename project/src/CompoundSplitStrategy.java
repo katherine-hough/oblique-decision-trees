@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 /* Splits decision trees on conditions that consider boolean combinations of multiple
  * features */
-public class ComplexSplitStrategy extends SplitStrategy {
+public class CompoundSplitStrategy extends SplitStrategy {
 
   /* Maximum number of conditions used to create secondary conditions */
   private final int maxBaseConditions;
@@ -13,7 +13,7 @@ public class ComplexSplitStrategy extends SplitStrategy {
   private final double baseConditionsPercent;
 
   /* Default Constructor */
-  public ComplexSplitStrategy(DecisionTreeBuilder builder) {
+  public CompoundSplitStrategy(DecisionTreeBuilder builder) {
     super(builder);
     this.maxBaseConditions = builder.maxBaseConditions;
     this.minBaseConditions = builder.minBaseConditions;
