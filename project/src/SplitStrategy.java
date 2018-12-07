@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Random;
 import java.util.Collection;
 
 /* Represents some method for splitting a decision tree */
@@ -16,8 +15,6 @@ public class SplitStrategy {
   private final int numThreads;
   /* Maximum number of buckets considered for splitting per attribute */
   private final int maxBuckets;
-  /* Used to generate random elements */
-  private final Random rand;
   /* Stores that class label at the index it is associated with */
   private HashMap<String, Integer> classIndexMap;
 
@@ -25,7 +22,6 @@ public class SplitStrategy {
   public SplitStrategy(DecisionTreeBuilder builder) {
     this.numThreads = builder.numThreads;
     this.maxBuckets = builder.maxBuckets;
-    this.rand = builder.rand;
   }
 
   /* Setter for classIndexMap */
@@ -49,12 +45,15 @@ public class SplitStrategy {
    * feature axes */
   protected List<SplitCondition> getBaseConditions(List<Record> records) {
     List<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(records));
-    List<SplitCondition> conditions = new ArrayList<>();
     ArrayList<Callable<Boolean>> tasks = new ArrayList<>();
+    ArrayList<List<SplitCondition>> conditionsList = new ArrayList<>();
+    int i = 0;
     for(int feature : features) {
+      ArrayList<SplitCondition> next = new ArrayList<>();
+      conditionsList.add(next);
       Callable<Boolean> task = () -> {
         try {
-          addFeatureBaseConditions(records, feature, conditions);
+          addFeatureBaseConditions(records, feature, next);
           return true;
         } catch(Exception e) {
           e.printStackTrace();
@@ -64,16 +63,19 @@ public class SplitStrategy {
       tasks.add(task);
     }
     runTasks(tasks);
+    List<SplitCondition> conditions = new ArrayList<>();
+    for(List<SplitCondition> list : conditionsList) {
+      conditions.addAll(list);
+    }
     return conditions;
   }
 
   /* Gets the basic set of conditions which split the feature space along the
    * the specified feature axis */
   private void addFeatureBaseConditions(List<Record> records, int feature, List<SplitCondition> conditions) {
-    List<SplitCondition> tempConditions = new ArrayList<>();
     int[] classFreqsRight = DecisionTree.getClassFreqs(records, classIndexMap);
     int[] classFreqsLeft = new int[classIndexMap.size()];
-    AttributeSpace attrSpace = new AttributeSpace(records, feature, maxBuckets, rand, classIndexMap);
+    AttributeSpace attrSpace = new AttributeSpace(records, feature, maxBuckets, classIndexMap);
     for(int i = 0; i < attrSpace.numCandidates(); i++) {
       double bucket = attrSpace.getCandidate(i);
       Predicate<Record> condition = (record) -> {
@@ -86,10 +88,7 @@ public class SplitStrategy {
         classFreqsRight[j] -= classFreqs[j];
       }
       split.setImpurity(calcWeightedGiniImpurity(classFreqsLeft, classFreqsRight, DecisionTree.sumArray(classFreqsLeft), records.size()));
-      tempConditions.add(split);
-    }
-    synchronized(this) {
-      conditions.addAll(tempConditions);
+      conditions.add(split);
     }
   }
 

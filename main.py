@@ -47,10 +47,10 @@ def main():
         print(f'CART   | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the OC1 implementation
-        if not dataset[1]:
-            accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-            print(accuracies)
-            print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
+        # if not dataset[1]:
+        #     accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+        #     print(accuracies)
+        #     print(f'OC1    | Accuracy: mean = {np.average(accuracies):5.5f}, std.dev = {np.std(accuracies):5.5f} | Elapsed Time (s): {elapsed_time:5.5f}')
 
         # Run the C-DT implementation
         accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')

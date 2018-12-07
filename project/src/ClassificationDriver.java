@@ -26,11 +26,11 @@ public class ClassificationDriver {
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
     DecisionTreeBuilder builder = new DecisionTreeBuilder()
-                      .reservePortionDenom(2)
+                      .reservePortionDenom(3)
                       .prune(false)
                       .rand(new Random(484))
                       .numThreads(4)
-                      .maxBuckets(500)
+                      .maxBuckets(200)
                       .maxNonHomogenuousPercent(0.01)
                       .maxBaseConditions(300)
                       .minBaseConditions(100)
@@ -41,7 +41,7 @@ public class ClassificationDriver {
                       .populationSize(128)
                       .tournamentSize(4)
                       .replacementTournamentSize(6)
-                      .maxGenerations(100);
+                      .maxGenerations(200);
     Class<? extends SplitStrategy> strategyClass;
     if(method.equals("GA-ODT")) {
       strategyClass = GeneticSplitStrategy.class;

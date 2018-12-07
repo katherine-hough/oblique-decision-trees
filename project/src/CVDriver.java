@@ -51,7 +51,7 @@ public class CVDriver {
   }
 
   /* Returns macro-average of recall scores per class */
-  private static double calcBalancedAccuracy(ArrayList<String> predictedLabels, ArrayList<Record> testRecords) {
+  public static double calcBalancedAccuracy(List<String> predictedLabels, List<Record> testRecords) {
     ArrayList<String> classes = new ArrayList<>(Record.getAllClasses(testRecords));
     int[] truePositives = new int[classes.size()];
     int[] positives = new int[classes.size()];

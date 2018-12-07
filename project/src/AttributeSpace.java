@@ -17,11 +17,11 @@ public class AttributeSpace {
 
   /* Constructor. Makes a sorted list of valueBuckets for splitting the specified records
    * on the specified feature */
-  public AttributeSpace(Iterable<Record> records, int attribute, int maxBuckets, Random rand, HashMap<String, Integer> classIndexMap) {
+  public AttributeSpace(Iterable<Record> records, int attribute, int maxBuckets, HashMap<String, Integer> classIndexMap) {
     this.classIndexMap = classIndexMap;
     this.buckets = createInitialBuckets(records, attribute);
     mergeHomogenuousBuckets(buckets);
-    reduceBuckets(buckets, maxBuckets, rand);
+    reduceBuckets(buckets, maxBuckets, new Random(484));
   }
 
   /* Returns a sorted list of buckets representing every possible value of the specified attribute */
