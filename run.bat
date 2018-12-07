@@ -1,5 +1,5 @@
 @echo off
-set dataset=dermatology
+set dataset=multiple-features
 set sparse=dense
 
 javac -Xlint:unchecked -d project/target project/src/*.java

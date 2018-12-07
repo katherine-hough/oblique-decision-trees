@@ -30,7 +30,7 @@ public class ClassificationDriver {
                       .prune(false)
                       .rand(new Random(484))
                       .numThreads(4)
-                      .maxBuckets(200)
+                      .maxBuckets(500)
                       .maxNonHomogenuousPercent(0.01)
                       .maxBaseConditions(300)
                       .minBaseConditions(100)
