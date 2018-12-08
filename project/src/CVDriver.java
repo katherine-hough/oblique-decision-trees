@@ -28,7 +28,7 @@ public class CVDriver {
     createFolds(trainingRecords, new Random(Integer.parseInt(args[4])));
     if(args[5].equals("F")) {
       timer.printElapsedTime("Writing folds to files");
-      writeFoldsToFiles(args[1], trainingRecords, sparse);
+      writeFoldsToFiles(args[1], trainingRecords, sparse, Integer.parseInt(args[4]));
     } else {
       timer.printElapsedTime("Cross validating");
       crossValidate(args[5]);
@@ -45,7 +45,7 @@ public class CVDriver {
       System.out.printf("Fold #%d's Accuracy: %.5f\n", (fold+1), accuracies.get(fold));
     }
     double mean = DataMiningUtil.mean(accuracies);
-    double stdDev = DataMiningUtil.sampleStandardDeviation(accuracies);
+    double stdDev = DataMiningUtil.populationStandardDeviation(accuracies);
     System.out.printf("Accuracies: %s\n", accuracies);
     System.out.printf("Accuracy: mean = %f, std.dev = %f\n", mean, stdDev);
   }
@@ -108,7 +108,7 @@ public class CVDriver {
     }
   }
 
-  private static void writeFoldsToFiles(String trainFilename, ArrayList<Record> trainingRecords, boolean sparse) {
+  private static void writeFoldsToFiles(String trainFilename, ArrayList<Record> trainingRecords, boolean sparse, int randomSeed) {
     String[] dataPath = trainFilename.split(Pattern.quote(java.io.File.separator));
     String[] dataFile = (dataPath[dataPath.length-1]).split("\\.");
     TreeSet<Integer> features = new TreeSet<>(Record.getAllFeatures(trainingRecords));
@@ -116,7 +116,7 @@ public class CVDriver {
     for(int i = 0; i<dataPath.length-1;i++) {
       directoryPath += dataPath[i] + java.io.File.separator;
     }
-    directoryPath += "folds" + java.io.File.separator + numFolds + "-folds";
+    directoryPath += "folds" + java.io.File.separator + numFolds + "-folds-" + randomSeed;
     DataMiningUtil.makeDirectoryPath(directoryPath);
     for(int i = 0; i < numFolds; i++) {
       String testFile = directoryPath + java.io.File.separator + dataFile[0] + (i+1) + "-test." + dataFile[1];

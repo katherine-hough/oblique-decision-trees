@@ -26,7 +26,7 @@ public class ClassificationDriver {
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
     DecisionTreeBuilder builder = new DecisionTreeBuilder()
-                      .reservePortionDenom(3)
+                      .reservePortionDenom(5)
                       .prune(false)
                       .rand(new Random(484))
                       .numThreads(4)
@@ -53,7 +53,6 @@ public class ClassificationDriver {
       throw new RuntimeException("Invalid splitting method name: " + method);
     }
     DecisionTree classifier = builder.build(trainingData, strategyClass);
-    // System.out.println(TreePrintingUtil.getTreeString(classifier, 5));
     return classifier.classifyAll(testData);
   }
 }
