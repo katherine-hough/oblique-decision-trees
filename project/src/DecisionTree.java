@@ -74,7 +74,7 @@ public class DecisionTree extends Classifier {
   }
 
   /* Returns the index of the largest value in the specified array */
-  private int getIndexOfMax(int[] values) {
+  public static int getIndexOfMax(int[] values) {
     int maxIndex = 0;
     for(int i = 1; i < values.length; i++) {
       maxIndex = (values[i] > values[maxIndex]) ? i : maxIndex;
@@ -240,7 +240,7 @@ public class DecisionTree extends Classifier {
         bestIndex = i;
       }
     }
-    if(unprunedCorrectPredictions+1 >= correctPredictions.get(bestIndex)) {
+    if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
       bestIndex = -1;
     }
     for(int i = bestIndex+1; i < correctPredictions.size(); i++) {

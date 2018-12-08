@@ -281,3 +281,4 @@ visualization/
 !data/wine/wine.data
 !data/wine/wine.labels
 *.html
+run.bat

@@ -15,8 +15,8 @@ def main():
     num_folds = 10 # Number of folds made for cross-validation
     random_seeds = [484, 101, 434, 2222, 12, 676, 10101, 337, 99, 23] # Seeds used for the random number generator
 
-    # random_seeds = random_seeds[:5]
-    datasets = datasets[:6]
+    # random_seeds = random_seeds[:7]
+    datasets = datasets[2:3]
 
     # Compile the java code for the project
     if(os.name == 'nt'):
@@ -40,37 +40,45 @@ def main():
         title = f'{dataset[0]}'
         print(f'-------+---------------------{center_string(title, 17, "-")}-------+--------------------------')
         for random_seed in random_seeds:
-            # Create random folds for the dataset
-            make_folds = create_folds_cmd(num_folds, random_seed, dataset)
-            ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
-            assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
+            # Create random folds for the dataset if necessary
+            data_path = os.path.join('data', dataset[0], 'folds', f'{num_folds}-folds-{random_seed}')
+            if not os.path.isdir(data_path):
+                make_folds = create_folds_cmd(num_folds, random_seed, dataset)
+                ret_code = subprocess.call(make_folds, stdout=subprocess.DEVNULL)
+                assert (ret_code==0), f'Failed to create folds for {dataset[0]}.'
+                print(f'Created folds {dataset[0]}-{random_seed}')
 
             # Run the CART implementation
             accuracies, elapsed_time = run_cart(num_folds, random_seed, dataset)
             avg_accuracies['CART'].append(np.average(accuracies))
             avg_runtimes['CART'].append(elapsed_time)
+            print(f'CART {np.average(accuracies)} {elapsed_time}')
 
             # Run the OC1 implementation
             if not dataset[1]:
                 accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
                 avg_accuracies['OC1'].append(np.average(accuracies))
                 avg_runtimes['OC1'].append(elapsed_time)
+                print(f'OC1 {np.average(accuracies)} {elapsed_time}')
 
             # Run the C-DT implementation
             accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
             avg_accuracies['C-DT'].append(np.average(accuracies))
             avg_runtimes['C-DT'].append(elapsed_time)
+            print(f'C-DT {np.average(accuracies)} {elapsed_time}')
 
             # Run the GA-ODT implementation
             accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
             avg_accuracies['GA-ODT'].append(np.average(accuracies))
             avg_runtimes['GA-ODT'].append(elapsed_time)
+            print(f'GA-ODT {np.average(accuracies)} {elapsed_time}')
 
         for key in avg_accuracies:
-            title = center_string(key, 6, ' ')
-            print(f'{title}| Accuracy: mean = {np.average(avg_accuracies[key]):5.5f}, std.dev = {np.std(avg_accuracies[key]):5.5f} | Elapsed Time (s): {np.average(avg_runtimes[key]):5.5f}')
-            print(f'Accs: {avg_accuracies[key]}')
-            print(f'RTs: {avg_runtimes[key]}')
+            if len(avg_accuracies[key]) > 0:
+                title = center_string(key, 6, ' ')
+                print(f'{title}| Accuracy: mean = {np.average(avg_accuracies[key]):5.5f}, std.dev = {np.std(avg_accuracies[key]):5.5f} | Elapsed Time (s): {np.average(avg_runtimes[key]):5.5f}')
+                print(f'Accs: {avg_accuracies[key]}')
+                print(f'RTs: {avg_runtimes[key]}')
 
 # Centers the specified string to the specified width by padding it with the specified
 # symbol
