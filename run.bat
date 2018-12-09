@@ -1,5 +1,5 @@
 @echo off
-set dataset=multiple-features
+set dataset=wine
 set sparse=dense
 
 javac -Xlint:unchecked -d project/target project/src/*.java
