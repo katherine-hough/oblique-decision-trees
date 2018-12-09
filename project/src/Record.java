@@ -76,19 +76,21 @@ public class Record extends HashMap<Integer, Double> {
       double mean = DataMiningUtil.mean(values);
       double stdDev = DataMiningUtil.sampleStandardDeviation(values);
       for(Record record : trainingRecords) {
-        if(stdDev == 0) {
-          record.put(feature, 0.0);
-        } else {
-          record.put(feature, (record.getOrDefault(feature)-mean)/stdDev);
-        }
+        standardize(record, feature, mean, stdDev);
       }
       for(Record record : testRecords) {
-        if(stdDev == 0) {
-          record.put(feature, 0.0);
-        } else {
-          record.put(feature, (record.getOrDefault(feature)-mean)/stdDev);
-        }
+        standardize(record, feature, mean, stdDev);
       }
+    }
+  }
+
+  /* Standardizes the value for the specified feature for the specified record */
+  private static void standardize(Record record, int feature, double mean, double stdDev) {
+    double newVal = (stdDev == 0) ? 0.0 : (record.getOrDefault(feature)-mean)/stdDev;
+    if(newVal == 0) {
+      record.remove(feature);
+    } else {
+      record.put(feature, newVal);
     }
   }
 
@@ -146,26 +148,29 @@ public class Record extends HashMap<Integer, Double> {
     for(int feature: allFeats) {
       HashMap<String, ArrayList<Double>> classValuesMap = new HashMap<>();
       ArrayList<Double> values = new ArrayList<>();
+      /* Create lists of all the values for this attribute for each class and overall */
       for(Record record : records) {
-        if(record.containsKey(feature) && record.get(feature)!=null) {
+        if(record.getOrDefault(feature)!=null) {
           String label = record.getClassLabel();
           classValuesMap.putIfAbsent(label, new ArrayList<Double>());
-          classValuesMap.get(label).add(record.get(feature));
-          values.add(record.get(feature));
+          classValuesMap.get(label).add(record.getOrDefault(feature));
+          values.add(record.getOrDefault(feature));
         }
       }
-      double overallMedian = values.size()> 0 ? DataMiningUtil.median(values) : -1;
+      /* Calculate the median values */
+      double overallMedian = values.size() > 0 ? DataMiningUtil.median(values) : 0;
       HashMap<String, Double> medians = new HashMap<>();
       for(String key : classValuesMap.keySet()) {
         medians.put(key, DataMiningUtil.median(classValuesMap.get(key)));
       }
+      /* Fill in values for missing records missing this attribute */
       for(Record record : records) {
-        if(record.containsKey(feature) && record.get(feature)==null) {
+        if(record.getOrDefault(feature)==null) {
           String label = record.getClassLabel();
           if(medians.containsKey(label)) {
             // use the median for this record's class
             record.put(feature, medians.get(label));
-          } else if (overallMedian > 0) {
+          } else if (values.size() > 0) {
             // no other records in the same class contained this feature
             // use the overall median
             record.put(feature, overallMedian);

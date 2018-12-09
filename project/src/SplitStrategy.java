@@ -6,6 +6,7 @@ import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.Collection;
 
 /* Represents some method for splitting a decision tree */
 public class SplitStrategy {
@@ -14,11 +15,18 @@ public class SplitStrategy {
   private final int numThreads;
   /* Maximum number of buckets considered for splitting per attribute */
   private final int maxBuckets;
+  /* Stores that class label at the index it is associated with */
+  private HashMap<String, Integer> classIndexMap;
 
   /* Default Constructor */
   public SplitStrategy(DecisionTreeBuilder builder) {
     this.numThreads = builder.numThreads;
     this.maxBuckets = builder.maxBuckets;
+  }
+
+  /* Setter for classIndexMap */
+  public void setClassIndexMap(HashMap<String, Integer> classIndexMap) {
+    this.classIndexMap = classIndexMap;
   }
 
   /* Returns the split condition that produces the purest partition of the reaching
@@ -37,16 +45,50 @@ public class SplitStrategy {
    * feature axes */
   protected List<SplitCondition> getBaseConditions(List<Record> records) {
     List<Integer> features = new ArrayList<Integer>(Record.getAllFeatures(records));
+    ArrayList<Callable<Boolean>> tasks = new ArrayList<>();
+    ArrayList<List<SplitCondition>> conditionsList = new ArrayList<>();
+    int i = 0;
+    for(int feature : features) {
+      ArrayList<SplitCondition> next = new ArrayList<>();
+      conditionsList.add(next);
+      Callable<Boolean> task = () -> {
+        try {
+          addFeatureBaseConditions(records, feature, next);
+          return true;
+        } catch(Exception e) {
+          e.printStackTrace();
+          return false;
+        }
+      };
+      tasks.add(task);
+    }
+    runTasks(tasks);
     List<SplitCondition> conditions = new ArrayList<>();
-    for(Integer feature : features) {
-      for(double bucket : AttributeSpace.getSplitBuckets(records, feature, maxBuckets)) {
-        Predicate<Record> condition = (record) -> {
-          return record.getOrDefault(feature) < bucket;
-        };
-        conditions.add(new SplitCondition(condition, feature, bucket));
-      }
+    for(List<SplitCondition> list : conditionsList) {
+      conditions.addAll(list);
     }
     return conditions;
+  }
+
+  /* Gets the basic set of conditions which split the feature space along the
+   * the specified feature axis */
+  private void addFeatureBaseConditions(List<Record> records, int feature, List<SplitCondition> conditions) {
+    int[] classFreqs = DecisionTree.getClassFreqs(records, classIndexMap);
+    AttributeSpace attrSpace = new AttributeSpace(records, feature, maxBuckets, classIndexMap);
+    for(int i = 0; i < attrSpace.numCandidates(); i++) {
+      double bucket = attrSpace.getCandidate(i);
+      Predicate<Record> condition = (record) -> {
+        return record.getOrDefault(feature) < bucket;
+      };
+      SplitCondition split = new SplitCondition(condition, feature, bucket);
+      int[] classFreqsLeft = attrSpace.getFreqList(i);
+      int[] classFreqsRight = new int[classIndexMap.size()];
+      for(int j = 0; j < classFreqs.length; j++) {
+        classFreqsRight[j] = classFreqs[j] - classFreqsLeft[j];
+      }
+      split.setImpurity(calcWeightedGiniImpurity(classFreqsLeft, classFreqsRight, DecisionTree.sumArray(classFreqsLeft), records.size()));
+      conditions.add(split);
+    }
   }
 
   /* Selects and returns a SplitCondition from the specified list of tied (with respected
@@ -69,7 +111,6 @@ public class SplitStrategy {
   /* Return a list of the specified number of conditions with the lowest impurity.
    * Includes any additional conditions that are tied for lowest impurity */
   protected List<SplitCondition> mostPureConditions(int numConditions, List<SplitCondition> conditions, List<Record> records, DecisionTree tree) {
-    ExecutorService taskExecutor = Executors.newFixedThreadPool(numThreads);
     final int conditionsPerTask = 100;
     ArrayList<Callable<Boolean>> tasks = new ArrayList<>(conditions.size());
     for(int x = 0; x < conditions.size(); x+=conditionsPerTask) {
@@ -89,13 +130,7 @@ public class SplitStrategy {
       };
       tasks.add(task);
     }
-    try {
-      taskExecutor.invokeAll(tasks);
-    } catch (InterruptedException e) {
-      throw new IllegalStateException(e);
-    } finally {
-      taskExecutor.shutdown();
-    }
+    runTasks(tasks);
     PriorityQueue<SplitCondition> conditionQueue = new PriorityQueue<>(conditions);
     ArrayList<SplitCondition> topConditions = new ArrayList<>();
     SplitCondition prev = null;
@@ -103,6 +138,18 @@ public class SplitStrategy {
       topConditions.add(conditionQueue.poll());
     }
     return topConditions;
+  }
+
+  /* Runs the specified tasks */
+  private <T> void runTasks(Collection<? extends Callable<T>> tasks) {
+    ExecutorService taskExecutor = Executors.newFixedThreadPool(numThreads);
+    try {
+      taskExecutor.invokeAll(tasks);
+    } catch (InterruptedException e) {
+      throw new IllegalStateException(e);
+    } finally {
+      taskExecutor.shutdown();
+    }
   }
 
   /* The weighted GINI impurity of the split formed by partitioning the specified
@@ -122,10 +169,15 @@ public class SplitStrategy {
         classFreqsRight[index]++;
       }
     }
+    return calcWeightedGiniImpurity(classFreqsLeft, classFreqsRight, totalLeft, records.size());
+  }
+
+  /* Returns the weighted GINI impurity of a binary split that results in the specified properties */
+  public static double calcWeightedGiniImpurity(int[] classFreqsLeft, int[] classFreqsRight, int totalLeft, int totalRecords) {
     double giniLeft = getGiniImpurity(classFreqsLeft);
     double giniRight = getGiniImpurity(classFreqsRight);
-    double probLeft = (1.0*totalLeft)/records.size();
-    double probRight = (1.0*totalRight)/records.size();
+    double probLeft = (1.0*totalLeft)/totalRecords;
+    double probRight = (1.0*(totalRecords-totalLeft))/totalRecords;
     return giniLeft*probLeft + giniRight*probRight;
   }
 

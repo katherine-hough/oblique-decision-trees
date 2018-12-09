@@ -39,7 +39,8 @@ public class GeneticSplitStrategy extends SplitStrategy {
    * and conditions are the ones that would have resulted in the purest traditional
    * decision tree split. */
   private void setTargetFeatures(List<Record> records, DecisionTree tree) {
-    int numCond = (int)Math.min(records.size()*geneConditionsPercent + minGeneConditions, maxGeneConditions);
+    double classFactor = 1.0/Record.getAllClasses(records).size();
+    int numCond = (int)Math.min(classFactor*records.size()*geneConditionsPercent + minGeneConditions, maxGeneConditions);
     List<SplitCondition> conditions = mostPureConditions(numCond, getBaseConditions(records), records, tree);
     TreeSet<Integer> features = new TreeSet<>();
     for(SplitCondition condition : conditions) {

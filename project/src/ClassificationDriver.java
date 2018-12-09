@@ -26,22 +26,22 @@ public class ClassificationDriver {
    * data using the specified decision tree method */
   public static ArrayList<String> calculateLabels(String method, ArrayList<Record> trainingData, ArrayList<Record> testData) {
     DecisionTreeBuilder builder = new DecisionTreeBuilder()
-                      .reservePortionDenom(2)
+                      .reservePortionDenom(5)
                       .prune(false)
                       .rand(new Random(484))
                       .numThreads(4)
                       .maxBuckets(200)
-                      .maxNonHomogenuousPercent(0.01)
+                      .maxNonHomogenuousPercent(0.001)
                       .maxBaseConditions(300)
                       .minBaseConditions(100)
                       .baseConditionsPercent(0.01)
                       .maxGeneConditions(100)
                       .minGeneConditions(1)
-                      .geneConditionsPercent(0.15)
+                      .geneConditionsPercent(0.45)
                       .populationSize(128)
                       .tournamentSize(4)
                       .replacementTournamentSize(6)
-                      .maxGenerations(100);
+                      .maxGenerations(200);
     Class<? extends SplitStrategy> strategyClass;
     if(method.equals("GA-ODT")) {
       strategyClass = GeneticSplitStrategy.class;
@@ -53,7 +53,6 @@ public class ClassificationDriver {
       throw new RuntimeException("Invalid splitting method name: " + method);
     }
     DecisionTree classifier = builder.build(trainingData, strategyClass);
-    // System.out.println(TreePrintingUtil.getTreeString(classifier, 5));
     return classifier.classifyAll(testData);
   }
 }

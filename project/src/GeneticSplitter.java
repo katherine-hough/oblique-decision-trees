@@ -48,6 +48,9 @@ public class GeneticSplitter {
   /* Return the best split condition found after the maximum number of
    * generations */
   public SplitCondition getBestSplitCondition() {
+    if(targetFeatures.length == 0) {
+      return null;
+    }
     Individual[] population = initializePopulation();
     if(population == null) {
       return null;

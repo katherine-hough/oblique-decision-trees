@@ -37,6 +37,7 @@ public class DecisionTree extends Classifier {
     for(Record record : records) {
       this.classIndexMap.putIfAbsent(record.getClassLabel(), classIndexMap.size());
     }
+    splitStrategy.setClassIndexMap(classIndexMap);
     this.indexClassMap = new String[classIndexMap.size()];
     for(String key : classIndexMap.keySet()) {
       this.indexClassMap[classIndexMap.get(key)] = key;
@@ -62,8 +63,18 @@ public class DecisionTree extends Classifier {
     return classFreqs;
   }
 
+  /* Returns the frequencies of the different classes found in the specified list
+   * of records */
+  public static int[] getClassFreqs(List<Record> records, HashMap<String, Integer> classIndexMap) {
+    int[] classFreqs = new int[classIndexMap.size()];
+    for(Record record : records) {
+      classFreqs[classIndexMap.get(record.getClassLabel())]++;
+    }
+    return classFreqs;
+  }
+
   /* Returns the index of the largest value in the specified array */
-  private int getIndexOfMax(int[] values) {
+  public static int getIndexOfMax(int[] values) {
     int maxIndex = 0;
     for(int i = 1; i < values.length; i++) {
       maxIndex = (values[i] > values[maxIndex]) ? i : maxIndex;
@@ -72,7 +83,7 @@ public class DecisionTree extends Classifier {
   }
 
   /* Returns the sum of the values in the specified array */
-  private int getSum(int[] values) {
+  public static int sumArray(int[] values) {
     int sum = 0;
     for(int i = 0; i < values.length; i++) {
       sum += values[i];
@@ -90,7 +101,7 @@ public class DecisionTree extends Classifier {
   /* Returns the number of records not from the majority class in the specified list */
   private int getNumberMisclassified(List<Record> records) {
     int[] classFreqs = getClassFreqs(records);
-    return getSum(classFreqs) - classFreqs[getIndexOfMax(classFreqs)];
+    return sumArray(classFreqs) - classFreqs[getIndexOfMax(classFreqs)];
   }
 
   /* Removes all records from the specified list that do not contain the specified feature
@@ -229,7 +240,7 @@ public class DecisionTree extends Classifier {
         bestIndex = i;
       }
     }
-    if(unprunedCorrectPredictions+1 >= correctPredictions.get(bestIndex)) {
+    if(unprunedCorrectPredictions >= correctPredictions.get(bestIndex)) {
       bestIndex = -1;
     }
     for(int i = bestIndex+1; i < correctPredictions.size(); i++) {
@@ -348,7 +359,7 @@ public class DecisionTree extends Classifier {
 
     /* Returns the training error for this node without considering its children */
     double nodeTrainingError() {
-      return SplitStrategy.getGiniImpurity(classFreqs);
+      return sumArray(classFreqs) - classFreqs[getIndexOfMax(classFreqs)];
     }
 
     /* Returns every descendant of this node that is a leaf node plus this node if
