@@ -13,7 +13,7 @@ def main():
         ('multiple-features', False, 2000, 649, 10), ('arcene', False, 200, 9961, 2),
         ('farm-ads', True, 4143, 54877, 2), ('dorothea', True, 1150, 91598, 2)]
     num_folds = 10 # Number of folds made for cross-validation
-    random_seeds = [484, 101, 434, 2222, 12, 676, 10101, 337, 99, 23] # Seeds used for the random number generator
+    random_seeds = [484, 101, 676, 2222, 12, 434, 10101, 337, 99, 23] # Seeds used for the random number generator
 
     random_seeds = random_seeds[:5]
     datasets = datasets[:6]
