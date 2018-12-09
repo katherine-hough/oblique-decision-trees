@@ -73,8 +73,7 @@ public class SplitStrategy {
   /* Gets the basic set of conditions which split the feature space along the
    * the specified feature axis */
   private void addFeatureBaseConditions(List<Record> records, int feature, List<SplitCondition> conditions) {
-    int[] classFreqsRight = DecisionTree.getClassFreqs(records, classIndexMap);
-    int[] classFreqsLeft = new int[classIndexMap.size()];
+    int[] classFreqs = DecisionTree.getClassFreqs(records, classIndexMap);
     AttributeSpace attrSpace = new AttributeSpace(records, feature, maxBuckets, classIndexMap);
     for(int i = 0; i < attrSpace.numCandidates(); i++) {
       double bucket = attrSpace.getCandidate(i);
@@ -82,10 +81,10 @@ public class SplitStrategy {
         return record.getOrDefault(feature) < bucket;
       };
       SplitCondition split = new SplitCondition(condition, feature, bucket);
-      int[] classFreqs = attrSpace.getCandidatesClassFreqs(i);
+      int[] classFreqsLeft = attrSpace.getFreqList(i);
+      int[] classFreqsRight = new int[classIndexMap.size()];
       for(int j = 0; j < classFreqs.length; j++) {
-        classFreqsLeft[j] += classFreqs[j];
-        classFreqsRight[j] -= classFreqs[j];
+        classFreqsRight[j] = classFreqs[j] - classFreqsLeft[j];
       }
       split.setImpurity(calcWeightedGiniImpurity(classFreqsLeft, classFreqsRight, DecisionTree.sumArray(classFreqsLeft), records.size()));
       conditions.add(split);

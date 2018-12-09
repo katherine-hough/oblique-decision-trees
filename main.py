@@ -55,16 +55,16 @@ def main():
             # print(f'CART {np.average(accuracies)} {elapsed_time}')
 
             # Run the OC1 implementation
-            # if not dataset[1]:
-            #     accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-            #     avg_accuracies['OC1'].append(np.average(accuracies))
-            #     avg_runtimes['OC1'].append(elapsed_time)
+            if not dataset[1]:
+                accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+                avg_accuracies['OC1'].append(np.average(accuracies))
+                avg_runtimes['OC1'].append(elapsed_time)
                 # print(f'OC1 {np.average(accuracies)} {elapsed_time}')
 
             # Run the C-DT implementation
-            # accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
-            # avg_accuracies['C-DT'].append(np.average(accuracies))
-            # avg_runtimes['C-DT'].append(elapsed_time)
+            accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
+            avg_accuracies['C-DT'].append(np.average(accuracies))
+            avg_runtimes['C-DT'].append(elapsed_time)
             # print(f'C-DT {np.average(accuracies)} {elapsed_time}')
 
             # Run the GA-ODT implementation
