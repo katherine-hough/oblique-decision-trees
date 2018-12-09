@@ -150,7 +150,7 @@ public class Record extends HashMap<Integer, Double> {
       ArrayList<Double> values = new ArrayList<>();
       /* Create lists of all the values for this attribute for each class and overall */
       for(Record record : records) {
-        if(record.containsKey(feature) && record.get(feature)!=null) {
+        if(record.getOrDefault(feature)!=null) {
           String label = record.getClassLabel();
           classValuesMap.putIfAbsent(label, new ArrayList<Double>());
           classValuesMap.get(label).add(record.getOrDefault(feature));

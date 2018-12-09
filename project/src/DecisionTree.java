@@ -359,7 +359,7 @@ public class DecisionTree extends Classifier {
 
     /* Returns the training error for this node without considering its children */
     double nodeTrainingError() {
-      return SplitStrategy.getGiniImpurity(classFreqs);
+      return sumArray(classFreqs) - classFreqs[getIndexOfMax(classFreqs)];
     }
 
     /* Returns every descendant of this node that is a leaf node plus this node if

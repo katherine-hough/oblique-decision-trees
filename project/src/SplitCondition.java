@@ -71,7 +71,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
   /* Returns a string representation of the split condition */
   @Override
   public String toString() {
-    return String.format("%s|%f", desc, impurity);
+    return String.format("%s", desc);
   }
 
   /* Returns a condition that is the logical negation of this condition */
