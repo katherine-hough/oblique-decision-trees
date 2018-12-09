@@ -16,7 +16,7 @@ def main():
     random_seeds = [484, 101, 676, 2222, 12, 434, 10101, 337, 99, 23] # Seeds used for the random number generator
 
     random_seeds = random_seeds[:5]
-    datasets = datasets[:6]
+    datasets = datasets[7:]
 
     # Compile the java code for the project
     if(os.name == 'nt'):
@@ -55,23 +55,23 @@ def main():
             # print(f'CART {np.average(accuracies)} {elapsed_time}')
 
             # Run the OC1 implementation
-            # if not dataset[1]:
-            #     accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
-            #     avg_accuracies['OC1'].append(np.average(accuracies))
-            #     avg_runtimes['OC1'].append(elapsed_time)
-            #     print(f'OC1 {np.average(accuracies)} {elapsed_time}')
+            if not dataset[1]:
+                accuracies, elapsed_time = run_oc1(num_folds, random_seed, dataset)
+                avg_accuracies['OC1'].append(np.average(accuracies))
+                avg_runtimes['OC1'].append(elapsed_time)
+                print(f'OC1 {np.average(accuracies)} {elapsed_time}')
 
             # Run the C-DT implementation
-            # accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
-            # avg_accuracies['C-DT'].append(np.average(accuracies))
-            # avg_runtimes['C-DT'].append(elapsed_time)
-            # print(f'C-DT {np.average(accuracies)} {elapsed_time}')
+            accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'C-DT')
+            avg_accuracies['C-DT'].append(np.average(accuracies))
+            avg_runtimes['C-DT'].append(elapsed_time)
+            print(f'C-DT {np.average(accuracies)} {elapsed_time}')
 
             # Run the GA-ODT implementation
-            accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
-            avg_accuracies['GA-ODT'].append(np.average(accuracies))
-            avg_runtimes['GA-ODT'].append(elapsed_time)
-            print(f'GA-ODT {np.average(accuracies)} {elapsed_time}')
+            # accuracies, elapsed_time = run_project_dt(num_folds, random_seed, dataset, 'GA-ODT')
+            # avg_accuracies['GA-ODT'].append(np.average(accuracies))
+            # avg_runtimes['GA-ODT'].append(elapsed_time)
+            # print(f'GA-ODT {np.average(accuracies)} {elapsed_time}')
 
         for key in avg_accuracies:
             if len(avg_accuracies[key]) > 0:
