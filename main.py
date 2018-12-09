@@ -16,7 +16,7 @@ def main():
     random_seeds = [484, 101, 676, 2222, 12, 434, 10101, 337, 99, 23] # Seeds used for the random number generator
 
     random_seeds = random_seeds[:5]
-    datasets = datasets[:6]
+    # datasets = datasets[:6]
 
     # Compile the java code for the project
     if(os.name == 'nt'):
