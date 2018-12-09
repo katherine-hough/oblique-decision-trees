@@ -41,24 +41,24 @@ public class DecisionTreeBuilder {
   /* Constructor, sets all values to their defaults */
   public DecisionTreeBuilder() {
     this.reservePortionDenom = 5;
-    this.prune = true;
+    this.prune = false;
     this.rand = new Random(484);
     this.numThreads = 4;
-    this.maxBuckets = 100;
-    this.maxNonHomogenuousPercent = 0.005;
+    this.maxBuckets = 200;
+    this.maxNonHomogenuousPercent = 0.001;
     this.maxBaseConditions = 300;
     this.minBaseConditions = 100;
     this.baseConditionsPercent = 0.01;
-    this.maxGeneConditions = 50;
+    this.maxGeneConditions = 100;
     this.minGeneConditions = 1;
-    this.geneConditionsPercent = 0.4;
+    this.geneConditionsPercent = 0.45;
     this.geneticBuilder = new GeneticSplitter.GeneticSplitterBuilder()
                       .rand(rand)
-                      .populationSize(264)
+                      .populationSize(128)
                       .tournamentSize(4)
-                      .replacementTournamentSize(7)
+                      .replacementTournamentSize(6)
                       .maxBuckets(maxBuckets)
-                      .maxGenerations(250);
+                      .maxGenerations(200);
   }
 
   public DecisionTreeBuilder reservePortionDenom(int reservePortionDenom) {
