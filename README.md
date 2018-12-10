@@ -1,9 +1,7 @@
 # Oblique Decision Trees
 Project for the Fall 2018 section of CS-484-001 at George Mason University
 
-Explored the performance of two newly created decision tree creation methods and
-compares their performance on eight datasets against to two existing stock
-decision tree creation methods
+Explores the performance of two newly created decision tree methods and compares their performance on eight datasets against to two existing stock decision tree methods
 
 ### Prerequisites
 * Java SE Development Kit (JDK) 8+
