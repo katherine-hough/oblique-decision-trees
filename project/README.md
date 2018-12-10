@@ -9,12 +9,12 @@ This project contains two new methods for constructing decision trees that are c
 
 ### Formatting Data
 * Label files must have one class label per line in the same order as the corresponding training file.
-* Class Labels are treated as strings so "1" is not the same as "1 ".
+* Class labels are treated as strings so "1" is not the same as "1 ".
 * Feature vector files can either be in a sparse or a dense format, with one instance/vector per line.
 * Dense feature vectors are represented on a single line with each feature in order and separated by whitespace from the next.
-* Sparse feature vectors are represented on a single line. Features can be represented in any order by specifying the feature number followed by whitespace and then the value of the feature. Each feature number value pair is separated from the next by whitespace. Any feature not specified for a vector is assumed to be 0-valued.
+* Sparse feature vectors are represented on a single line. Features can be represented in any order by specifying the feature number followed by whitespace and then the value of the feature. Each feature number, value pair is separated from the next by whitespace. Any feature not specified for a vector is assumed to be 0-valued.
 * All features must be numeric.
-* Missing features can be used only in dense files, and should be denoted with a single "?".
+* Missing features can be used only in dense files and should be denoted with a single "?".
 
 ### Running a Test Set Classification
 * run: java -cp project/target ClassificationDriver [sparse|dense] [test_feature_vectors_file] [training_feature_vectors_file] [training_labels_file] [number_of_folds] [output_labels_file] [GA-ODT|C-DT|DT]
