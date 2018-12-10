@@ -14,7 +14,7 @@ decision tree creation methods
 * scipy (https://www.scipy.org/)
 
 ### Getting Started
-To run all of the decision tree implementations on the provided datasets run main.py.
+To run all of the decision tree methods on the provided datasets run main.py.
 
 ### Stock Methods:
 * CART (http://scikit-learn.org/stable/modules/tree.html)
