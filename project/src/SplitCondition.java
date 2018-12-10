@@ -3,13 +3,21 @@ import java.util.function.Predicate;
 /* Represents a condition to split the instances at a node of a decision tree at */
 public class SplitCondition implements Comparable<SplitCondition> {
 
+  /* A split representation of the decision boundary of this condition */
   private final String desc;
+  /* Predicate representation of the decision boundary */
   private final Predicate<Record> condition;
+  /* The Gini impurity of the split produced by this condition if it has been
+   * calculated, otherwise -1 */
   private double impurity;
+  /* Represents how complex/compounded this condition is */
   private int rank;
-  private int feature; // optional field, feature this split occurs on
-  private double bucket; // optional field, splitting value for feature
+  /* optional field, feature this split occurs on */
+  private int feature;
+  /* optional field, splitting value for feature */
+  private double bucket;
 
+  /* Constructor */
   public SplitCondition(Predicate<Record> condition, String desc) {
     this.condition = condition;
     this.desc = desc;
@@ -17,6 +25,7 @@ public class SplitCondition implements Comparable<SplitCondition> {
     this.impurity = -1;
   }
 
+  /* Constructor */
   public SplitCondition(Predicate<Record> condition, int feature, double bucket) {
     this.condition = condition;
     this.desc = String.format("x[%d] < %2.2f", feature, bucket);

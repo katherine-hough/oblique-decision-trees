@@ -241,7 +241,6 @@ visualization/
 !data/arcene/arcene.param
 
 # Include for breast-cancer dataset
-!data/breast-cancer/breast-cancer_src.data
 !data/breast-cancer/breast-cancer.data
 !data/breast-cancer/breast-cancer.labels
 !data/breast-cancer/breast-cancer.names
@@ -260,12 +259,6 @@ visualization/
 !data/multiple-features/multiple-features.data
 !data/multiple-features/multiple-features.labels
 !data/multiple-features/mfeat.info
-!data/multiple-features/mfeat-fac.txt
-!data/multiple-features/mfeat-fou.txt
-!data/multiple-features/mfeat-kar.txt
-!data/multiple-features/mfeat-mor.txt
-!data/multiple-features/mfeat-pix.txt
-!data/multiple-features/mfeat-zer.txt
 
 # Include for dorothea
 !data/dorothea/dorothea.data

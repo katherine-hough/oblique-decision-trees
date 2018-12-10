@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 /* Classifies the test instances using the training instances. Writes the

@@ -329,7 +329,7 @@ public class GeneticSplitter {
       return this;
     }
 
-    /* Returns a GeneticSplitter instance built from the builders parameters */
+    /* Returns a GeneticSplitter instance built from the builder's parameters */
     public GeneticSplitter build() {
       return new GeneticSplitter(this);
     }

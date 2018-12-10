@@ -169,6 +169,7 @@ public class DataMiningUtil {
     return getStratifiedGroups(instances, numGroups, classes, rand);
   }
 
+  /* Calculates the median value for the list of doubles */
   public static double median(List<Double> values) {
     List<Double> copy = new ArrayList<>(values);
     Collections.sort(copy);

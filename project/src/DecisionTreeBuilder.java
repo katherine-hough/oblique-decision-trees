@@ -143,6 +143,7 @@ public class DecisionTreeBuilder {
     return this;
   }
 
+  /* Returns a DecisionTree instance built from the builder's parameters */
   public <T extends SplitStrategy> DecisionTree build(List<Record> records, Class<T> strategyClass) {
     try {
       SplitStrategy splitStrategy = strategyClass.getConstructor(DecisionTreeBuilder.class).newInstance(this);

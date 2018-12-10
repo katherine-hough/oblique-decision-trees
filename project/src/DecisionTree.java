@@ -1,10 +1,8 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.function.Predicate;
 import java.util.Random;
 
 /* A trained decision tree used for classifying records. */
@@ -129,42 +127,6 @@ public class DecisionTree extends Classifier {
     return trainingRecords;
   }
 
-  /* Creates lists containing the string representations of nodes at each level
-   of the tree */
-  public ArrayList<ArrayList<ArrayList<String>>> getBFSStrings() {
-    ArrayList<ArrayList<ArrayList<String>>> levels = new ArrayList<>();
-    ArrayList<DecisionNode> curLevel = new ArrayList<>();
-    ArrayList<String> nullStrings = new ArrayList<>();
-    nullStrings.add(null);
-    nullStrings.add(null);
-    curLevel.add(root);
-    while(!curLevel.isEmpty()) {
-      ArrayList<DecisionNode> nextLevel = new ArrayList<>();
-      ArrayList<ArrayList<String>> curLevelStrings = new ArrayList<>();
-      boolean nonNullChild = false;
-      for(DecisionNode node : curLevel) {
-        if(node == null) {
-          nextLevel.add(null);
-          nextLevel.add(null);
-          curLevelStrings.add(nullStrings);
-        } else {
-          nextLevel.add(node.leftChild);
-          nextLevel.add(node.rightChild);
-          curLevelStrings.add(node.getStrings());
-          if(node.leftChild != null || node.rightChild != null) {
-            nonNullChild = true;
-          }
-        }
-      }
-      levels.add(curLevelStrings);
-      curLevel = nextLevel;
-      if(!nonNullChild) {
-        return levels;
-      }
-    }
-    return levels;
-  }
-
   /* Randomly (based on the specified Random instance) reserves 1 divided by the
    * specfied reserve portion denominator instances of the training data to use in
    * post-pruning. Creates a tree of the specified tree class with the remaining
@@ -270,6 +232,80 @@ public class DecisionTree extends Classifier {
       }
     }
     return correctPredictions;
+  }
+
+  /* Creates lists containing the string representations of nodes at each level
+   of the tree */
+  private ArrayList<ArrayList<ArrayList<String>>> getBFSStrings() {
+    ArrayList<ArrayList<ArrayList<String>>> levels = new ArrayList<>();
+    ArrayList<DecisionNode> curLevel = new ArrayList<>();
+    ArrayList<String> nullStrings = new ArrayList<>();
+    nullStrings.add(null);
+    nullStrings.add(null);
+    curLevel.add(root);
+    while(!curLevel.isEmpty()) {
+      ArrayList<DecisionNode> nextLevel = new ArrayList<>();
+      ArrayList<ArrayList<String>> curLevelStrings = new ArrayList<>();
+      boolean nonNullChild = false;
+      for(DecisionNode node : curLevel) {
+        if(node == null) {
+          nextLevel.add(null);
+          nextLevel.add(null);
+          curLevelStrings.add(nullStrings);
+        } else {
+          nextLevel.add(node.leftChild);
+          nextLevel.add(node.rightChild);
+          curLevelStrings.add(node.getStrings());
+          if(node.leftChild != null || node.rightChild != null) {
+            nonNullChild = true;
+          }
+        }
+      }
+      levels.add(curLevelStrings);
+      curLevel = nextLevel;
+      if(!nonNullChild) {
+        return levels;
+      }
+    }
+    return levels;
+  }
+
+  /* Prints a vertices + edges representation of this tree to the specified file */
+  public void printGraphRepresentationToFile(String filename) {
+    ArrayList<String> lines = new ArrayList<>();
+    ArrayList<ArrayList<ArrayList<String>>> levels = getBFSStrings();
+    int nodeNum = 0;
+    lines.add("Nodes:");
+    ArrayList<ArrayList<Integer>> nodeNums = new ArrayList<>();
+    for(int level = 0; level < levels.size(); level++) {
+      nodeNums.add(new ArrayList<>());
+      for(int node = 0; node < levels.get(level).size(); node++) {
+        ArrayList<String> nodeStrs = levels.get(level).get(node);
+        if(nodeStrs.get(0) != null && nodeStrs.get(0).length() > 0) {
+          lines.add(String.format("%d|%s|%s", nodeNum, nodeStrs.get(0) , nodeStrs.get(1)));
+          nodeNums.get(level).add(nodeNum++);
+        } else {
+          nodeNums.get(level).add(-1);
+        }
+      }
+    }
+    lines.add("Edges:");
+    for(int level = 0; level < nodeNums.size()-1; level++) {
+      for(int node = 0; node < nodeNums.get(level).size(); node++) {
+        int src = nodeNums.get(level).get(node);
+        if(src > -1) {
+          int left = nodeNums.get(level+1).get(node*2);
+          int right = nodeNums.get(level+1).get(node*2+1);
+          if(left > -1) {
+            lines.add(String.format("%d -> %d", src, left));
+          }
+          if(right > -1) {
+            lines.add(String.format("%d -> %d", src, right));
+          }
+        }
+      }
+    }
+    DataMiningUtil.writeToFile(lines, filename);
   }
 
   /* Represents a node in the decision tree */
