@@ -50,8 +50,6 @@ public class GeneticSplitter {
   public SplitCondition getBestSplitCondition() {
     if(targetFeatures.length == 0) {
       return null;
-    } else if(targetFeatures.length == 1) {
-      return topConditions.get(0);
     }
     Individual[] population = initializePopulation();
     if(population == null) {

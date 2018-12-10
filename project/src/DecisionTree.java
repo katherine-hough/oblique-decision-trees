@@ -289,17 +289,21 @@ public class DecisionTree extends Classifier {
     /* Constructor */
     DecisionNode(List<Record> reachingRecords) {
       this.classFreqs = getClassFreqs(reachingRecords);
+      String tempLeafLabel = getMostFrequentLabel(reachingRecords);
       if (reachingRecords.size() == 0) {
         leafLabel = defaultClass;
       } else if(getNumberMisclassified(reachingRecords) <= maxNonHomogenuousRecords) {
-        leafLabel = getMostFrequentLabel(reachingRecords);
+        leafLabel = tempLeafLabel;
       } else {
         splitCondition = splitStrategy.selectSplitCondition(reachingRecords, tree);
         if(splitCondition == null) {
-          leafLabel = getMostFrequentLabel(reachingRecords);
+          leafLabel = tempLeafLabel;
         } else {
           List<Record> trueRecords = new ArrayList<>(reachingRecords);
           List<Record> falseRecords  = splitOnCondition(splitCondition, trueRecords);
+          if(trueRecords.size() == 0 || falseRecords.size() == 0) {
+            leafLabel = tempLeafLabel;
+          }
           leftChild = new DecisionNode(trueRecords);
           rightChild = new DecisionNode(falseRecords);
         }

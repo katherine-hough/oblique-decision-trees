@@ -1,5 +1,5 @@
 @echo off
-set dataset=wine
+set dataset=breast-cancer
 set sparse=dense
 
 javac -Xlint:unchecked -d project/target project/src/*.java
