@@ -6,7 +6,7 @@ compares their performance on eight datasets against to two existing stock
 decision tree creation methods
 
 ### Prerequisites
-* Java SE Development Kit (JDK) 8
+* Java SE Development Kit (JDK) 8+
 * Python 3.6+
 * GCC 4.8+
 * numpy (http://www.numpy.org/)
