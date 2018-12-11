@@ -1,36 +1,36 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                */
-/* Department of Computer Science		                */
+/* Johns Hopkins University			                                */
+/* Department of Computer Science		                            */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					*/
+/* Contact : murthy@cs.jhu.edu					                        */
 /****************************************************************/
-/* File Name : mktree.c						*/
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : September 1994		                */
+/* File Name : mktree.c						                              */
+/* Author : Sreerama K. Murthy					                        */
+/* Last modified : September 1994		                            */
 /*                 (unnormalize_hyperplane corrected - 9/21/94).*/
-/* Contains modules : 	main					*/
-/*			allocate_structures			*/
-/*			deallocate_structures			*/
-/*			build_tree				*/
-/*			build_subtree				*/
-/*			axis_parallel_split			*/
-/*			oblique_split				*/
-/*			cross_validate				*/
-/*			print_log_and_exit			*/
-/*			mktree_help				*/
-/* Uses modules in :	oc1.h					*/
-/*			util.c					*/
-/*			load_data.c				*/
-/*			classify.c				*/
-/*			train_util.c				*/
-/*			classify_util.c				*/
-/*			compute_impurity.c			*/
-/*			perturb.c				*/
-/*			prune.c					*/
-/* Is used by modules in :	None.				*/
-/* Remarks       :	This file has the OC1 modules, that	*/
-/*			build the decision trees recursively.	*/
+/* Contains modules : 	main					                          */
+/*			allocate_structures			                                */
+/*			deallocate_structures			                              */
+/*			build_tree				                                      */
+/*			build_subtree				                                    */
+/*			axis_parallel_split			                                */
+/*			oblique_split				                                    */
+/*			cross_validate				                                  */
+/*			print_log_and_exit			                                */
+/*			mktree_help				                                      */
+/* Uses modules in :	oc1.h					                            */
+/*			util.c					                                        */
+/*			load_data.c				                                      */
+/*			classify.c				                                      */
+/*			train_util.c				                                    */
+/*			classify_util.c				                                  */
+/*			compute_impurity.c			                                */
+/*			perturb.c				                                        */
+/*			prune.c					                                        */
+/* Is used by modules in :	None.				                        */
+/* Remarks       :	This file has the OC1 modules, that	        */
+/*			build the decision trees recursively.	                  */
 /****************************************************************/
 #include "oc1.h"
 
@@ -75,25 +75,25 @@ POINT **train_points=NULL,**test_points=NULL;
 
 
 /************************************************************************/
-/* Module name : main							*/
-/* Functionality :	Accepts user's options as input, sets control	*/
-/*			variables accordingly, and invokes the appro-	*/
-/*			priate data-reading, tree-building and 		*/
-/*			classifying routines. 				*/
-/* Parameters :	argc,argv : See any standard C textbook for details.	*/
-/* Returns :	nothing.						*/
-/* Calls modules :	mktree_help 					*/
-/*			print_log_and_exit				*/
-/*			read_data (load_data.c)				*/
-/*			allocate_structures				*/
-/*			build_tree					*/
-/*			write_tree (train_util.c)			*/
-/*			cross_validate					*/
-/*			deallocate_structures				*/
-/*			read_tree (classify_util.c)			*/
-/*			estimate_accuracy (classify.c)			*/
-/*			classify (classify.c)				*/
-/* Is called by modules : None.						*/
+/* Module name : main							                                      */
+/* Functionality :	Accepts user's options as input, sets control	      */
+/*			variables accordingly, and invokes the appro-	                  */
+/*			priate data-reading, tree-building and 		                      */
+/*			classifying routines. 				                                  */
+/* Parameters :	argc,argv : See any standard C textbook for details.	  */
+/* Returns :	nothing.						                                      */
+/* Calls modules :	mktree_help 					                              */
+/*			print_log_and_exit				                                      */
+/*			read_data (load_data.c)				                                  */
+/*			allocate_structures				                                      */
+/*			build_tree					                                            */
+/*			write_tree (train_util.c)			                                  */
+/*			cross_validate					                                        */
+/*			deallocate_structures				                                    */
+/*			read_tree (classify_util.c)			                                */
+/*			estimate_accuracy (classify.c)			                            */
+/*			classify (classify.c)				                                    */
+/* Is called by modules : None.						                              */
 /************************************************************************/
 main (int argc, char *argv[])
 {
@@ -376,14 +376,14 @@ main (int argc, char *argv[])
 }
 
 /************************************************************************/
-/* Module name : allocate_structures					*/
-/* Functionality :	Allocates space for some global data structures.*/
-/* Parameters : no_of_points : size of the training dataset.		*/
-/* Returns :	nothing.						*/
-/* Calls modules :	vector (util.c)					*/
-/*			ivector (util.c)				*/
-/*			dvector (util.c)				*/
-/* Is called by modules :	main					*/
+/* Module name : allocate_structures					                          */
+/* Functionality :	Allocates space for some global data structures.    */
+/* Parameters : no_of_points : size of the training dataset.		        */
+/* Returns :	nothing.						                                      */
+/* Calls modules :	vector (util.c)					                            */
+/*			ivector (util.c)				                                        */
+/*			dvector (util.c)				                                        */
+/* Is called by modules :	main					                                */
 /************************************************************************/
 allocate_structures(no_of_points)
      int no_of_points;
@@ -406,14 +406,14 @@ allocate_structures(no_of_points)
 }
 
 /************************************************************************/
-/* Module name : deallocate_structures					*/
+/* Module name : deallocate_structures					                        */
 /* Functionality : Frees space allocated to some global data structures.*/
-/* Parameters : no_of_points : size of the training dataset.		*/
-/* Returns :	nothing.						*/
-/* Calls modules :	free_vector (util.c)				*/
-/*			free_ivector (util.c)				*/
-/*			free_dvector (util.c)				*/
-/* Is called by modules :	main					*/
+/* Parameters : no_of_points : size of the training dataset.		        */
+/* Returns :	nothing.						                                      */
+/* Calls modules :	free_vector (util.c)				                        */
+/*			free_ivector (util.c)				                                    */
+/*			free_dvector (util.c)				                                    */
+/* Is called by modules :	main					                                */
 /************************************************************************/
 deallocate_structures(no_of_points)
      int no_of_points;
@@ -550,43 +550,43 @@ struct tree_node *build_tree(points,no_of_points,dt_file)
 }
 
 /************************************************************************/
-/* Module name : build_subtree						*/
-/* Functionality :	Recursively builds a decision tree. i.e., finds	*/
-/*			the best (heuristic) hyperplane separating the 	*/
-/*			given set of points, and recurses on both sides	*/
-/*			of the hyperplane. The best axis-parallel split	*/
-/*			is considered if -o option is not chosen, 	*/
-/*			before computing oblique splits.		*/
-/* Parameters :	node_str : Label to be assigned to the decision tree	*/
-/*		           node to be created. 				*/
-/*		cur_points : array of pointers to the points under	*/
-/*		             consideration.			       	*/
-/*		cur_no_of_points : Number of points.	                */
-/* Returns :	pointer to the decision tree node created.		*/
-/*		NULL, if a node couldn't be created.			*/
-/* Calls modules :	set_counts (compute_impurity.c)			*/
-/*			compute_impurity (compute_impurity.c)		*/
-/*			axis_parallel_split				*/
-/*			vector (util.c)					*/
-/*			oblique_split					*/
-/*			free_vector (util.c)				*/
-/*			error (util.c)					*/
-/*			find_values (perturb.c)				*/
-/*			largest_element (compute_impurity.c)		*/
-/*			build_subtree					*/
-/* Is called by modules : 	main					*/
-/*				build_tree				*/
-/*				build_subtree				*/
-/*				cross_validate				*/
+/* Module name : build_subtree						                              */
+/* Functionality :	Recursively builds a decision tree. i.e., finds	    */
+/*			the best (heuristic) hyperplane separating the 	                */
+/*			given set of points, and recurses on both sides	                */
+/*			of the hyperplane. The best axis-parallel split	                */
+/*			is considered if -o option is not chosen, 	                    */
+/*			before computing oblique splits.		                            */
+/* Parameters :	node_str : Label to be assigned to the decision tree	  */
+/*		           node to be created. 				                            */
+/*		cur_points : array of pointers to the points under	              */
+/*		             consideration.			       	                          */
+/*		cur_no_of_points : Number of points.	                            */
+/* Returns :	pointer to the decision tree node created.		            */
+/*		NULL, if a node couldn't be created.			                        */
+/* Calls modules :	set_counts (compute_impurity.c)			                */
+/*			compute_impurity (compute_impurity.c)		                        */
+/*			axis_parallel_split				                                      */
+/*			vector (util.c)					                                        */
+/*			oblique_split					                                          */
+/*			free_vector (util.c)				                                    */
+/*			error (util.c)					                                        */
+/*			find_values (perturb.c)				                                  */
+/*			largest_element (compute_impurity.c)		                        */
+/*			build_subtree					                                          */
+/* Is called by modules : 	main					                              */
+/*				build_tree				                                            */
+/*				build_subtree				                                          */
+/*				cross_validate				                                        */
 /* Important Variables used : 	initial_impurity: "inherent" impurity in*/
-/*				the point set under consideration. ie.,	*/
-/*				impurity when the separating hyperplane	*/
-/*				lies on one side of the point set.	*/
-/*				If any amount of perturbations (bounded	*/
-/*				by the parametric settings) can not	*/
-/*				result in a hyperplane that has a lesser*/
-/*				impurity than this value, no new tree	*/
-/*				node is created.			*/
+/*				the point set under consideration. ie.,	                      */
+/*				impurity when the separating hyperplane	                      */
+/*				lies on one side of the point set.	                          */
+/*				If any amount of perturbations (bounded	                      */
+/*				by the parametric settings) can not	                          */
+/*				result in a hyperplane that has a lesser                      */
+/*				impurity than this value, no new tree	                        */
+/*				node is created.			                                        */
 /************************************************************************/
 struct tree_node *build_subtree(node_str,cur_points,cur_no_of_points)
                   char *node_str;
@@ -849,25 +849,25 @@ struct tree_node *create_tree_node()
 }
 
 /************************************************************************/
-/* Module name : oblique_split						*/
-/* Functionality : 	Attempts to find the hyperplane, at an unrestri-*/
-/*			cted orientation, that best separates 		*/
-/*			"cur_points" (minimizing the current impurity	*/
-/*			measure), using hill climbing and randomization.*/
+/* Module name : oblique_split						                              */
+/* Functionality : 	Attempts to find the hyperplane, at an unrestri-    */
+/*			cted orientation, that best separates 		                      */
+/*			"cur_points" (minimizing the current impurity	                  */
+/*			measure), using hill climbing and randomization.                */
 /* Parameters :	cur_points : array of pointers to the points (samples)	*/
-/*			     under consideration.			*/
-/*		cur_no_of_points : number of points under consideration.*/
-/* Returns :	the impurity measure of the best hyperplane found.	*/
-/*		The hyperplane itself is returned through the global	*/
-/*		array "coeff_array".					*/
-/* Calls modules :	generate_random_hyperplane			*/
-/*			find_values (perturb.c)				*/
-/*			set_counts (compute_impurity.c)			*/
-/*			compute_impurity (compute_impurity.c)		*/
-/*			myrandom (util.c)				*/
-/*			suggest_perturbation (perturb.c)		*/
-/*			perturb_randomly (perturb.c)			*/
-/* Is called by modules :	build_subtree				*/
+/*			     under consideration.			                                  */
+/*		cur_no_of_points : number of points under consideration.          */
+/* Returns :	the impurity measure of the best hyperplane found.	      */
+/*		The hyperplane itself is returned through the global	            */
+/*		array "coeff_array".					                                    */
+/* Calls modules :	generate_random_hyperplane			                    */
+/*			find_values (perturb.c)				                                  */
+/*			set_counts (compute_impurity.c)			                            */
+/*			compute_impurity (compute_impurity.c)		                        */
+/*			myrandom (util.c)				                                        */
+/*			suggest_perturbation (perturb.c)		                            */
+/*			perturb_randomly (perturb.c)			                              */
+/* Is called by modules :	build_subtree				                          */
 /************************************************************************/
 float oblique_split(cur_points,cur_no_of_points,cur_label)
      POINT **cur_points;
@@ -1112,22 +1112,22 @@ int alter_coefficients(cur_points,cur_no_of_points)
 
 
 /************************************************************************/
-/* Module name : 	axis_parallel_split				*/
-/* Functionality : 	Attempts to find the hyperplane, at an axis-	*/
-/*			parallel orientation, that best separates	*/
-/*			"cur_points" (minimizing the current impurity	*/
-/*			measure). 					*/
+/* Module name : 	axis_parallel_split				                            */
+/* Functionality : 	Attempts to find the hyperplane, at an axis-	      */
+/*			parallel orientation, that best separates	                      */
+/*			"cur_points" (minimizing the current impurity	                  */
+/*			measure). 					                                            */
 /* Parameters :	cur_points : array of pointers to the points (samples)	*/
-/*			     under consideration.			*/
-/*		cur_no_of_points : number of points under consideration.*/
-/* Returns :	the impurity of the best hyperplane found.	        */
-/*		The hyperplane itself is returned through the global	*/
-/*		array "coeff_array".					*/
-/* Calls modules :	linear_split (perturb.c)			*/
-/*			find_values (perturb.c)				*/
-/*			set_counts (compute_impurity.c)			*/
-/*			compute_impurity (compute_impurity.c)		*/
-/* Is called by modules :	build_subtree				*/
+/*			     under consideration.			                                  */
+/*		cur_no_of_points : number of points under consideration.          */
+/* Returns :	the impurity of the best hyperplane found.	              */
+/*		The hyperplane itself is returned through the global	            */
+/*		array "coeff_array".					                                    */
+/* Calls modules :	linear_split (perturb.c)			                      */
+/*			find_values (perturb.c)				                                  */
+/*			set_counts (compute_impurity.c)			                            */
+/*			compute_impurity (compute_impurity.c)		                        */
+/* Is called by modules :	build_subtree				                          */
 /************************************************************************/
 float axis_parallel_split(cur_points,cur_no_of_points)
      POINT **cur_points;
@@ -1208,18 +1208,18 @@ write_hyperplane(out,label)
 }
 
 /************************************************************************/
-/* Module name : cross_validate						*/
-/* Functionality :	Performs K-fold cross_validation on a training  */
-/*                      set.					        */
-/* Parameters : points : point set under consideration			*/
-/*		no_of_points.						*/
-/* Returns :	Nothing.					 	*/
-/* Calls modules :	ivector (util.c)				*/
-/*			build_tree					*/
-/*			estimate_accuracy (classify.c)	                */
-/*			error (util.c)					*/
-/*			write_tree (train_util.c)			*/
-/* Is called by modules :	main					*/
+/* Module name : cross_validate						                              */
+/* Functionality :	Performs K-fold cross_validation on a training      */
+/*                      set.					                                  */
+/* Parameters : points : point set under consideration			            */
+/*		no_of_points.						                                          */
+/* Returns :	Nothing.					 	                                      */
+/* Calls modules :	ivector (util.c)				                            */
+/*			build_tree					                                            */
+/*			estimate_accuracy (classify.c)	                                */
+/*			error (util.c)					                                        */
+/*			write_tree (train_util.c)			                                  */
+/* Is called by modules :	main					                                */
 /************************************************************************/
 cross_validate(points,no_of_points)
      int no_of_points;
@@ -1328,14 +1328,14 @@ cross_validate(points,no_of_points)
 
 
 /************************************************************************/
-/* Module name :	print_log_and_exit				*/
-/* Functionality :	prints the log of a run of OC1 into the user-	*/
-/*			specified "log_file" (default : oc1.log). Log	*/
-/*			mainly consists of the parameter settings for   */
+/* Module name :	print_log_and_exit				                            */
+/* Functionality :	prints the log of a run of OC1 into the user-	      */
+/*			specified "log_file" (default : oc1.log). Log	                  */
+/*			mainly consists of the parameter settings for                   */
 /*                      the particular run.                             */
-/* Returns :	Nothing.						*/
-/* Calls modules :	none.						*/
-/* Is called by modules :	main					*/
+/* Returns :	Nothing.						                                      */
+/* Calls modules :	none.						                                    */
+/* Is called by modules :	main					                                */
 /************************************************************************/
 print_log_and_exit()
 {

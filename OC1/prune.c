@@ -1,30 +1,30 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                */
-/* Department of Computer Science		                */
+/* Johns Hopkins University			                                */
+/* Department of Computer Science		                            */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					*/
+/* Contact : murthy@cs.jhu.edu					                        */
 /****************************************************************/
-/* File Name : prune.c						*/
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : July 1994					*/
-/* Contains modules : 	prune					*/
-/*			error_complexity_prune			*/
-/*			cut_weakest_links			*/
-/*			subtree_cost				*/
-/*			node_cost				*/
-/*			compute_alpha				*/
-/*			replicate_tree				*/
-/*			cut_subtrees				*/
-/*			deallocate_tree				*/
-/* Uses modules in :	util.c					*/
-/*			oc1.h					*/ 
-/* Is used by modules in :	main (mktree.c)			*/
-/*				cross_validate (mktree.c)	*/
-/* Remarks       : 	Currently only one pruning strategy is	*/
-/*			implemented. This is Breiman et al's	*/
-/*			Error Complexity or Cost Complexity	*/
-/*			pruning.				*/
+/* File Name : prune.c						                              */
+/* Author : Sreerama K. Murthy					                        */
+/* Last modified : July 1994					                          */
+/* Contains modules : 	prune					                          */
+/*			error_complexity_prune			                            */
+/*			cut_weakest_links			                                  */
+/*			subtree_cost				                                    */
+/*			node_cost				                                        */
+/*			compute_alpha				                                    */
+/*			replicate_tree				                                  */
+/*			cut_subtrees				                                    */
+/*			deallocate_tree				                                  */
+/* Uses modules in :	util.c					                          */
+/*			oc1.h					                                          */ 
+/* Is used by modules in :	main (mktree.c)			                */
+/*				cross_validate (mktree.c)	                            */
+/* Remarks       : 	Currently only one pruning strategy is	    */
+/*			implemented. This is Breiman et al's	                  */
+/*			Error Complexity or Cost Complexity	                    */
+/*			pruning.				                                        */
 /****************************************************************/		
 #include "oc1.h"
 
@@ -45,18 +45,18 @@ struct dt
 
 
 /************************************************************************/
-/* Module name : prune							*/ 
-/* Functionality :	High level pruning routine that in turn calls	*/
-/*			the particular pruning strategy selected.	*/
-/*			Currently, only Breiman et al's error complexity*/
+/* Module name : prune							                                    */ 
+/* Functionality :	High level pruning routine that in turn calls	      */
+/*			the particular pruning strategy selected.	                      */
+/*			Currently, only Breiman et al's error complexity                */
 /*                      pruning using a separate test set is available.	*/
-/* Parameters :	dtree: Pointer to the root of the decision tree that	*/
-/*		needs to be pruned.					*/
-/* Returns :	Pointer to the root of the pruned decision tree.	*/
-/* Calls modules :	error_complexity_prune 				*/
-/*			error (util.c)					*/
-/* Is called by modules :	main (mktree.c)				*/
-/*				cross_validate (mktree.c)		*/
+/* Parameters :	dtree: Pointer to the root of the decision tree that	  */
+/*		needs to be pruned.					                                      */
+/* Returns :	Pointer to the root of the pruned decision tree.	        */
+/* Calls modules :	error_complexity_prune 				                      */
+/*			error (util.c)					                                        */
+/* Is called by modules :	main (mktree.c)				                        */
+/*				cross_validate (mktree.c)		                                  */
 /************************************************************************/
 struct tree_node *prune(dtree,prune_points,no_of_prune_points)
      struct point **prune_points;
@@ -78,24 +78,24 @@ struct tree_node *prune(dtree,prune_points,no_of_prune_points)
 
 
 /************************************************************************/
-/* Module name : error_complexity_prune       			        */ 
-/* Functionality :	Performs Breiman et al's Error Complexity	*/
-/*			pruning on a decision tree. (See the book	*/
-/*			"Classification and Regression Trees" for	*/
-/*			more details of the pruning algorithm.)		*/
-/*			Currently, we have not yet implemented 		*/
-/*			pruning using cross validation. The global	*/
-/*			parameter "prune_portion" determines the	*/
-/*			size of the random proportion of points		*/
-/*			from the training set that is used exclusively  */
-/*                      for pruning.                            	*/ 
-/* Parameters :	root : Pointer to the root of the decision tree to be	*/
-/*		pruned.							*/
-/* Returns :	Pointer to the root of the pruned decision tree.	*/
-/* Calls modules :	leaf_count (classify_util.c)			*/
-/*			estimate_accuracy (classify.c)	*/
-/*			cut_weakest_links				*/
-/* Is called by modules : 	prune					*/
+/* Module name : error_complexity_prune       			                    */ 
+/* Functionality :	Performs Breiman et al's Error Complexity	          */
+/*			pruning on a decision tree. (See the book	                      */
+/*			"Classification and Regression Trees" for	                      */
+/*			more details of the pruning algorithm.)		                      */
+/*			Currently, we have not yet implemented 		                      */
+/*			pruning using cross validation. The global	                    */
+/*			parameter "prune_portion" determines the	                      */
+/*			size of the random proportion of points		                      */
+/*			from the training set that is used exclusively                  */
+/*                      for pruning.                            	      */ 
+/* Parameters :	root : Pointer to the root of the decision tree to be  	*/
+/*		pruned.							                                              */
+/* Returns :	Pointer to the root of the pruned decision tree.	        */
+/* Calls modules :	leaf_count (classify_util.c)			                  */
+/*			estimate_accuracy (classify.c)	                                */
+/*			cut_weakest_links				                                        */
+/* Is called by modules : 	prune					                              */
 /************************************************************************/
 struct tree_node *error_complexity_prune(root)
      struct tree_node *root;
@@ -165,32 +165,32 @@ struct tree_node *error_complexity_prune(root)
 }
 
 /************************************************************************/
-/* Module name :	cut_weakest_links				*/ 
-/* Functionality :	Given a decision tree, this calculates the cost	*/
-/*			complexity parameter "alpha" for each interme-	*/
-/*			diate node except the root, and severs the	*/
-/*			subtrees starting at nodes with the lowest	*/
-/*			alpha values.					*/
-/* Parameters :	dtree : Pointer to the root of a decision tree.		*/	
-/* Returns :	Pointer to the root of a decision tree, which is the	*/
-/*		same as the input tree, except that the weakest links	*/
-/*		have been cut.						*/
-/* Calls modules :	leaf_count (classify_util.c)			*/
-/*			compute_alpha					*/
-/*			replicate_tree					*/
-/*			cut_subtrees					*/
-/* Is called by modules :	error_complexity_prune			*/
-/* Important Variables used :	alpha_array : Is a float array of length*/
-/*				equal to the number of internal nodes	*/
-/*				in the tree. This stores the alpha	*/
-/*				value for each internal node in the	*/
-/*				tree. Storing alpha values in an array	*/
-/*				in addition to in the tree nodes makes	*/
-/*				control flow easier to understand.	*/
-/* Remarks :	It is important to note that this routine does not 	*/
-/*		return the input tree with some links cut. Links are	*/
-/*		cut from a duplicate copy of the input tree, and that	*/
-/*		duplicate tree is output.				*/
+/* Module name :	cut_weakest_links				                              */ 
+/* Functionality :	Given a decision tree, this calculates the cost	    */
+/*			complexity parameter "alpha" for each interme-	                */
+/*			diate node except the root, and severs the	                    */
+/*			subtrees starting at nodes with the lowest	                    */
+/*			alpha values.					                                          */
+/* Parameters :	dtree : Pointer to the root of a decision tree.		      */	
+/* Returns :	Pointer to the root of a decision tree, which is the	    */
+/*		same as the input tree, except that the weakest links	            */
+/*		have been cut.						                                        */
+/* Calls modules :	leaf_count (classify_util.c)			                  */
+/*			compute_alpha					                                          */
+/*			replicate_tree					                                        */
+/*			cut_subtrees					                                          */
+/* Is called by modules :	error_complexity_prune			                  */
+/* Important Variables used :	alpha_array : Is a float array of length  */
+/*				equal to the number of internal nodes                         */
+/*				in the tree. This stores the alpha	                          */
+/*				value for each internal node in the	                          */
+/*				tree. Storing alpha values in an array	                      */
+/*				in addition to in the tree nodes makes                        */
+/*				control flow easier to understand.	                          */
+/* Remarks :	It is important to note that this routine does not 	      */
+/*		return the input tree with some links cut. Links are	            */
+/*		cut from a duplicate copy of the input tree, and that	            */
+/*		duplicate tree is output.				                                  */
 /************************************************************************/
 struct tree_node *cut_weakest_links(dtree)
      struct tree_node *dtree;
@@ -221,24 +221,24 @@ struct tree_node *cut_weakest_links(dtree)
 }
 
 /************************************************************************/
-/* Module name :	compute_alpha					*/ 
-/* Functionality :	"alpha" is a crucial parameter in error comple-	*/
-/*			xity pruning. "alpha" of an internal node N 	*/
-/*			can be taken to measure, in informal terms, the	*/
-/*			usefulness, in classifying the training set, 	*/
-/*			per terminal node in the subtree starting at N.	*/
-/*			This routine recursively computes the alpha	*/
-/*			value at each internal node of the tree, and	*/
-/*			stores these values in the array "alpha_array".	*/
-/* Parameters :	node : pointer to the node, at and below which the	*/
-/*		alpha values need to be computed.			*/
-/* Returns :	Nothing explicitly. 					*/
-/* Calls modules :	node_cost					*/
-/*			subtree_cost					*/
-/*			compute_alpha					*/
-/*			leaf_count (classify_util.c)			*/
-/* Is called by modules : 	cut_weakest_links			*/
-/*				compute_alpha				*/
+/* Module name :	compute_alpha					                                */ 
+/* Functionality :	"alpha" is a crucial parameter in error comple-	    */
+/*			xity pruning. "alpha" of an internal node N 	                  */
+/*			can be taken to measure, in informal terms, the	                */
+/*			usefulness, in classifying the training set, 	                  */
+/*			per terminal node in the subtree starting at N.                	*/
+/*			This routine recursively computes the alpha	                    */
+/*			value at each internal node of the tree, and	                  */
+/*			stores these values in the array "alpha_array".	                */
+/* Parameters :	node : pointer to the node, at and below which the    	*/
+/*		alpha values need to be computed.			                            */
+/* Returns :	Nothing explicitly. 					                            */
+/* Calls modules :	node_cost					                                  */
+/*			subtree_cost					                                          */
+/*			compute_alpha					                                          */
+/*			leaf_count (classify_util.c)			                              */
+/* Is called by modules : 	cut_weakest_links			                      */
+/*				compute_alpha				                                          */
 /************************************************************************/
 compute_alpha(node)
      struct tree_node *node;
@@ -260,15 +260,15 @@ compute_alpha(node)
 }
 
 /************************************************************************/
-/* Module name :	subtree_cost					*/ 
-/* Functionality :	recursively computes the cost of the subtree 	*/
-/*			below an internal node.				*/
-/* Parameters :	cur_node : pointer to a decision tree node.		*/	
-/* Returns :	A floating point number, representing the cost of	*/
-/*		the subtree at cur_node.				*/
-/* Calls modules :	subtree_cost					*/
-/* Is called by modules :	compute_alpha				*/
-/*				subtree_cost				*/
+/* Module name :	subtree_cost					                                */ 
+/* Functionality :	recursively computes the cost of the subtree      	*/
+/*			below an internal node.				                                  */
+/* Parameters :	cur_node : pointer to a decision tree node.		          */	
+/* Returns :	A floating point number, representing the cost of	        */
+/*		the subtree at cur_node.				                                  */
+/* Calls modules :	subtree_cost					                              */
+/* Is called by modules :	compute_alpha				                          */
+/*				subtree_cost				                                          */
 /************************************************************************/
 float subtree_cost(cur_node)
      struct tree_node *cur_node;
@@ -300,13 +300,13 @@ float subtree_cost(cur_node)
 }
 
 /************************************************************************/
-/* Module name : node_cost						*/
-/* Functionality :	computes the cost of a node.			*/
+/* Module name : node_cost						                                  */
+/* Functionality :	computes the cost of a node.			                  */
 /* Parameters :	cur_node : pointer to the DT node under consideration.	*/
-/* Returns :	A floating point number, representing the cost of	*/
-/*		*cur_node.						*/
-/* Calls modules : None							*/
-/* Is called by modules :	compute_alpha				*/
+/* Returns :	A floating point number, representing the cost of	        */
+/*		*cur_node.						                                            */
+/* Calls modules : None							                                    */
+/* Is called by modules :	compute_alpha				                          */
 /************************************************************************/
 float node_cost(cur_node)
      struct tree_node *cur_node;
@@ -326,17 +326,17 @@ float node_cost(cur_node)
 } 
  
 /************************************************************************/
-/* Module name :	replicate_tree					*/ 
-/* Functionality :	Given a decision tree, this module forms an	*/
-/*			exact copy of it, recursively.			*/
-/* Parameters :	root : Pointer to the root of a (sub)tree.		*/
-/* Returns :	Pointer to the root of an identical (sub)tree.		*/
-/* Calls modules :	error (util.c)					*/
-/*			vector (util.c)					*/
-/*			ivector (util.c)				*/
-/*			replicate_tree					*/
-/* Is called by modules :	cut_weakest_links			*/
-/*				replicate_tree				*/
+/* Module name :	replicate_tree					                              */ 
+/* Functionality :	Given a decision tree, this module forms an	        */
+/*			exact copy of it, recursively.			                            */
+/* Parameters :	root : Pointer to the root of a (sub)tree.		          */
+/* Returns :	Pointer to the root of an identical (sub)tree.		        */
+/* Calls modules :	error (util.c)				                            	*/
+/*			vector (util.c)					                                        */
+/*			ivector (util.c)				                                        */
+/*			replicate_tree					                                        */
+/* Is called by modules :	cut_weakest_links			                        */
+/*				replicate_tree				                                        */
 /************************************************************************/
 struct tree_node *replicate_tree(root)
      struct tree_node *root;
@@ -377,19 +377,19 @@ struct tree_node *replicate_tree(root)
 }
 
 /************************************************************************/
-/* Module name : cut_subtrees						*/ 
+/* Module name : cut_subtrees						                                */ 
 /* Functionality : Given a decision tree node N, and a value of alpha,	*/
-/*		   this module recursively finds all nodes in the	*/
-/*		   subtree at N whose alpha values are equal to the	*/
-/*		   given value, and cuts such branches.			*/	
-/* Parameters :	cur_node: Pointer to a decision tree node.		*/
-/*		alpha_threshold: Alpha value at which a node has to be	*/
-/*		cut.							*/
-/* Returns :	Nothing.						*/
-/* Calls modules :	cut_subtrees					*/
-/* Is called by modules :	cut_subtrees				*/
-/*				cut_weakest_links			*/
-/* Remarks : 	The root of a decision tree is never cut.		*/
+/*		   this module recursively finds all nodes in the	                */
+/*		   subtree at N whose alpha values are equal to the	              */
+/*		   given value, and cuts such branches.			                      */	
+/* Parameters :	cur_node: Pointer to a decision tree node.		          */
+/*		alpha_threshold: Alpha value at which a node has to be	          */
+/*		cut.							                                                */
+/* Returns :	Nothing.						                                      */
+/* Calls modules :	cut_subtrees					                              */
+/* Is called by modules :	cut_subtrees				                          */
+/*				cut_weakest_links			                                        */
+/* Remarks : 	The root of a decision tree is never cut.		              */
 /************************************************************************/
 cut_subtrees(cur_node,alpha_threshold)
      struct tree_node *cur_node;
@@ -416,17 +416,17 @@ cut_subtrees(cur_node,alpha_threshold)
 }
 
 /************************************************************************/
-/* Module name : deallocate_tree					*/
-/* Functionality :	Recursively frees the memory allocated to a 	*/
-/*			decision tree.					*/
-/* Parameters :	Pointer to the root of a decision tree.			*/
-/* Returns :	Nothing.						*/
-/* Calls modules :	deallocate_tree					*/
-/*			free_vector (util.c)				*/
-/*			free_ivector (util.c)				*/
-/* Is called by modules :	error_complexity_prune			*/
-/*				cut_subtrees				*/
-/*				deallocate_tree				*/
+/* Module name : deallocate_tree					                              */
+/* Functionality :	Recursively frees the memory allocated to a 	      */
+/*			decision tree.					                                        */
+/* Parameters :	Pointer to the root of a decision tree.			            */
+/* Returns :	Nothing.						                                      */
+/* Calls modules :	deallocate_tree					                            */
+/*			free_vector (util.c)				                                    */
+/*			free_ivector (util.c)				                                    */
+/* Is called by modules :	error_complexity_prune			                  */
+/*				cut_subtrees				                                          */
+/*				deallocate_tree				                                        */
 /************************************************************************/
 deallocate_tree(root)
      struct tree_node *root;

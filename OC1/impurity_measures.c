@@ -1,30 +1,30 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                */
-/* Department of Computer Science		                */
+/* Johns Hopkins University			                                */
+/* Department of Computer Science		                            */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					*/
+/* Contact : murthy@cs.jhu.edu					                        */
 /****************************************************************/
-/* File Name : impurity_measures.c				*/
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : July 1994					*/
-/* Contains modules :	maxminority				*/
-/*			summinority				*/
-/*			variance				*/
-/*			info_gain				*/
-/*			gini_index				*/
-/*			twoing					*/
-/* Uses modules in : 	compute_impurity.c			*/
-/*			oc1.h					*/
-/* Is used by modules in :	compute_impurity.c		*/
-/* Remarks       :	If the user wants to "plug-in" a new	*/
-/*			impurity measure, that function should	*/
-/*			look like the functions in this file.   */
-/*                      It is also probably convenient to	*/
-/*			concatenate such new measures to	*/
-/*			this file, so that the user needn't 	*/
-/*			bother with the global declarations and	*/
-/*			changing the makefile.			*/
+/* File Name : impurity_measures.c				                      */
+/* Author : Sreerama K. Murthy					                        */
+/* Last modified : July 1994					                          */
+/* Contains modules :	maxminority				                        */
+/*			summinority				                                      */
+/*			variance				                                        */
+/*			info_gain				                                        */
+/*			gini_index				                                      */
+/*			twoing					                                        */
+/* Uses modules in : 	compute_impurity.c			                  */
+/*			oc1.h					                                          */
+/* Is used by modules in :	compute_impurity.c		              */
+/* Remarks       :	If the user wants to "plug-in" a new	      */
+/*			impurity measure, that function should	                */
+/*			look like the functions in this file.                   */
+/*                      It is also probably convenient to	      */
+/*			concatenate such new measures to	                      */
+/*			this file, so that the user needn't 	                  */
+/*			bother with the global declarations and	                */
+/*			changing the makefile.			                            */
 /*                      Note that none of the measure use any   */
 /*                      input parameters. The  only information */
 /*                      used is the number of dimensions, the   */
@@ -47,16 +47,16 @@ extern int no_of_categories;
 int largest_element();
 
 /************************************************************************/
-/* Module name :	maxminority					*/ 
-/* Functionality :	Suggested by Heath et al in their IJCAI-93 paper*/
+/* Module name :	maxminority					                                  */ 
+/* Functionality :	Suggested by Heath et al in their IJCAI-93 paper    */
 /*                      Has the theoretical advantage that the depth of */
 /*                      of the resulting tree has to be logarithmic in  */
 /*                      the number of instances. Can be computed very   */
 /*                      efficiently - no log computations.              */
-/* Returns :	larger of the minority values on the left and right.	*/
-/* 		(minority on a side = sum of the counts of all classes	*/
-/*		except the class with the highest count.)		*/
-/* Calls modules :	largest_element (compute_impurity.c)		*/
+/* Returns :	larger of the minority values on the left and right.	    */
+/* 		(minority on a side = sum of the counts of all classes	          */
+/*		except the class with the highest count.)		                      */
+/* Calls modules :	largest_element (compute_impurity.c)		            */
 /************************************************************************/
 float maxminority()
 {
@@ -78,16 +78,16 @@ float maxminority()
 }
 
 /************************************************************************/
-/* Module name :	summinority					*/ 
-/* Functionality :	Suggested by Heath et al in their IJCAI-93 paper*/
+/* Module name :	summinority					                                  */ 
+/* Functionality :	Suggested by Heath et al in their IJCAI-93 paper    */
 /*                      Is intuitively most appealing, and can be       */
 /*                      computed efficiently - no log computations.     */
 /*                      Does well on several domains, in spite of its   */
 /*                      simplicity.                                     */
-/* Returns :	sum of the minority values on the left and right.	*/
-/* 		(minority on a side = sum of the counts of all classes	*/
-/*		except the class with the highest count.)		*/
-/* Calls modules :	largest_element (compute_impurity.c)		*/
+/* Returns :	sum of the minority values on the left and right.	        */
+/* 		(minority on a side = sum of the counts of all classes	          */
+/*		except the class with the highest count.)		                      */
+/* Calls modules :	largest_element (compute_impurity.c)		            */
 /************************************************************************/
 float summinority()
 {
@@ -107,16 +107,16 @@ float summinority()
 }
 
 /************************************************************************/
-/* Module name :	variance					*/ 
-/* Functionality :	Suggested by Heath et al in their IJCAI-93 paper*/
+/* Module name :	variance					                                    */ 
+/* Functionality :	Suggested by Heath et al in their IJCAI-93 paper    */
 /*                      as the Sum_of_Impurities measure.               */
-/* Returns :	sum of the category number variances on the	 	*/
-/*		left and right, making adjustments for bias.		*/
-/* 		Variance on a side = sigma  ((xi - avg)*(xi - avg))	*/
-/*				     i=1..k				*/
-/* 		where x1,..xk are the classes (categories) of the	*/
-/*		points on that side of the hyperplane, and		*/
-/*		avg = (x1+x2+..+xk)/k.					*/
+/* Returns :	sum of the category number variances on the	 	            */
+/*		left and right, making adjustments for bias.		                  */
+/* 		Variance on a side = sigma  ((xi - avg)*(xi - avg))	              */
+/*				     i=1..k				                                            */
+/* 		where x1,..xk are the classes (categories) of the	                */
+/*		points on that side of the hyperplane, and		                    */
+/*		avg = (x1+x2+..+xk)/k.					                                  */
 /************************************************************************/
 float variance()
 {
@@ -191,12 +191,12 @@ int *p1,*p2;
 }
 
 /************************************************************************/
-/* Module name : info_gain						*/ 
-/* Functionality :	Computes the (Quinlan's) information gain of 	*/
-/*			the current split. As OC1 tries to minimize the	*/
-/*			"impurity" instead of maximizing the information*/
-/*			"gain", this module returns the reciprocal of 	*/
-/*			the computed gain.				*/
+/* Module name : info_gain						                                  */ 
+/* Functionality :	Computes the (Quinlan's) information gain of 	      */
+/*			the current split. As OC1 tries to minimize the	                */
+/*			"impurity" instead of maximizing the information                */
+/*			"gain", this module returns the reciprocal of 	                */
+/*			the computed gain.				                                      */
 /* Remarks : Much less efficient to compute than the minority measures. */
 /*           But often works much better.                               */
 /************************************************************************/
@@ -255,11 +255,11 @@ float info_gain()
 }
 
 /************************************************************************/
-/* Module name : gini_index						*/ 
-/* Functionality :	Computes gini_index of a hyperplane. This stati-*/
-/*			stical measure was described in the context of 	*/
-/*			decision trees by Leo Breiman et al in the CART	*/
-/*			book, 1984.					*/
+/* Module name : gini_index						                                  */ 
+/* Functionality :	Computes gini_index of a hyperplane. This stati-    */
+/*			stical measure was described in the context of 	                */
+/*			decision trees by Leo Breiman et al in the CART	                */
+/*			book, 1984.					                                            */
 /* Remarks : Efficient to compute - No log computations.                */
 /*           Performs quite well.                                       */
 /************************************************************************/
@@ -301,11 +301,11 @@ float gini_index()
 }
  
 /************************************************************************/
-/* Module name : twoing							*/ 
-/* Functionality :	Computes, by twoing rule, the goodness of a 	*/
+/* Module name : twoing							                                    */ 
+/* Functionality :	Computes, by twoing rule, the goodness of a 	      */
 /*                      hyperplane. Returns the reciprocal of this value*/
-/*			The twoing measure is described in detail  	*/
-/*			by Leo Breiman et al in their CART book (1984).	*/
+/*			The twoing measure is described in detail  	                    */
+/*			by Leo Breiman et al in their CART book (1984).	                */
 /************************************************************************/
 float twoing()
 {

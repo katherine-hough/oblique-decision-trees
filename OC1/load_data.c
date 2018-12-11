@@ -1,26 +1,26 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                */
-/* Department of Computer Science		                */
+/* Johns Hopkins University			                            */
+/* Department of Computer Science		                        */
 /****************************************************************/
 /* Contact : murthy@cs.jhu.edu                                  */
 /****************************************************************/
-/* File Name : load_data.c 					*/
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : June 1995					*/
-/* Contains modules : 	load_points				*/
-/*			allocate_point_array			*/
-/*			shuffle_points				*/
-/* Uses modules in :	oc1.h 					*/
-/*			util.c					*/
-/* Is used by modules in :	mktree.c			*/
+/* File Name : load_data.c 					                    */
+/* Author : Sreerama K. Murthy					                */
+/* Last modified : June 1995					                */
+/* Contains modules : 	load_points				                */
+/*			allocate_point_array			                    */
+/*			shuffle_points				                        */
+/* Uses modules in :	oc1.h 					                */
+/*			util.c					                            */
+/* Is used by modules in :	mktree.c			                */
 /*                              display.c                       */
-/* Remarks       :	                                        */
-/*			Throughout this program and others	*/
-/*			in OC1, "points" refer to data instances*/
-/*			or examples. This usage is due to the 	*/
-/*			geometric interpretation of the	        */
-/*			attribute space used by OC1.		*/
+/* Remarks       :	                                            */
+/*			Throughout this program and others	                */
+/*			in OC1, "points" refer to data instances            */
+/*			or examples. This usage is due to the 	            */
+/*			geometric interpretation of the	                    */
+/*			attribute space used by OC1.		                */
 /*                7/28/95: load_points routine is corrected to  */
 /*                      read in missing values correctly.       */
 /****************************************************************/
@@ -36,22 +36,22 @@ extern float *sdev_attribute_value;
 int *category_array = NULL;
 
 /************************************************************************/
-/* Module name : load_points						*/
+/* Module name : load_points						                    */
 /* Functionality : Downloads data points from the input file into the	*/
-/*		   array train_points.					*/
-/*		   Dynamically allocates space for the points read.	*/
+/*		   array train_points.					                        */
+/*		   Dynamically allocates space for the points read.	            */
 /*                 Computes the number of dimensions (attributes) and   */
 /*                 number of classes.                                   */
-/* Parameters :	infile :	File pointer to the input file.		*/
-/*		points_ptr : 	pointer to the array into which the	*/
-/*				data points are to be loaded.		*/
-/* Returns :	Number of points read.					*/
-/* Calls modules :	error (util.c)					*/
-/*			allocate_point_array				*/
-/* Is called by modules :	read_data (mktree.c)			*/
-/*				main (display.c)			*/
+/* Parameters :	infile :	File pointer to the input file.		        */
+/*		points_ptr : 	pointer to the array into which the	            */
+/*				data points are to be loaded.		                    */
+/* Returns :	Number of points read.					                */
+/* Calls modules :	error (util.c)					                    */
+/*			allocate_point_array				                        */
+/* Is called by modules :	read_data (mktree.c)			            */
+/*				main (display.c)			                            */
 /* Remarks :	Assumes that the no_of_dimensions and no_of_categories 	*/
-/* 		are set.		 				*/
+/* 		are set.		 				                                */
 /************************************************************************/
 int load_points(infile,points_ptr)
      FILE *infile;
@@ -273,19 +273,19 @@ int load_points(infile,points_ptr)
 
 
 /************************************************************************/
-/* Module name : allocate_point_array					*/
-/* Functionality :	Allocates or reallocates "array_name" to be an	*/
-/*			array of pointers (to POINT structures), of	*/
-/*			size "size". Fully allocates all the POINT	*/
-/*			structures also.				*/
-/* Parameters :	array_name : name of the array to be (re)allocated.	*/
-/*		size	   : number of points to be allocated.		*/
-/*		prev_size  : 0 if array_name doesn't exist already	*/
-/*			     current size otherwise.			*/
-/* Returns :	pointer to the allocated array.				*/
-/* Calls modules :	error (util.c)					*/
-/*			vector (util.c)					*/
-/* Is called by modules : 	load_points				*/
+/* Module name : allocate_point_array					                */
+/* Functionality :	Allocates or reallocates "array_name" to be an	    */
+/*			array of pointers (to POINT structures), of	                */
+/*			size "size". Fully allocates all the POINT	                */
+/*			structures also.				                            */
+/* Parameters :	array_name : name of the array to be (re)allocated.	    */
+/*		size	   : number of points to be allocated.		            */
+/*		prev_size  : 0 if array_name doesn't exist already	            */
+/*			     current size otherwise.			                    */
+/* Returns :	pointer to the allocated array.				            */
+/* Calls modules :	error (util.c)					                    */
+/*			vector (util.c)					                            */
+/* Is called by modules : 	load_points				                    */
 /************************************************************************/
 POINT **allocate_point_array(array_name,size,prev_size)
      POINT **array_name;
@@ -343,19 +343,19 @@ POINT **allocate_point_array(array_name,size,prev_size)
 
 
 /************************************************************************/
-/* Module name :	shuffle_points					*/
-/* Functionality :	Pseudo-randomly shuffles the points in the	*/
-/*			array "array_name". 				*/
-/*			for i = 1 to n, do				*/
-/*			  swap point i with the point at a random 	*/
-/*			  position between 1 and n.			*/
-/* Parameters :	array_name : Point array which is to be shuffled.	*/
-/*		count	: Number of entries in the array.		*/
-/* Returns : Nothing.							*/
-/* Calls modules :	myrandom (util.c)				*/
-/* Is called by modules :	load_points				*/
-/* Remarks :	Achieves shuffling just by swapping pointers, thus 	*/
-/*		not spending time on allocation/deallocation.		*/
+/* Module name :	shuffle_points					                    */
+/* Functionality :	Pseudo-randomly shuffles the points in the	        */
+/*			array "array_name". 				                        */
+/*			for i = 1 to n, do				                            */
+/*			  swap point i with the point at a random 	                */
+/*			  position between 1 and n.			                        */
+/* Parameters :	array_name : Point array which is to be shuffled.	    */
+/*		count	: Number of entries in the array.		                */
+/* Returns : Nothing.							                        */
+/* Calls modules :	myrandom (util.c)				                    */
+/* Is called by modules :	load_points				                    */
+/* Remarks :	Achieves shuffling just by swapping pointers, thus 	    */
+/*		not spending time on allocation/deallocation.		            */
 /************************************************************************/
 shuffle_points(array_name,count)
      POINT **array_name;

@@ -1,31 +1,31 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                */
-/* Department of Computer Science		                */
+/* Johns Hopkins University			                                */
+/* Department of Computer Science		                            */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					*/
+/* Contact : murthy@cs.jhu.edu					                        */
 /****************************************************************/
-/* File Name :	tree_util.c					*/
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : July 1994					*/
-/* Contains modules : 	read_tree				*/
-/*			read_subtree				*/
-/*			read_hp					*/
-/*			read_header				*/
-/*			write_tree				*/
-/*			write_subtree				*/
-/*			write_hp       				*/
-/*			write_header				*/
-/*			isleftchild				*/
-/*			isrightchild				*/
-/*			leaf_count				*/
-/*			tree_depth				*/
-/* Uses modules in :	oc1.h					*/
-/*			util.c					*/ 
-/* Is used by modules in :	mktree.c			*/
-/* Remarks       : 	These routines are mainly used to read	*/
-/*			a decision tree from a file, and to     */
-/*                      write a tree to a file.			*/
+/* File Name :	tree_util.c					                            */
+/* Author : Sreerama K. Murthy					                        */
+/* Last modified : July 1994					                          */
+/* Contains modules : 	read_tree				                        */
+/*			read_subtree				                                    */
+/*			read_hp					                                        */
+/*			read_header				                                      */
+/*			write_tree				                                      */
+/*			write_subtree				                                    */
+/*			write_hp       				                                  */
+/*			write_header				                                    */
+/*			isleftchild				                                      */
+/*			isrightchild				                                    */
+/*			leaf_count				                                      */
+/*			tree_depth				                                      */
+/* Uses modules in :	oc1.h					                            */
+/*			util.c					                                        */ 
+/* Is used by modules in :	mktree.c			                      */
+/* Remarks       : 	These routines are mainly used to read	    */
+/*			a decision tree from a file, and to                     */
+/*                      write a tree to a file.			            */
 /****************************************************************/		
 
 #include "oc1.h"
@@ -36,21 +36,21 @@ struct tree_node *extra_node;
 char train_data[LINESIZE];
 
 /************************************************************************/
-/* Module name :	read_tree					*/ 
-/* Functionality : High level routine for reading in a decision tree	*/
-/* Parameters :	decision_tree : Name of the file in which the tree is	*/
-/*		stored.							*/
-/* Returns :	pointer to the root node of the tree.			*/
-/* Calls modules :	read_subtree					*/
-/*			read_header					*/
-/*			read_hp						*/
-/*			error (util.c)					*/
-/* Is called by modules :	main (mktree.c)				*/
-/*				main (gen_data.c)			*/
-/* Remarks : 	It is assumed that the file "decision_tree" is		*/
-/* 		written in a format similar to the output of the	*/
-/*		write_tree module. A sample decision tree is given in   */
-/*              the file sample.dt.				        */ 
+/* Module name :	read_tree					                                    */ 
+/* Functionality : High level routine for reading in a decision tree	  */
+/* Parameters :	decision_tree : Name of the file in which the tree is	  */
+/*		stored.							                                              */
+/* Returns :	pointer to the root node of the tree.			                */
+/* Calls modules :	read_subtree					                              */
+/*			read_header					                                            */
+/*			read_hp						                                              */
+/*			error (util.c)					                                        */
+/* Is called by modules :	main (mktree.c)				                        */
+/*				main (gen_data.c)			                                        */
+/* Remarks : 	It is assumed that the file "decision_tree" is		        */
+/* 		written in a format similar to the output of the	                */
+/*		write_tree module. A sample decision tree is given in             */
+/*              the file sample.dt.				                              */ 
 /************************************************************************/
 struct tree_node *read_tree(decision_tree)
      char *decision_tree;
@@ -78,25 +78,25 @@ struct tree_node *read_tree(decision_tree)
 
 
 /************************************************************************/
-/* Module name :	read_subtree					*/ 
-/* Functionality :	recursively reads in the hyperplane, left 	*/
-/*			subtree and the right subtree at a node of 	*/
-/*			the decision tree. 				*/
-/* Parameters :	root : node, the subtree at which is to be read.	*/
-/*		dtree: file pointer where the tree is available.	*/
-/* Returns :	nothing.						*/
-/* Calls modules :	read_subtree					*/
-/*			read_hp						*/
-/*			isleftchild					*/
-/*			isrightchild					*/
-/* Is called by modules :	read_tree				*/
-/*				read_subtree				*/
-/* Important Variables Used :	extra_node 				*/
-/*	Hyperplanes are read from the file "dtree" in the order "parent,*/
-/*	left child, right child". In case a node does not have either a	*/
-/* 	left child or a right child or both, this routine reads one 	*/
-/*	hyperplane before it is needed. Such hyperplanes, that are read	*/
-/*	before they are needed, are stored in extra_node.		*/
+/* Module name :	read_subtree					                                */ 
+/* Functionality :	recursively reads in the hyperplane, left 	        */
+/*			subtree and the right subtree at a node of 	                    */
+/*			the decision tree. 			                                        */
+/* Parameters :	root : node, the subtree at which is to be read.	      */
+/*		dtree: file pointer where the tree is available.                 	*/
+/* Returns :	nothing.						                                      */
+/* Calls modules :	read_subtree				                              	*/
+/*			read_hp					                                                */
+/*			isleftchild					                                            */
+/*			isrightchild				                                          	*/
+/* Is called by modules :	read_tree			                              	*/
+/*				read_subtree				                                          */
+/* Important Variables Used :	extra_node 			                         	*/
+/*	Hyperplanes are read from the file "dtree" in the order "parent,    */
+/*	left child, right child". In case a node does not have either a	    */
+/* 	left child or a right child or both, this routine reads one         */
+/*	hyperplane before it is needed. Such hyperplanes, that are read	    */
+/*	before they are needed, are stored in extra_node.		                */
 /************************************************************************/
 read_subtree(root,dtree)
      struct tree_node *root;
@@ -139,18 +139,18 @@ read_subtree(root,dtree)
 }
 
 /************************************************************************/
-/* Module name : read_hp						*/
-/* Functionality :	Reads a hyperplane (one node of the decision	*/
-/*			tree).						*/
-/* Parameters :	dtree : file pointer to the decision tree file.		*/
-/* Returns : pointer to the decision tree node read.			*/
-/* Calls modules :	vector (util.c)					*/
-/*			error (util.c)					*/
-/* Is called by modules :	read_tree				*/
-/*				read_subtree				*/
-/* Remarks :	Rather strict adherance to format.			*/
-/*		Please carefully follow the format in sample.dt, if	*/
-/*		your decision tree files are not produced by "mktree".	*/
+/* Module name : read_hp						                                    */
+/* Functionality :	Reads a hyperplane (one node of the decision	      */
+/*			tree).						                                              */
+/* Parameters :	dtree : file pointer to the decision tree file.		      */
+/* Returns : pointer to the decision tree node read.			              */
+/* Calls modules :	vector (util.c)					                            */
+/*			error (util.c)					                                        */
+/* Is called by modules :	read_tree				                              */
+/*				read_subtree				                                          */
+/* Remarks :	Rather strict adherance to format.			                  */
+/*		Please carefully follow the format in sample.dt, if	              */
+/*		your decision tree files are not produced by "mktree".	          */
 /************************************************************************/
 struct tree_node *read_hp(dtree)
      FILE *dtree;
@@ -225,14 +225,14 @@ struct tree_node *read_hp(dtree)
 }
 
 /************************************************************************/
-/* Module name : isleftchild						*/
-/* Functionality : 	Checks if node x is a left child of node y.	*/
-/*			i.e., checks if the label of node x is the same	*/
-/*			as label of y, concatenated with "l".		*/
-/* Parameters : x,y : pointers to two decision tree nodes.		*/
-/* Returns :	1 : if x is the left child of y				*/
-/*		0 : otherwise						*/
-/* Is called by modules :	read_subtree				*/
+/* Module name : isleftchild						                                */
+/* Functionality : 	Checks if node x is a left child of node y.	        */
+/*			i.e., checks if the label of node x is the same               	*/
+/*			as label of y, concatenated with "l".		                        */
+/* Parameters : x,y : pointers to two decision tree nodes.		          */
+/* Returns :	1 : if x is the left child of y				                    */
+/*		0 : otherwise						                                          */
+/* Is called by modules :	read_subtree				                          */
 /************************************************************************/
 int isleftchild(x,y)
      struct tree_node *x,*y;
@@ -245,14 +245,14 @@ int isleftchild(x,y)
 }
 
 /************************************************************************/
-/* Module name : isrightchild						*/
-/* Functionality : 	Checks if node x is a right child of node y.	*/
-/*			i.e., checks if the label of node x is the same	*/
-/*			as label of y, concatenated with "l".		*/
-/* Parameters : x,y : pointers to two decision tree nodes.		*/
-/* Returns :	1 : if x is the right child of y			*/
-/*		0 : otherwise						*/
-/* Is called by modules :	read_subtree				*/
+/* Module name : isrightchild						                                */
+/* Functionality : 	Checks if node x is a right child of node y.	      */
+/*			i.e., checks if the label of node x is the same	                */
+/*			as label of y, concatenated with "l".		                        */
+/* Parameters : x,y : pointers to two decision tree nodes.		          */
+/* Returns :	1 : if x is the right child of y			                    */
+/*		0 : otherwise						                                          */
+/* Is called by modules :	read_subtree				                          */
 /************************************************************************/
 int isrightchild(x,y)
      struct tree_node *x,*y;
@@ -265,17 +265,17 @@ int isrightchild(x,y)
 }
 
 /************************************************************************/
-/* Module name : read_header						*/
-/* Functionality :	Reads the header information in a decision tree	*/
-/*			file.						*/
-/* Parameters :	dtree : file pointer to the decision tree file.		*/
-/* Returns : 	1 : if the header is successfully read.			*/
-/*		0 : otherwise.						*/
-/* Calls modules : none.						*/
-/* Is called by modules :	read_tree				*/
-/* Remarks :	Rather strict adherance to format.			*/
-/*		Please carefully follow the format in sample.dt, if	*/
-/*		your decision tree files are not produced by "mktree".	*/
+/* Module name : read_header						                                */
+/* Functionality :	Reads the header information in a decision tree	    */
+/*			file.						                                                */
+/* Parameters :	dtree : file pointer to the decision tree file.		      */
+/* Returns : 	1 : if the header is successfully read.		              	*/
+/*		0 : otherwise.						                                        */
+/* Calls modules : none.						                                    */
+/* Is called by modules :	read_tree				                              */
+/* Remarks :	Rather strict adherance to format.		                   	*/
+/*		Please carefully follow the format in sample.dt, if             	*/
+/*		your decision tree files are not produced by "mktree".	          */
 /************************************************************************/
 int read_header(dtree)
      FILE *dtree;
@@ -287,14 +287,14 @@ int read_header(dtree)
 }
 
 /************************************************************************/
-/* Module name : leaf_count						*/
+/* Module name : leaf_count						                                  */
 /* Functionality :      Calculates the number of leaves of a subtree.   */
 /* Parameters : cur_node :      pointer to the root of the subtree whose*/
 /*                              leaves are to be counted.               */
 /* Returns :    number of leaves of the subtree pointed to by "cur_node"*/
-/* Calls modules :      leaf_count                                 	*/
-/* Is called by modules :       estimate_accuracy (classify.c)		*/
-/*				main (display.c)			*/
+/* Calls modules :      leaf_count                                 	    */
+/* Is called by modules :       estimate_accuracy (classify.c)		      */
+/*				main (display.c)		                                         	*/
 /************************************************************************/
 int leaf_count(cur_node)
      struct tree_node *cur_node;
@@ -308,14 +308,14 @@ int leaf_count(cur_node)
 /************************************************************************/
 /* Module name : tree_depth                                             */
 /* Functionality :      Calculate the maximum depth of any node in a    */
-/*                      decision tree.					*/
+/*                      decision tree.					                        */
 /*                      Depth of a node is its distance (in terms of the*/
 /*                      number of intermediate nodes) from the root.    */
 /* Parameters : cur_node :      pointer to the root of the subtree whose*/
 /*                              leaves are to be counted.               */
 /* Calls modules :      tree_depth                                      */
-/* Is called by modules :       estimate_accuracy (classify.c)		*/
-/*				main (display.c)			*/
+/* Is called by modules :       estimate_accuracy (classify.c)		      */
+/*				main (display.c)			                                        */
 /************************************************************************/
 int tree_depth(cur_node)
      struct tree_node *cur_node;
@@ -331,24 +331,24 @@ int tree_depth(cur_node)
 }
  
 /************************************************************************/
-/* Module name : write_tree						*/
-/* Functionality :	High level routine to write a decision tree to 	*/
-/*			a file.						*/
+/* Module name : write_tree						                                  */
+/* Functionality :	High level routine to write a decision tree to 	    */
+/*			a file.						                                              */
 /* Parameters :	root : pointer to the structure containing the root of	*/
-/*		       decision tree.					*/
-/*		dt_file : Name of the file into which the dt is to be	*/
-/*		       stored.						*/
-/* Returns :	Nothing.						*/
-/* Calls modules : 	error (util.c)					*/
-/*			write_header					*/
-/*			write_subtree					*/
-/* Is called by modules :	main (mktree.c)				*/
-/*				cross_validate (mktree.c)		*/
-/* Remarks :	The input/output formats are rather strict at this	*/
-/*		stage for OC1. The read_tree routines                   */
-/*		produce run time errors while reading decision trees	*/
-/*		even if there is the slightest deviation from the	*/
-/*		format outputted by the "write_*" routines.             */
+/*		       decision tree.					                                    */
+/*		dt_file : Name of the file into which the dt is to be	            */
+/*		       stored.						                                        */
+/* Returns :	Nothing.						                                      */
+/* Calls modules : 	error (util.c)					                            */
+/*			write_header					                                          */
+/*			write_subtree					                                          */
+/* Is called by modules :	main (mktree.c)				                        */
+/*				cross_validate (mktree.c)		                                  */
+/* Remarks :	The input/output formats are rather strict at this      	*/
+/*		stage for OC1. The read_tree routines                             */
+/*		produce run time errors while reading decision trees	            */
+/*		even if there is the slightest deviation from the	                */
+/*		format outputted by the "write_*" routines.                       */
 /************************************************************************/
 write_tree(root,dt_file)
      struct tree_node *root;
@@ -365,16 +365,16 @@ write_tree(root,dt_file)
 }
 
 /************************************************************************/
-/* Module name :	write_subtree					*/ 
-/* Functionality : 	Initiates writing a hyperplane, and recursively	*/
-/*			writes the subtrees on the left and right of the*/
-/*			hyperplane.					*/
+/* Module name :	write_subtree					                                */ 
+/* Functionality : 	Initiates writing a hyperplane, and recursively	    */
+/*			writes the subtrees on the left and right of the                */
+/*			hyperplane.					                                            */
 /* Parameters :	cur_node : Pointer to the DT node under consideration.	*/
-/*		dtree : File pointer to the output file.		*/
-/* Calls modules :	write_subtree					*/
-/*			write_hp					*/
-/* Is called by modules :	write_subtree				*/
-/*				write_tree				*/
+/*		dtree : File pointer to the output file.	                      	*/
+/* Calls modules :	write_subtree					                              */
+/*			write_hp					                                              */
+/* Is called by modules :	write_subtree				                          */
+/*				write_tree				                                            */
 /************************************************************************/
 write_subtree(cur_node,dtree)
      struct tree_node *cur_node;
@@ -388,19 +388,19 @@ write_subtree(cur_node,dtree)
 }
 
 /************************************************************************/
-/* Module name :	write_hp					*/ 
-/* Functionality : Writes one hyperplane.				*/
+/* Module name :	write_hp					                                    */ 
+/* Functionality : Writes one hyperplane.				                        */
 /* Parameters :	cur_node : Pointer to the DT node under consideration.	*/
-/*		dtree : File pointer to the output file.		*/
-/* Is called by modules :	write_subtree				*/
-/* Important Variables used :	cur_node->label : Label is the empty	*/
-/*				string for the root node. If string x	*/
-/*				is the label of a node, xl is the label	*/
-/*				of its left child, and xr of its right	*/
-/*				child. Label plays an important role,	*/
-/*				because it informs the tree reading	*/
-/*				routines (in classify_util.c) about the	*/
-/*				structure of the DT.			*/
+/*		dtree : File pointer to the output file.		                      */
+/* Is called by modules :	write_subtree				                          */
+/* Important Variables used :	cur_node->label : Label is the empty      */
+/*				string for the root node. If string x                       	*/
+/*				is the label of a node, xl is the label                       */
+/*				of its left child, and xr of its right	                      */
+/*				child. Label plays an important role,                         */
+/*				because it informs the tree reading	                          */
+/*				routines (in classify_util.c) about the	                      */
+/*				structure of the DT.			                                    */
 /************************************************************************/
 write_hp(cur_node,dtree)
      struct tree_node *cur_node;
@@ -441,10 +441,10 @@ write_hp(cur_node,dtree)
 }
 
 /************************************************************************/
-/* Module name :	write_header					*/ 
-/* Functionality :	Writes the decision tree header.		*/
-/* Parameters :	dtree : file pointer to the output file.		*/
-/* Is called by modules :	write_tree				*/
+/* Module name :	write_header					                                */ 
+/* Functionality :	Writes the decision tree header.		                */
+/* Parameters :	dtree : file pointer to the output file.		            */
+/* Is called by modules :	write_tree				                            */
 /************************************************************************/
 write_header(dtree)
      FILE *dtree;

@@ -1,21 +1,21 @@
 /****************************************************************/
-/* Copyright 1993 : Johns Hopkins University			*/
-/*                 Department of Computer Science		*/
+/* Copyright 1993 : Johns Hopkins University			              */
+/*                 Department of Computer Science		            */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					*/
+/* Contact : murthy@cs.jhu.edu					                        */
 /****************************************************************/
-/* File Name : perturb.c					*/
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : October 1993					*/
-/* Contains modules :	suggest_perturbation			*/
-/*			perturb_randomly			*/
-/*			linear_split				*/ 
-/*			compare					*/
-/*			find_values				*/
-/* Uses modules in :	oc1.h					*/ 
-/*			util.c					*/
-/*			compute_impurity.c			*/
-/* Is used by modules in :	mktree.c			*/
+/* File Name : perturb.c					                              */
+/* Author : Sreerama K. Murthy					                        */
+/* Last modified : October 1993					                        */
+/* Contains modules :	suggest_perturbation			                */
+/*			perturb_randomly			                                  */
+/*			linear_split				                                    */ 
+/*			compare					                                        */
+/*			find_values				                                      */
+/* Uses modules in :	oc1.h					                            */ 
+/*			util.c					                                        */
+/*			compute_impurity.c			                                */
+/* Is used by modules in :	mktree.c			                      */
 /****************************************************************/		
 
 #include "oc1.h"
@@ -130,8 +130,8 @@ float cart_perturb(cur_points,cur_no_of_points, cur_coeff,cur_error)
 /*                 linear_split                                         */
 /*                 compute_impurity (compute_impurity.c)                */
 /* Is called by modules :  cart_split (mktree.c)                        */
-/* Important Variables used :
-/* Remarks :
+/* Important Variables used :                                           */
+/* Remarks :                                                            */
 /************************************************************************/
 float cart_perturb_constant(cur_points,cur_no_of_points,cur_error)
      POINT **cur_points;
@@ -171,38 +171,38 @@ float cart_perturb_constant(cur_points,cur_no_of_points,cur_error)
 }
 
 /************************************************************************/
-/* Module name : suggest_perturbation					*/ 
-/* Functionality :	Suggests a new value for the coefficient 	*/
-/*			"cur_coeff". This value is at least as good	*/
-/*			as the existing value, in terms of the global	*/
-/*			impurity measure. If no such value can be found,*/
-/*			HUGE is returned. 				*/
-/* Parameters :	cur_points : array of pointers to the points under	*/
-/*			     consideration.				*/
-/*		cur_no_of_points : count of the points in consideration.*/
-/*		cur_coeff : coefficient to be improved.			*/
-/*		cur_error_ptr : Pointer to the impurity of the current	*/
-/*				hyperplane.				*/
-/* Returns :	New value for the coefficient "cur_coeff".		*/
-/*		HUGE : if no better value than the existing one can be	*/
-/*		found.							*/
-/* Calls modules :	find_values					*/
-/*			linear_split					*/
-/*			reset_counts (compute_impurity.c)		*/
-/*			compute_impurity (compute_impurity.c)		*/
-/*			myrandom (util.c)				*/
-/* Is called by modules :	oblique_split (mktree.c)		*/
-/* Important Variables used : 	no_of_stagnant_perturbations : global	*/
-/*				variable that tells us how many pertur-	*/
-/*				bations, immediately preceding the	*/
-/*				current one, were consecutively 	*/
-/*				"stagnant", ie., did not lessen the	*/
-/*				global impurity. The probability that	*/
-/*				the perturbation-to-be-suggested is	*/
-/*				stagnant, is inversely exponentially 	*/
-/*				dependent on this number.		*/
-/* Remarks :	For a detailed description of the perturbation 		*/
-/*		algorithm, see Murthy et al's paper in AAAI-93.		*/
+/* Module name : suggest_perturbation					                          */ 
+/* Functionality :	Suggests a new value for the coefficient 	          */
+/*			"cur_coeff". This value is at least as good	                    */
+/*			as the existing value, in terms of the global	                  */
+/*			impurity measure. If no such value can be found,                */
+/*			HUGE is returned. 				                                      */
+/* Parameters :	cur_points : array of pointers to the points under	    */
+/*			     consideration.				                                      */
+/*		cur_no_of_points : count of the points in consideration.          */
+/*		cur_coeff : coefficient to be improved.			                      */
+/*		cur_error_ptr : Pointer to the impurity of the current	          */
+/*				hyperplane.				                                            */
+/* Returns :	New value for the coefficient "cur_coeff".		            */
+/*		HUGE : if no better value than the existing one can be	          */
+/*		found.							                                              */
+/* Calls modules :	find_values					                                */
+/*			linear_split					                                          */
+/*			reset_counts (compute_impurity.c)		                            */
+/*			compute_impurity (compute_impurity.c)		                        */
+/*			myrandom (util.c)				                                        */
+/* Is called by modules :	oblique_split (mktree.c)		                  */
+/* Important Variables used : 	no_of_stagnant_perturbations : global	  */
+/*				variable that tells us how many pertur-	                      */
+/*				bations, immediately preceding the	                          */
+/*				current one, were consecutively 	                            */
+/*				"stagnant", ie., did not lessen the	                          */
+/*				global impurity. The probability that	                        */
+/*				the perturbation-to-be-suggested is                           */
+/*				stagnant, is inversely exponentially                        	*/
+/*				dependent on this number.		                                  */
+/* Remarks :	For a detailed description of the perturbation 		        */
+/*		algorithm, see Murthy et al's paper in AAAI-93.		                */
 /************************************************************************/
 float suggest_perturbation(cur_points,cur_no_of_points,cur_coeff,cur_error)
      POINT **cur_points;
@@ -275,31 +275,31 @@ float suggest_perturbation(cur_points,cur_no_of_points,cur_coeff,cur_error)
 
 
 /************************************************************************/
-/* Module name : perturb_randomly					*/ 
-/* Functionality :	Tries to perturb the current hyperplane in a	*/
-/*			random direction, by a deterministic amount.	*/
-/*			The amount of perturbation along the random 	*/
-/*			direction is chosen so that the global impurity	*/
-/*			is minimized.					*/
-/* Parameters :	cur_points : Array of pointers to the points under	*/
-/*		consideration.						*/
-/*		cur_no_of_points : Number of points in consideration.	*/
-/*		cur_error_ptr :	Pointer to the current value of global	*/
-/*		impurity.						*/
-/* Returns :	TRUE : If the random perturbation is accomplished	*/
-/*		(so that the global impurity is at least as good as	*/
-/*		 it used to be).					*/
-/*		FALSE : otherwise					*/
-/*		The new location of the hyperplane, after perturbation,	*/
-/*		can be obtained from the global array "coeff_array".	*/
-/* Calls modules :	vector (util.c)					*/
-/*			generate_random_hyperplane (train_util.c)	*/
-/*			find_values					*/
-/*			reset_counts (compute_impurity.c)		*/
-/*			linear_split 					*/
-/*			compute_impurity (compute_impurity.c)		*/	
-/*			free_vector (util.c)				*/
-/* Is called by modules : oblique_split (mktree.c)			*/
+/* Module name : perturb_randomly					                              */ 
+/* Functionality :	Tries to perturb the current hyperplane in a	      */
+/*			random direction, by a deterministic amount.	                  */
+/*			The amount of perturbation along the random 	                  */
+/*			direction is chosen so that the global impurity	                */
+/*			is minimized.					                                          */
+/* Parameters :	cur_points : Array of pointers to the points under	    */
+/*		consideration.						                                        */
+/*		cur_no_of_points : Number of points in consideration.	            */
+/*		cur_error_ptr :	Pointer to the current value of global	          */
+/*		impurity.						                                              */
+/* Returns :	TRUE : If the random perturbation is accomplished	        */
+/*		(so that the global impurity is at least as good as	              */
+/*		 it used to be).					                                        */
+/*		FALSE : otherwise					                                        */
+/*		The new location of the hyperplane, after perturbation,	          */
+/*		can be obtained from the global array "coeff_array".	            */
+/* Calls modules :	vector (util.c)					                            */
+/*			generate_random_hyperplane (train_util.c)	                      */
+/*			find_values					                                            */
+/*			reset_counts (compute_impurity.c)		                            */
+/*			linear_split 					                                          */
+/*			compute_impurity (compute_impurity.c)		                        */	
+/*			free_vector (util.c)				                                    */
+/* Is called by modules : oblique_split (mktree.c)			                */
 /************************************************************************/
 float perturb_randomly(cur_points,cur_no_of_points,cur_error,cur_label)
      POINT **cur_points;
@@ -368,29 +368,29 @@ float perturb_randomly(cur_points,cur_no_of_points,cur_error,cur_label)
 }
 
 /************************************************************************/
-/* Module name : compare						*/
-/* Functionality : 	used by the C library function "qsort".		*/
-/*			see "man qsort" for more details.		*/
-/* Parameters :	ptr1,ptr2 : Pointers to the values that are to be	*/
-/*		compared. In this case, we are comparing the values 	*/
-/*		suggested by two data points for a hyperplane 		*/
-/*		coefficient. See the "Important variables used" section	*/
-/*		below.							*/ 
-/* Returns :	1, 0 or -1, depending on whether the first value is	*/
-/*		more, equal or less than the second.			*/
-/* Calls modules : None.						*/
-/* Is called by modules : qsort in linear_split				*/
+/* Module name : compare						                                    */
+/* Functionality : 	used by the C library function "qsort".		          */
+/*			see "man qsort" for more details.		                            */
+/* Parameters :	ptr1,ptr2 : Pointers to the values that are to be	      */
+/*		compared. In this case, we are comparing the values 	            */
+/*		suggested by two data points for a hyperplane 		                */
+/*		coefficient. See the "Important variables used" section	          */
+/*		below.							                                              */ 
+/* Returns :	1, 0 or -1, depending on whether the first value is	      */
+/*		more, equal or less than the second.			                        */
+/* Calls modules : None.						                                    */
+/* Is called by modules : qsort in linear_split				                  */
 /* Important Variables used : struct unidim : Consider the 2D case. Let	*/
-/*		the equation of the hyperplane be ax1+bx2+c=0. a,b and	*/
-/*		c have some values for the current hyperplane location.	*/
-/*		We are trying to perturb the hyperplane to a better	*/
-/*		location. We do this coefficient after coefficient. 	*/
-/*		Consider "a" as a variable, whose value we need to 	*/
-/*		determine, and b and c as constants. By substituting	*/
-/*		each data point in the above equation, we get a value	*/
-/*		for "a". It is this value that is stored in the "value"	*/
-/*		field of the structure unidim. The "cat" field stores	*/
-/*		the category of the data point under consideration.	*/
+/*		the equation of the hyperplane be ax1+bx2+c=0. a,b and	          */
+/*		c have some values for the current hyperplane location.	          */
+/*		We are trying to perturb the hyperplane to a better             	*/
+/*		location. We do this coefficient after coefficient. 	            */
+/*		Consider "a" as a variable, whose value we need to 	              */
+/*		determine, and b and c as constants. By substituting	            */
+/*		each data point in the above equation, we get a value	            */
+/*		for "a". It is this value that is stored in the "value"	          */
+/*		field of the structure unidim. The "cat" field stores	            */
+/*		the category of the data point under consideration.	              */
 /************************************************************************/
 int compare(ptr1,ptr2) 
      struct unidim  *ptr1,*ptr2;
@@ -406,26 +406,26 @@ int compare(ptr1,ptr2)
 
 
 /************************************************************************/
-/* Module name : linear_split						*/ 
-/* Functionality :	Sorts the values in the unidim structure	*/
-/*			array "candidates" (see the module header for	*/
-/*			"compare" above), and splits the array at a 	*/
-/*			position that minimizes the impurity measure.	*/
-/* Parameters :	no_of_eff_points : Number of valid entries in the	*/
-/*				   "candidates" array.		*/
-/* Returns :	value of the coefficient that results in an optimal	*/
-/*		one dimensional spilit.					*/ 
-/* Calls modules :	qsort (C library routine)			*/
-/*			myrandom (util.c)				*/
-/*			reset_counts (compute_impurity.c)		*/
-/*			compute_impurity (compute_impurity.c)		*/
-/* Is called by modules :	suggest_perturbation			*/
-/*				perturb_randomly			*/
-/*				axis_parallel_split (mktree.c)		*/	
-/* Remarks :								*/ 
-/*	     2.	A Lot of the computation done in OC1 takes place in	*/
-/*		the "qsort" system call in this routine, and in the	*/
-/*		module "find_values".					*/
+/* Module name : linear_split						                                */ 
+/* Functionality :	Sorts the values in the unidim structure	          */
+/*			array "candidates" (see the module header for	                  */
+/*			"compare" above), and splits the array at a 	                  */
+/*			position that minimizes the impurity measure.	                  */
+/* Parameters :	no_of_eff_points : Number of valid entries in the	      */
+/*				   "candidates" array.		                                    */
+/* Returns :	value of the coefficient that results in an optimal	      */
+/*		one dimensional spilit.					                                  */ 
+/* Calls modules :	qsort (C library routine)			                      */
+/*			myrandom (util.c)				                                        */
+/*			reset_counts (compute_impurity.c)		                            */
+/*			compute_impurity (compute_impurity.c)		                        */
+/* Is called by modules :	suggest_perturbation			                    */
+/*				perturb_randomly			                                        */
+/*				axis_parallel_split (mktree.c)		                            */	
+/* Remarks :								                                            */ 
+/*	     2.	A Lot of the computation done in OC1 takes place in	        */
+/*		the "qsort" system call in this routine, and in the	              */
+/*		module "find_values".					                                    */
 /************************************************************************/
 float linear_split(no_of_eff_points) 
      int no_of_eff_points;

@@ -1,13 +1,13 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                */
-/* Department of Computer Science		                */
+/* Johns Hopkins University			                                */
+/* Department of Computer Science		                            */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					*/
+/* Contact : murthy@cs.jhu.edu					                        */
 /****************************************************************/
 /* File Name : oc1.h                                            */
-/* Author : Sreerama K. Murthy					*/
-/* Last modified : July 1994					*/
+/* Author : Sreerama K. Murthy					                        */
+/* Last modified : July 1994					                          */
 /* Contains modules : Data structure and constant definitions   */
 /* Is used by modules in : All *.c files, except util.c.        */
 /****************************************************************/
@@ -21,12 +21,12 @@
 /* Change the following statement to use a different impurity measure. */
 
 #define IMPURITY twoing()
-/* possible values are: maxminority                             */
-/*			summinority				*/
-/*			variance				*/
-/*			info_gain				*/
-/*			gini_index				*/
-/*			twoing					*/
+/* possible values are: maxminority                                    */
+/*			summinority                                                    */
+/*			variance				                                               */
+/*			info_gain				                                               */
+/*			gini_index				                                             */
+/*			twoing					                                               */
 
 
 #define NO_OF_STD_ERRORS	0 /* used for cost complexity pruning,
