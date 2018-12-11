@@ -1,36 +1,36 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                                */
-/* Department of Computer Science		                            */
+/* Johns Hopkins University                                     */
+/* Department of Computer Science                               */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					                        */
+/* Contact : murthy@cs.jhu.edu                                  */
 /****************************************************************/
-/* File Name : mktree.c						                              */
-/* Author : Sreerama K. Murthy					                        */
-/* Last modified : September 1994		                            */
+/* File Name : mktree.c                                         */
+/* Author : Sreerama K. Murthy                                  */
+/* Last modified : September 1994                               */
 /*                 (unnormalize_hyperplane corrected - 9/21/94).*/
-/* Contains modules : 	main					                          */
-/*			allocate_structures			                                */
-/*			deallocate_structures			                              */
-/*			build_tree				                                      */
-/*			build_subtree				                                    */
-/*			axis_parallel_split			                                */
-/*			oblique_split				                                    */
-/*			cross_validate				                                  */
-/*			print_log_and_exit			                                */
-/*			mktree_help				                                      */
-/* Uses modules in :	oc1.h					                            */
-/*			util.c					                                        */
-/*			load_data.c				                                      */
-/*			classify.c				                                      */
-/*			train_util.c				                                    */
-/*			classify_util.c				                                  */
-/*			compute_impurity.c			                                */
-/*			perturb.c				                                        */
-/*			prune.c					                                        */
-/* Is used by modules in :	None.				                        */
-/* Remarks       :	This file has the OC1 modules, that	        */
-/*			build the decision trees recursively.	                  */
+/* Contains modules :   main                                    */
+/*          allocate_structures                                 */
+/*          deallocate_structures                               */
+/*          build_tree                                          */
+/*          build_subtree                                       */
+/*          axis_parallel_split                                 */
+/*          oblique_split                                       */
+/*          cross_validate                                      */
+/*          print_log_and_exit                                  */
+/*          mktree_help                                         */
+/* Uses modules in :    oc1.h                                   */
+/*          util.c                                              */
+/*          load_data.c                                         */
+/*          classify.c                                          */
+/*          train_util.c                                        */
+/*          classify_util.c                                     */
+/*          compute_impurity.c                                  */
+/*          perturb.c                                           */
+/*          prune.c                                             */
+/* Is used by modules in :  None.                               */
+/* Remarks       :  This file has the OC1 modules, that         */
+/*          build the decision trees recursively.               */
 /****************************************************************/
 #include "oc1.h"
 
@@ -75,25 +75,25 @@ POINT **train_points=NULL,**test_points=NULL;
 
 
 /************************************************************************/
-/* Module name : main							                                      */
-/* Functionality :	Accepts user's options as input, sets control	      */
-/*			variables accordingly, and invokes the appro-	                  */
-/*			priate data-reading, tree-building and 		                      */
-/*			classifying routines. 				                                  */
-/* Parameters :	argc,argv : See any standard C textbook for details.	  */
-/* Returns :	nothing.						                                      */
-/* Calls modules :	mktree_help 					                              */
-/*			print_log_and_exit				                                      */
-/*			read_data (load_data.c)				                                  */
-/*			allocate_structures				                                      */
-/*			build_tree					                                            */
-/*			write_tree (train_util.c)			                                  */
-/*			cross_validate					                                        */
-/*			deallocate_structures				                                    */
-/*			read_tree (classify_util.c)			                                */
-/*			estimate_accuracy (classify.c)			                            */
-/*			classify (classify.c)				                                    */
-/* Is called by modules : None.						                              */
+/* Module name : main                                                   */
+/* Functionality :  Accepts user's options as input, sets control       */
+/*          variables accordingly, and invokes the appro-               */
+/*          priate data-reading, tree-building and                      */
+/*          classifying routines.                                       */
+/* Parameters : argc,argv : See any standard C textbook for details.    */
+/* Returns :    nothing.                                                */
+/* Calls modules :  mktree_help                                         */
+/*          print_log_and_exit                                          */
+/*          read_data (load_data.c)                                     */
+/*          allocate_structures                                         */
+/*          build_tree                                                  */
+/*          write_tree (train_util.c)                                   */
+/*          cross_validate                                              */
+/*          deallocate_structures                                       */
+/*          read_tree (classify_util.c)                                 */
+/*          estimate_accuracy (classify.c)                              */
+/*          classify (classify.c)                                       */
+/* Is called by modules : None.                                         */
 /************************************************************************/
 main (int argc, char *argv[])
 {
@@ -261,20 +261,20 @@ main (int argc, char *argv[])
   {
     if (strlen(test_data) || no_of_folds != 0)
     {
-  	  j = unlabeled;
-  	  unlabeled = FALSE;
-  	  read_data(train_data,0);
-  	  unlabeled = j;
-	  } else
-	  {
-  	  i = no_of_train_points;
-  	  j = unlabeled;
-  	  unlabeled = FALSE;
-  	  read_data(train_data,i);
-  	  /*this call loads training, and test point sets.
-  	    see the module header of read_data. */
-  	  unlabeled = j;
-	   }
+      j = unlabeled;
+      unlabeled = FALSE;
+      read_data(train_data,0);
+      unlabeled = j;
+      } else
+      {
+      i = no_of_train_points;
+      j = unlabeled;
+      unlabeled = FALSE;
+      read_data(train_data,i);
+      /*this call loads training, and test point sets.
+        see the module header of read_data. */
+      unlabeled = j;
+       }
 
     if (verbose)
     {
@@ -292,17 +292,17 @@ main (int argc, char *argv[])
 
     allocate_structures(no_of_train_points);
 
-    if (no_of_folds == 0)	/* No cross validation. */
-  	{
-  	  if  (!strlen(dt_file) && !no_file_output) sprintf(dt_file,"%s.dt",train_data);
-  	  root = build_tree(train_points,no_of_train_points,dt_file);
-  	}
+    if (no_of_folds == 0)   /* No cross validation. */
+    {
+      if  (!strlen(dt_file) && !no_file_output) sprintf(dt_file,"%s.dt",train_data);
+      root = build_tree(train_points,no_of_train_points,dt_file);
+    }
     else
-  	{
-  	  if (no_of_folds == -1) no_of_folds = no_of_train_points;
-  	  if (no_of_folds <= 1 || no_of_folds > no_of_train_points) usage(pname);
-  	  cross_validate(train_points,no_of_train_points);
-  	}
+    {
+      if (no_of_folds == -1) no_of_folds = no_of_train_points;
+      if (no_of_folds <= 1 || no_of_folds > no_of_train_points) usage(pname);
+      cross_validate(train_points,no_of_train_points);
+    }
 
     deallocate_structures(no_of_train_points);
 
@@ -313,77 +313,77 @@ main (int argc, char *argv[])
     {
       read_data(test_data,-1);
       if (verbose)
-	{
-	  printf("%d testing examples loaded from %s.\n",
-		 no_of_test_points,test_data);
+    {
+      printf("%d testing examples loaded from %s.\n",
+         no_of_test_points,test_data);
           if (no_of_missing_values)
-	    printf("%d missing values filled with respective attribute means.\n",
-		   no_of_missing_values);
-	}
+        printf("%d missing values filled with respective attribute means.\n",
+           no_of_missing_values);
+    }
     }
 
   if (no_of_test_points)
     {
       if (root == NULL)
-	{
-	  if ((root = read_tree(dt_file)) != NULL)
-	    { if (verbose) printf("Decision tree read from %s.\n",dt_file); }
-	  else
-	    {
-	      fprintf(stderr,"Mktree: Cannot read %s.\n",dt_file);
-	      print_log_and_exit();
-	    }
-	}
+    {
+      if ((root = read_tree(dt_file)) != NULL)
+        { if (verbose) printf("Decision tree read from %s.\n",dt_file); }
+      else
+        {
+          fprintf(stderr,"Mktree: Cannot read %s.\n",dt_file);
+          print_log_and_exit();
+        }
+    }
 
       if (unlabeled == TRUE)
-	{
-	  char out_file[LINESIZE];
-	  FILE *outfile;
+    {
+      char out_file[LINESIZE];
+      FILE *outfile;
 
-	  sprintf(out_file,"%s.classified",test_data);
-	  classify(test_points,no_of_test_points,root,out_file);
-	  printf("Test instances with labels written to %s.\n", out_file);
-	}
+      sprintf(out_file,"%s.classified",test_data);
+      classify(test_points,no_of_test_points,root,out_file);
+      printf("Test instances with labels written to %s.\n", out_file);
+    }
       else
-	{
-	  result = estimate_accuracy (test_points,no_of_test_points,root);
-	  printf("accuracy = %.2f\t#leaves = %.2f\tmax depth = %.2f\n",
-		 result.accuracy,result.leaf_count,result.tree_depth);
+    {
+      result = estimate_accuracy (test_points,no_of_test_points,root);
+      printf("accuracy = %.2f\t#leaves = %.2f\tmax depth = %.2f\n",
+         result.accuracy,result.leaf_count,result.tree_depth);
 
-	  if (verbose)
-	    for (i=1;i<=no_of_categories;i++)
-	      if (result.class[2*i] != 0)
-		printf("Category %d : accuracy = %.2f (%d/%d)\n",
-		       i, 100.0 * result.class[2*i-1]/result.class[2*i],
-		       result.class[2*i-1],result.class[2*i]);
-	}
+      if (verbose)
+        for (i=1;i<=no_of_categories;i++)
+          if (result.class[2*i] != 0)
+        printf("Category %d : accuracy = %.2f (%d/%d)\n",
+               i, 100.0 * result.class[2*i-1]/result.class[2*i],
+               result.class[2*i-1],result.class[2*i]);
+    }
     }
   else
     {
       result = estimate_accuracy (train_points,no_of_train_points,root);
       printf("acc. on training set = %.2f\t#leaves = %.0f\tmax depth = %.0f\n",
-	     result.accuracy,result.leaf_count,result.tree_depth);
+         result.accuracy,result.leaf_count,result.tree_depth);
 
       if (verbose)
-	for (i=1;i<=no_of_categories;i++)
-	  if (result.class[2*i] != 0)
-	    printf("Category %d : accuracy = %.2f (%d/%d)\n",
-		   i, 100.0 * result.class[2*i-1]/result.class[2*i],
-		   result.class[2*i-1],result.class[2*i]);
+    for (i=1;i<=no_of_categories;i++)
+      if (result.class[2*i] != 0)
+        printf("Category %d : accuracy = %.2f (%d/%d)\n",
+           i, 100.0 * result.class[2*i-1]/result.class[2*i],
+           result.class[2*i-1],result.class[2*i]);
     }
 
   print_log_and_exit();
 }
 
 /************************************************************************/
-/* Module name : allocate_structures					                          */
-/* Functionality :	Allocates space for some global data structures.    */
-/* Parameters : no_of_points : size of the training dataset.		        */
-/* Returns :	nothing.						                                      */
-/* Calls modules :	vector (util.c)					                            */
-/*			ivector (util.c)				                                        */
-/*			dvector (util.c)				                                        */
-/* Is called by modules :	main					                                */
+/* Module name : allocate_structures                                    */
+/* Functionality :  Allocates space for some global data structures.    */
+/* Parameters : no_of_points : size of the training dataset.            */
+/* Returns :    nothing.                                                */
+/* Calls modules :  vector (util.c)                                     */
+/*          ivector (util.c)                                            */
+/*          dvector (util.c)                                            */
+/* Is called by modules :   main                                        */
 /************************************************************************/
 allocate_structures(no_of_points)
      int no_of_points;
@@ -397,7 +397,7 @@ allocate_structures(no_of_points)
   left_count = ivector(1,no_of_categories);
   right_count = ivector(1,no_of_categories);
   candidates = (struct unidim *)malloc((unsigned)no_of_points *
-				       sizeof(struct unidim));
+                       sizeof(struct unidim));
   candidates -= 1;
   attribute_min = vector(1,no_of_dimensions);
   attribute_avg = vector(1,no_of_dimensions);
@@ -406,14 +406,14 @@ allocate_structures(no_of_points)
 }
 
 /************************************************************************/
-/* Module name : deallocate_structures					                        */
+/* Module name : deallocate_structures                                  */
 /* Functionality : Frees space allocated to some global data structures.*/
-/* Parameters : no_of_points : size of the training dataset.		        */
-/* Returns :	nothing.						                                      */
-/* Calls modules :	free_vector (util.c)				                        */
-/*			free_ivector (util.c)				                                    */
-/*			free_dvector (util.c)				                                    */
-/* Is called by modules :	main					                                */
+/* Parameters : no_of_points : size of the training dataset.            */
+/* Returns :    nothing.                                                */
+/* Calls modules :  free_vector (util.c)                                */
+/*          free_ivector (util.c)                                       */
+/*          free_dvector (util.c)                                       */
+/* Is called by modules :   main                                        */
 /************************************************************************/
 deallocate_structures(no_of_points)
      int no_of_points;
@@ -466,11 +466,11 @@ struct tree_node *build_tree(points,no_of_points,dt_file)
     {
       animationfile = fopen(animation_file,"w");
       if (verbose)
-	{
-	  printf("All hyperplane perturbations being written to %s.\n",
-		 animation_file);
-	  printf("Use the Display() program for animation.\n");
-	}
+    {
+      printf("All hyperplane perturbations being written to %s.\n",
+         animation_file);
+      printf("Use the Display() program for animation.\n");
+    }
     }
 
   write_header(animationfile);
@@ -482,27 +482,27 @@ struct tree_node *build_tree(points,no_of_points,dt_file)
     {
       no_of_train_points = no_of_points - no_of_ptest_points;
       if (verbose) printf("%d randomly chosen instances kept away for pruning.\n\n",
-			  no_of_ptest_points);
+              no_of_ptest_points);
       /* "randomly chosen" because the points are shuffled in Read_Data. */
 
       train_points = allocate_point_array(train_points,no_of_train_points,0);
       for (i=1;i<=no_of_train_points;i++)
-	{
-	  for (j=1;j<=no_of_dimensions;j++)
-	    train_points[i]->dimension[j] = points[i]->dimension[j];
-	  train_points[i]->category = points[i]->category;
-	  train_points[i]->val = points[i]->val;
-	}
+    {
+      for (j=1;j<=no_of_dimensions;j++)
+        train_points[i]->dimension[j] = points[i]->dimension[j];
+      train_points[i]->category = points[i]->category;
+      train_points[i]->val = points[i]->val;
+    }
 
       ptest_points = allocate_point_array(ptest_points,no_of_ptest_points,0);
       for (i=no_of_train_points+1;i<=no_of_points;i++)
-	{
-	  k = i - no_of_train_points;
-	  for (j=1;j<=no_of_dimensions;j++)
-	    ptest_points[k]->dimension[j] = points[i]->dimension[j];
-	  ptest_points[k]->category = points[i]->category;
-	  ptest_points[k]->val = points[i]->val;
-	}
+    {
+      k = i - no_of_train_points;
+      for (j=1;j<=no_of_dimensions;j++)
+        ptest_points[k]->dimension[j] = points[i]->dimension[j];
+      ptest_points[k]->category = points[i]->category;
+      ptest_points[k]->val = points[i]->val;
+    }
     }
   else
     {
@@ -531,17 +531,17 @@ struct tree_node *build_tree(points,no_of_points,dt_file)
     {
       write_tree(proot,dt_file);
       if (proot == root) /* No pruning was done. */
-	  printf("Unpruned decision tree written to %s.\n",dt_file);
+      printf("Unpruned decision tree written to %s.\n",dt_file);
       else
         {
-	  char temp_str[LINESIZE];
+      char temp_str[LINESIZE];
 
-	  printf("Pruned decision tree written to %s.\n",dt_file);
-	  if(!no_file_output) sprintf(temp_str,"%s.unpruned",dt_file);
-	  write_tree(root,temp_str);
-	  printf("Unpruned decision tree written to %s.\n",temp_str);
+      printf("Pruned decision tree written to %s.\n",dt_file);
+      if(!no_file_output) sprintf(temp_str,"%s.unpruned",dt_file);
+      write_tree(root,temp_str);
+      printf("Unpruned decision tree written to %s.\n",temp_str);
 
-	}
+    }
     }
 
   root = proot;
@@ -550,43 +550,43 @@ struct tree_node *build_tree(points,no_of_points,dt_file)
 }
 
 /************************************************************************/
-/* Module name : build_subtree						                              */
-/* Functionality :	Recursively builds a decision tree. i.e., finds	    */
-/*			the best (heuristic) hyperplane separating the 	                */
-/*			given set of points, and recurses on both sides	                */
-/*			of the hyperplane. The best axis-parallel split	                */
-/*			is considered if -o option is not chosen, 	                    */
-/*			before computing oblique splits.		                            */
-/* Parameters :	node_str : Label to be assigned to the decision tree	  */
-/*		           node to be created. 				                            */
-/*		cur_points : array of pointers to the points under	              */
-/*		             consideration.			       	                          */
-/*		cur_no_of_points : Number of points.	                            */
-/* Returns :	pointer to the decision tree node created.		            */
-/*		NULL, if a node couldn't be created.			                        */
-/* Calls modules :	set_counts (compute_impurity.c)			                */
-/*			compute_impurity (compute_impurity.c)		                        */
-/*			axis_parallel_split				                                      */
-/*			vector (util.c)					                                        */
-/*			oblique_split					                                          */
-/*			free_vector (util.c)				                                    */
-/*			error (util.c)					                                        */
-/*			find_values (perturb.c)				                                  */
-/*			largest_element (compute_impurity.c)		                        */
-/*			build_subtree					                                          */
-/* Is called by modules : 	main					                              */
-/*				build_tree				                                            */
-/*				build_subtree				                                          */
-/*				cross_validate				                                        */
-/* Important Variables used : 	initial_impurity: "inherent" impurity in*/
-/*				the point set under consideration. ie.,	                      */
-/*				impurity when the separating hyperplane	                      */
-/*				lies on one side of the point set.	                          */
-/*				If any amount of perturbations (bounded	                      */
-/*				by the parametric settings) can not	                          */
-/*				result in a hyperplane that has a lesser                      */
-/*				impurity than this value, no new tree	                        */
-/*				node is created.			                                        */
+/* Module name : build_subtree                                          */
+/* Functionality :  Recursively builds a decision tree. i.e., finds     */
+/*          the best (heuristic) hyperplane separating the              */
+/*          given set of points, and recurses on both sides             */
+/*          of the hyperplane. The best axis-parallel split             */
+/*          is considered if -o option is not chosen,                   */
+/*          before computing oblique splits.                            */
+/* Parameters : node_str : Label to be assigned to the decision tree    */
+/*                 node to be created.                                  */
+/*      cur_points : array of pointers to the points under              */
+/*                   consideration.                                     */
+/*      cur_no_of_points : Number of points.                            */
+/* Returns :    pointer to the decision tree node created.              */
+/*      NULL, if a node couldn't be created.                            */
+/* Calls modules :  set_counts (compute_impurity.c)                     */
+/*          compute_impurity (compute_impurity.c)                       */
+/*          axis_parallel_split                                         */
+/*          vector (util.c)                                             */
+/*          oblique_split                                               */
+/*          free_vector (util.c)                                        */
+/*          error (util.c)                                              */
+/*          find_values (perturb.c)                                     */
+/*          largest_element (compute_impurity.c)                        */
+/*          build_subtree                                               */
+/* Is called by modules :   main                                        */
+/*              build_tree                                              */
+/*              build_subtree                                           */
+/*              cross_validate                                          */
+/* Important Variables used :   initial_impurity: "inherent" impurity in*/
+/*              the point set under consideration. ie.,                 */
+/*              impurity when the separating hyperplane                 */
+/*              lies on one side of the point set.                      */
+/*              If any amount of perturbations (bounded                 */
+/*              by the parametric settings) can not                     */
+/*              result in a hyperplane that has a lesser                */
+/*              impurity than this value, no new tree                   */
+/*              node is created.                                        */
 /************************************************************************/
 struct tree_node *build_subtree(node_str,cur_points,cur_no_of_points)
                   char *node_str;
@@ -620,39 +620,39 @@ struct tree_node *build_subtree(node_str,cur_points,cur_no_of_points)
     {
       cur_impurity = axis_parallel_split(cur_points,cur_no_of_points);
       if (cur_impurity && (strlen(node_str) == 0 ||
-			   cur_no_of_points > TOO_SMALL_FOR_OBLIQUE_SPLIT))
-	cur_impurity = cart_split(cur_points,cur_no_of_points,node_str);
+               cur_no_of_points > TOO_SMALL_FOR_OBLIQUE_SPLIT))
+    cur_impurity = cart_split(cur_points,cur_no_of_points,node_str);
     }
   else
     {
       if (axis_parallel)
-	cur_impurity = axis_parallel_split(cur_points,cur_no_of_points);
+    cur_impurity = axis_parallel_split(cur_points,cur_no_of_points);
 
       if (cur_impurity && oblique && cur_no_of_points > TOO_SMALL_FOR_OBLIQUE_SPLIT)
-	{
-	  float *ap_coeff_array,oblique_impurity;
+    {
+      float *ap_coeff_array,oblique_impurity;
 
-	  ap_coeff_array = vector(1,no_of_coeffs);
-	  for (i=1;i<=no_of_coeffs;i++) ap_coeff_array[i] = coeff_array[i];
+      ap_coeff_array = vector(1,no_of_coeffs);
+      for (i=1;i<=no_of_coeffs;i++) ap_coeff_array[i] = coeff_array[i];
 
-	  if (normalize) normalize_data(cur_points,cur_no_of_points);
-	  oblique_impurity = oblique_split(cur_points,cur_no_of_points,node_str);
-	  if (normalize)
-	    {
-	      unnormalize_data(cur_points,cur_no_of_points);
-	      unnormalize_hyperplane();
+      if (normalize) normalize_data(cur_points,cur_no_of_points);
+      oblique_impurity = oblique_split(cur_points,cur_no_of_points,node_str);
+      if (normalize)
+        {
+          unnormalize_data(cur_points,cur_no_of_points);
+          unnormalize_hyperplane();
               for (i=1;i<=no_of_dimensions;i++) attribute_min[i] = 0;
-	    }
+        }
 
-	  if (ap_bias * oblique_impurity >=  cur_impurity)
-	    {
-	      for (i=1;i<=no_of_coeffs;i++) coeff_array[i] = ap_coeff_array[i];
-	      coeff_modified = TRUE;
-	    }
-	  else cur_impurity = oblique_impurity;
+      if (ap_bias * oblique_impurity >=  cur_impurity)
+        {
+          for (i=1;i<=no_of_coeffs;i++) coeff_array[i] = ap_coeff_array[i];
+          coeff_modified = TRUE;
+        }
+      else cur_impurity = oblique_impurity;
 
-	  free_vector(ap_coeff_array,1,no_of_coeffs);
-	}
+      free_vector(ap_coeff_array,1,no_of_coeffs);
+    }
     }
 
   if (cur_impurity >= initial_impurity) return(NULL);
@@ -687,7 +687,7 @@ struct tree_node *build_subtree(node_str,cur_points,cur_no_of_points)
     /* Left region is not homogeneous. */
     {
       if ((lpoints = (POINT **) malloc ((unsigned)lpt * sizeof(POINT *)))
-	  == NULL) error("BUILD_DT : Memory allocation failure.");
+      == NULL) error("BUILD_DT : Memory allocation failure.");
       lpoints--;
       lindex = 0;
     }
@@ -696,7 +696,7 @@ struct tree_node *build_subtree(node_str,cur_points,cur_no_of_points)
     /* Right region is not homogeneous. */
     {
       if ((rpoints = (POINT **) malloc ((unsigned)rpt * sizeof(POINT *)))
-	  == NULL) error("BUILD_DT : Memory allocation failure.");
+      == NULL) error("BUILD_DT : Memory allocation failure.");
       rpoints--;
       rindex = 0;
     }
@@ -773,36 +773,36 @@ float cart_split(cur_points,cur_no_of_points,cur_label)
 
       for (cur_coeff = 1; cur_coeff < no_of_coeffs;cur_coeff++)
         {
-	  new_error = cart_perturb(cur_points,cur_no_of_points,cur_coeff,cur_error);
-	  if (alter_coefficients(cur_points,cur_no_of_points))
-	    {
-	      if (veryverbose)
-		printf("\tCART hill climbing for coeff. %d. impurity %.3f -> %.3f\n",
-		       cur_coeff,cur_error,new_error);
-	      cur_error = new_error;
-	      write_hyperplane(animationfile,cur_label);
-	      if (cur_error == 0) break;
-	    }
+      new_error = cart_perturb(cur_points,cur_no_of_points,cur_coeff,cur_error);
+      if (alter_coefficients(cur_points,cur_no_of_points))
+        {
+          if (veryverbose)
+        printf("\tCART hill climbing for coeff. %d. impurity %.3f -> %.3f\n",
+               cur_coeff,cur_error,new_error);
+          cur_error = new_error;
+          write_hyperplane(animationfile,cur_label);
+          if (cur_error == 0) break;
+        }
         }
       if (cur_error != 0)
         {
-	  new_error = cart_perturb_constant(cur_points,cur_no_of_points,cur_error);
-	  if (alter_coefficients(cur_points,cur_no_of_points))
-	    {
-	      if (veryverbose)
-		printf("\tCART hill climbing for coeff. %d. impurity %.3f -> %.3f\n",
-		       no_of_coeffs,cur_error,new_error);
-	      cur_error = new_error;
-	      write_hyperplane(animationfile,cur_label);
-	    }
+      new_error = cart_perturb_constant(cur_points,cur_no_of_points,cur_error);
+      if (alter_coefficients(cur_points,cur_no_of_points))
+        {
+          if (veryverbose)
+        printf("\tCART hill climbing for coeff. %d. impurity %.3f -> %.3f\n",
+               no_of_coeffs,cur_error,new_error);
+          cur_error = new_error;
+          write_hyperplane(animationfile,cur_label);
+        }
         }
        if (cycle_count > MAX_CART_CYCLES)
-	 /* Cart multivariate algorithm can get stuck in some domains.
-	    Arbitrary tie breaker. */
-	 break;
+     /* Cart multivariate algorithm can get stuck in some domains.
+        Arbitrary tie breaker. */
+     break;
 
       if (cycle_count != 1 && myabs(prev_impurity - cur_error)<TOLERANCE)
-	break;
+    break;
     }
 
   return(cur_error);
@@ -849,25 +849,25 @@ struct tree_node *create_tree_node()
 }
 
 /************************************************************************/
-/* Module name : oblique_split						                              */
-/* Functionality : 	Attempts to find the hyperplane, at an unrestri-    */
-/*			cted orientation, that best separates 		                      */
-/*			"cur_points" (minimizing the current impurity	                  */
-/*			measure), using hill climbing and randomization.                */
-/* Parameters :	cur_points : array of pointers to the points (samples)	*/
-/*			     under consideration.			                                  */
-/*		cur_no_of_points : number of points under consideration.          */
-/* Returns :	the impurity measure of the best hyperplane found.	      */
-/*		The hyperplane itself is returned through the global	            */
-/*		array "coeff_array".					                                    */
-/* Calls modules :	generate_random_hyperplane			                    */
-/*			find_values (perturb.c)				                                  */
-/*			set_counts (compute_impurity.c)			                            */
-/*			compute_impurity (compute_impurity.c)		                        */
-/*			myrandom (util.c)				                                        */
-/*			suggest_perturbation (perturb.c)		                            */
-/*			perturb_randomly (perturb.c)			                              */
-/* Is called by modules :	build_subtree				                          */
+/* Module name : oblique_split                                          */
+/* Functionality :  Attempts to find the hyperplane, at an unrestri-    */
+/*          cted orientation, that best separates                       */
+/*          "cur_points" (minimizing the current impurity               */
+/*          measure), using hill climbing and randomization.            */
+/* Parameters : cur_points : array of pointers to the points (samples)  */
+/*               under consideration.                                   */
+/*      cur_no_of_points : number of points under consideration.        */
+/* Returns :    the impurity measure of the best hyperplane found.      */
+/*      The hyperplane itself is returned through the global            */
+/*      array "coeff_array".                                            */
+/* Calls modules :  generate_random_hyperplane                          */
+/*          find_values (perturb.c)                                     */
+/*          set_counts (compute_impurity.c)                             */
+/*          compute_impurity (compute_impurity.c)                       */
+/*          myrandom (util.c)                                           */
+/*          suggest_perturbation (perturb.c)                            */
+/*          perturb_randomly (perturb.c)                                */
+/* Is called by modules :   build_subtree                               */
 /************************************************************************/
 float oblique_split(cur_points,cur_no_of_points,cur_label)
      POINT **cur_points;
@@ -902,158 +902,158 @@ float oblique_split(cur_points,cur_no_of_points,cur_label)
   while (least_error != 0.0 && restart_count <= no_of_restarts)
     {
       if (veryverbose)
-	printf(" Restart %d: Initial Impurity = %.3f\n",restart_count,cur_error);
+    printf(" Restart %d: Initial Impurity = %.3f\n",restart_count,cur_error);
 
       no_of_stagnant_perturbations = 0;
       if (order_of_perturbation == RANDOM)
-	{
-	  if (cycle_count <= 0) cycle_count = 10 * no_of_coeffs;
-	  for (i=1;i<=cycle_count;i++)
-	    {
-	      if (cur_error == 0.0) break;
-	      cur_coeff = 0;
-	      while (!cur_coeff)
-		cur_coeff = (int)myrandom(1.0,(float)(no_of_coeffs+1));
+    {
+      if (cycle_count <= 0) cycle_count = 10 * no_of_coeffs;
+      for (i=1;i<=cycle_count;i++)
+        {
+          if (cur_error == 0.0) break;
+          cur_coeff = 0;
+          while (!cur_coeff)
+        cur_coeff = (int)myrandom(1.0,(float)(no_of_coeffs+1));
 
-	      new_error = suggest_perturbation(cur_points,cur_no_of_points,
-					       cur_coeff,cur_error);
-	      if (new_error <= cur_error &&
-		  alter_coefficients(cur_points,cur_no_of_points))
-		{
-		  if (veryverbose)
-		    printf("\thill climbing for coeff. %d. impurity %.3f -> %.3f\n",
-			   cur_coeff,cur_error,new_error);
-		  cur_error = new_error;
-		  improved_in_this_cycle = TRUE;
-		  write_hyperplane(animationfile,cur_label);
-		  if (cur_error == 0) break;
-		}
-	      else /*Try improving in a random direction*/
-		{
-		  improved_in_this_cycle = FALSE;
-		  j = 0;
-		  while (cur_error != 0 &&
-			 !improved_in_this_cycle &&
-			 ++j<=max_no_of_random_perturbations)
-		    {
-		      new_error = perturb_randomly
-			          (cur_points,cur_no_of_points,cur_error);
-		      if (alter_coefficients(cur_points,cur_no_of_points))
-			{
-			  if (veryverbose)
-			    printf("\trandom jump. impurity %.3f -> %.3f\n",
-				   cur_error,new_error);
-			  cur_error = new_error;
-			  improved_in_this_cycle = TRUE;
-			  write_hyperplane(animationfile,cur_label);
-			}
-		    }
-		}
-	    }
-	}
+          new_error = suggest_perturbation(cur_points,cur_no_of_points,
+                           cur_coeff,cur_error);
+          if (new_error <= cur_error &&
+          alter_coefficients(cur_points,cur_no_of_points))
+        {
+          if (veryverbose)
+            printf("\thill climbing for coeff. %d. impurity %.3f -> %.3f\n",
+               cur_coeff,cur_error,new_error);
+          cur_error = new_error;
+          improved_in_this_cycle = TRUE;
+          write_hyperplane(animationfile,cur_label);
+          if (cur_error == 0) break;
+        }
+          else /*Try improving in a random direction*/
+        {
+          improved_in_this_cycle = FALSE;
+          j = 0;
+          while (cur_error != 0 &&
+             !improved_in_this_cycle &&
+             ++j<=max_no_of_random_perturbations)
+            {
+              new_error = perturb_randomly
+                      (cur_points,cur_no_of_points,cur_error);
+              if (alter_coefficients(cur_points,cur_no_of_points))
+            {
+              if (veryverbose)
+                printf("\trandom jump. impurity %.3f -> %.3f\n",
+                   cur_error,new_error);
+              cur_error = new_error;
+              improved_in_this_cycle = TRUE;
+              write_hyperplane(animationfile,cur_label);
+            }
+            }
+        }
+        }
+    }
 
       else /* best_first or sequential orders of perturbation.*/
-	{
-	  improved_in_this_cycle = TRUE;
-	  cycle_count = 0;
+    {
+      improved_in_this_cycle = TRUE;
+      cycle_count = 0;
 
-	  while (improved_in_this_cycle)
-	    {
-	      if (cur_error == 0.0) break;
-	      cycle_count++;
-	      improved_in_this_cycle = FALSE;
+      while (improved_in_this_cycle)
+        {
+          if (cur_error == 0.0) break;
+          cycle_count++;
+          improved_in_this_cycle = FALSE;
 
-	      if (order_of_perturbation == BEST_FIRST)
-		{
-		  best_cur_error = HUGE;
-		  best_coeff_to_improve = 1;
-		  old_nsp = no_of_stagnant_perturbations;
-		}
+          if (order_of_perturbation == BEST_FIRST)
+        {
+          best_cur_error = HUGE;
+          best_coeff_to_improve = 1;
+          old_nsp = no_of_stagnant_perturbations;
+        }
 
-	      for (cur_coeff = 1; cur_coeff < no_of_coeffs;cur_coeff++)
-		{
-		  new_error = suggest_perturbation(cur_points,cur_no_of_points,
-						   cur_coeff,cur_error);
-		  if (order_of_perturbation == BEST_FIRST)
-		    {
-		      if (new_error < best_cur_error)
-			{
-			  best_cur_error = new_error;
-			  best_coeff_to_improve = cur_coeff;
-			}
-		      no_of_stagnant_perturbations = old_nsp;
-		      if (best_cur_error == 0) break;
-		    }
-		  else if (new_error <= cur_error &&
-			   alter_coefficients(cur_points,cur_no_of_points))
-		    {
-		      if (veryverbose)
-			printf("\thill climbing for coeff. %d. impurity %.3f -> %.3f\n",
-			       cur_coeff,cur_error,new_error);
-		      cur_error = new_error;
-		      improved_in_this_cycle = TRUE;
-		      write_hyperplane(animationfile,cur_label);
-		      if (cur_error == 0) break;
-		    }
-		}
+          for (cur_coeff = 1; cur_coeff < no_of_coeffs;cur_coeff++)
+        {
+          new_error = suggest_perturbation(cur_points,cur_no_of_points,
+                           cur_coeff,cur_error);
+          if (order_of_perturbation == BEST_FIRST)
+            {
+              if (new_error < best_cur_error)
+            {
+              best_cur_error = new_error;
+              best_coeff_to_improve = cur_coeff;
+            }
+              no_of_stagnant_perturbations = old_nsp;
+              if (best_cur_error == 0) break;
+            }
+          else if (new_error <= cur_error &&
+               alter_coefficients(cur_points,cur_no_of_points))
+            {
+              if (veryverbose)
+            printf("\thill climbing for coeff. %d. impurity %.3f -> %.3f\n",
+                   cur_coeff,cur_error,new_error);
+              cur_error = new_error;
+              improved_in_this_cycle = TRUE;
+              write_hyperplane(animationfile,cur_label);
+              if (cur_error == 0) break;
+            }
+        }
 
-	      if (order_of_perturbation == BEST_FIRST
-		  && best_cur_error <= cur_error)
-		{
-		  cur_coeff = best_coeff_to_improve;
-		  new_error = suggest_perturbation(cur_points,cur_no_of_points,
-						   cur_coeff,cur_error);
-		  if (alter_coefficients(cur_points,cur_no_of_points))
-		    {
-		      if (veryverbose)
-			printf("\thill climbing for coeff. %d. impurity %.3f -> %.3f\n",
-			       cur_coeff,cur_error,new_error);
-		      cur_error = new_error;
-		      improved_in_this_cycle = TRUE;
-		      write_hyperplane(animationfile,cur_label);
-		    }
-		}
+          if (order_of_perturbation == BEST_FIRST
+          && best_cur_error <= cur_error)
+        {
+          cur_coeff = best_coeff_to_improve;
+          new_error = suggest_perturbation(cur_points,cur_no_of_points,
+                           cur_coeff,cur_error);
+          if (alter_coefficients(cur_points,cur_no_of_points))
+            {
+              if (veryverbose)
+            printf("\thill climbing for coeff. %d. impurity %.3f -> %.3f\n",
+                   cur_coeff,cur_error,new_error);
+              cur_error = new_error;
+              improved_in_this_cycle = TRUE;
+              write_hyperplane(animationfile,cur_label);
+            }
+        }
 
-	      if (cur_error != 0 && !improved_in_this_cycle)
-		/*Try improving along a random direction*/
-		{
-		  i = 0;
-		  while (cur_error != 0 &&
-			 !improved_in_this_cycle &&
-			 ++i<=max_no_of_random_perturbations)
-		    {
-		      new_error = perturb_randomly(cur_points,cur_no_of_points,
-						   cur_error,cur_label);
-		      if (alter_coefficients(cur_points,cur_no_of_points))
-			{
-			  if (veryverbose)
-			    printf("\trandom jump. impurity %.3f -> %.3f\n",
-				   cur_error,new_error);
-			  cur_error = new_error;
-			  improved_in_this_cycle = TRUE;
-			  write_hyperplane(animationfile,cur_label);
-			}
-		    }
-		}
-	    }
-	}
+          if (cur_error != 0 && !improved_in_this_cycle)
+        /*Try improving along a random direction*/
+        {
+          i = 0;
+          while (cur_error != 0 &&
+             !improved_in_this_cycle &&
+             ++i<=max_no_of_random_perturbations)
+            {
+              new_error = perturb_randomly(cur_points,cur_no_of_points,
+                           cur_error,cur_label);
+              if (alter_coefficients(cur_points,cur_no_of_points))
+            {
+              if (veryverbose)
+                printf("\trandom jump. impurity %.3f -> %.3f\n",
+                   cur_error,new_error);
+              cur_error = new_error;
+              improved_in_this_cycle = TRUE;
+              write_hyperplane(animationfile,cur_label);
+            }
+            }
+        }
+        }
+    }
 
       if (cur_error < least_error ||
-	  (cur_error == least_error && myrandom(0.0,1.0) > 0.5))
-	{
-	  least_error = cur_error;
-	  for (i=1;i<=no_of_coeffs;i++) best_coeff_array[i] = coeff_array[i];
-	}
+      (cur_error == least_error && myrandom(0.0,1.0) > 0.5))
+    {
+      least_error = cur_error;
+      for (i=1;i<=no_of_coeffs;i++) best_coeff_array[i] = coeff_array[i];
+    }
 
       if (least_error != 0 && ++restart_count <= no_of_restarts)
-	{
-	  generate_random_hyperplane(coeff_array,no_of_coeffs,MAX_COEFFICIENT);
-	  coeff_modified = TRUE;
-	  find_values(cur_points,cur_no_of_points);
-	  set_counts(cur_points,cur_no_of_points,1);
-	  cur_error = compute_impurity(cur_no_of_points);
-	  write_hyperplane(animationfile,cur_label);
-	}
+    {
+      generate_random_hyperplane(coeff_array,no_of_coeffs,MAX_COEFFICIENT);
+      coeff_modified = TRUE;
+      find_values(cur_points,cur_no_of_points);
+      set_counts(cur_points,cur_no_of_points,1);
+      cur_error = compute_impurity(cur_no_of_points);
+      write_hyperplane(animationfile,cur_label);
+    }
     }
 
   for (i=1;i<=no_of_coeffs;i++)
@@ -1092,15 +1092,15 @@ int alter_coefficients(cur_points,cur_no_of_points)
   for (i=1;i<=no_of_coeffs;i++)
     if (myabs(coeff_array[i]-modified_coeff_array[i]) > TOLERANCE)
       {
-	if (i != no_of_coeffs)
-	  for (j=1;j<=cur_no_of_points;j++)
-	    cur_points[j]->val += (modified_coeff_array[i] - coeff_array[i]) *
-	                          cur_points[j]->dimension[i];
-	else
-	  for (j=1;j<=cur_no_of_points;j++)
-	    cur_points[j]->val += (modified_coeff_array[i] - coeff_array[i]);
+    if (i != no_of_coeffs)
+      for (j=1;j<=cur_no_of_points;j++)
+        cur_points[j]->val += (modified_coeff_array[i] - coeff_array[i]) *
+                              cur_points[j]->dimension[i];
+    else
+      for (j=1;j<=cur_no_of_points;j++)
+        cur_points[j]->val += (modified_coeff_array[i] - coeff_array[i]);
 
-	coeff_array[i] = modified_coeff_array[i];
+    coeff_array[i] = modified_coeff_array[i];
       }
   if (j != 0)
     {
@@ -1112,22 +1112,22 @@ int alter_coefficients(cur_points,cur_no_of_points)
 
 
 /************************************************************************/
-/* Module name : 	axis_parallel_split				                            */
-/* Functionality : 	Attempts to find the hyperplane, at an axis-	      */
-/*			parallel orientation, that best separates	                      */
-/*			"cur_points" (minimizing the current impurity	                  */
-/*			measure). 					                                            */
-/* Parameters :	cur_points : array of pointers to the points (samples)	*/
-/*			     under consideration.			                                  */
-/*		cur_no_of_points : number of points under consideration.          */
-/* Returns :	the impurity of the best hyperplane found.	              */
-/*		The hyperplane itself is returned through the global	            */
-/*		array "coeff_array".					                                    */
-/* Calls modules :	linear_split (perturb.c)			                      */
-/*			find_values (perturb.c)				                                  */
-/*			set_counts (compute_impurity.c)			                            */
-/*			compute_impurity (compute_impurity.c)		                        */
-/* Is called by modules :	build_subtree				                          */
+/* Module name :    axis_parallel_split                                 */
+/* Functionality :  Attempts to find the hyperplane, at an axis-        */
+/*          parallel orientation, that best separates                   */
+/*          "cur_points" (minimizing the current impurity               */
+/*          measure).                                                   */
+/* Parameters : cur_points : array of pointers to the points (samples)  */
+/*               under consideration.                                   */
+/*      cur_no_of_points : number of points under consideration.        */
+/* Returns :    the impurity of the best hyperplane found.              */
+/*      The hyperplane itself is returned through the global            */
+/*      array "coeff_array".                                            */
+/* Calls modules :  linear_split (perturb.c)                            */
+/*          find_values (perturb.c)                                     */
+/*          set_counts (compute_impurity.c)                             */
+/*          compute_impurity (compute_impurity.c)                       */
+/* Is called by modules :   build_subtree                               */
 /************************************************************************/
 float axis_parallel_split(cur_points,cur_no_of_points)
      POINT **cur_points;
@@ -1143,12 +1143,12 @@ float axis_parallel_split(cur_points,cur_no_of_points)
     {
       coeff_array[cur_coeff] = 1;
       for (j=1;j<=cur_no_of_points;j++)
-	{
-	  candidates[j].value = cur_points[j]->dimension[cur_coeff];
-	  candidates[j].cat   = cur_points[j]->category;
-	}
+    {
+      candidates[j].value = cur_points[j]->dimension[cur_coeff];
+      candidates[j].cat   = cur_points[j]->category;
+    }
       coeff_array[no_of_coeffs] =
-	-1.0 * (float)linear_split(cur_no_of_points);
+    -1.0 * (float)linear_split(cur_no_of_points);
 
       coeff_modified = TRUE;
       find_values(cur_points,cur_no_of_points);
@@ -1156,11 +1156,11 @@ float axis_parallel_split(cur_points,cur_no_of_points)
       cur_error = compute_impurity(cur_no_of_points);
 
       if  (cur_coeff == 1 || cur_error < best_error)
-	{
-	  best_coeff = cur_coeff;
-	  best_coeff_split_at = coeff_array[no_of_coeffs];
-	  best_error = cur_error;
-	}
+    {
+      best_coeff = cur_coeff;
+      best_coeff_split_at = coeff_array[no_of_coeffs];
+      best_error = cur_error;
+    }
 
       coeff_array[cur_coeff] = 0;
       coeff_array[no_of_coeffs] = 0;
@@ -1208,18 +1208,18 @@ write_hyperplane(out,label)
 }
 
 /************************************************************************/
-/* Module name : cross_validate						                              */
-/* Functionality :	Performs K-fold cross_validation on a training      */
-/*                      set.					                                  */
-/* Parameters : points : point set under consideration			            */
-/*		no_of_points.						                                          */
-/* Returns :	Nothing.					 	                                      */
-/* Calls modules :	ivector (util.c)				                            */
-/*			build_tree					                                            */
-/*			estimate_accuracy (classify.c)	                                */
-/*			error (util.c)					                                        */
-/*			write_tree (train_util.c)			                                  */
-/* Is called by modules :	main					                                */
+/* Module name : cross_validate                                         */
+/* Functionality :  Performs K-fold cross_validation on a training      */
+/*                      set.                                            */
+/* Parameters : points : point set under consideration                  */
+/*      no_of_points.                                                   */
+/* Returns :    Nothing.                                                */
+/* Calls modules :  ivector (util.c)                                    */
+/*          build_tree                                                  */
+/*          estimate_accuracy (classify.c)                              */
+/*          error (util.c)                                              */
+/*          write_tree (train_util.c)                                   */
+/* Is called by modules :   main                                        */
 /************************************************************************/
 cross_validate(points,no_of_points)
      int no_of_points;
@@ -1266,24 +1266,24 @@ cross_validate(points,no_of_points)
       no_of_folds++;
 
       for (i=1;i<=no_of_points;i++)
-	{
-	  points[i]->val = 0;
-	  if (i >= fold_begin && i <= fold_end)
-	    test_points[++no_of_test_points] = points[i];
-	  else train_points[++no_of_train_points] = points[i];
-	}
+    {
+      points[i]->val = 0;
+      if (i >= fold_begin && i <= fold_end)
+        test_points[++no_of_test_points] = points[i];
+      else train_points[++no_of_train_points] = points[i];
+    }
 
       if (verbose) printf("Fold %d:\n",no_of_folds);
       if (fold_begin == 1)
-	root = build_tree(train_points,no_of_train_points,dt_file);
+    root = build_tree(train_points,no_of_train_points,dt_file);
       else root = build_tree(train_points,no_of_train_points,"");
 
       results[no_of_folds] = estimate_accuracy(test_points,no_of_test_points,root);
 
       printf("fold %d: acc. = %.2f\t#leaves = %.0f\tmax. depth = %.0f\n",
-	     no_of_folds,results[no_of_folds].accuracy,
-	     results[no_of_folds].leaf_count,
-	     results[no_of_folds].tree_depth);
+         no_of_folds,results[no_of_folds].accuracy,
+         results[no_of_folds].leaf_count,
+         results[no_of_folds].tree_depth);
 
       if (fold_end == no_of_points) break;
       else fold_begin = fold_end+1;
@@ -1301,7 +1301,7 @@ cross_validate(points,no_of_points)
       resultsum.leaf_count += results[i].leaf_count;
       resultsum.tree_depth += results[i].tree_depth;
       for (j=1;j<= 2 * no_of_categories;j++)
-	resultsum.class[j] += results[i].class[j];
+    resultsum.class[j] += results[i].class[j];
     }
 
   resultsum.leaf_count /= no_of_folds;
@@ -1312,30 +1312,30 @@ cross_validate(points,no_of_points)
 
   if (verbose) printf("\nOverall:\t");
   printf("accuracy = %.2f\t#leaves = %.2f\tmax depth = %.2f\n",
-	 resultsum.accuracy,resultsum.leaf_count,resultsum.tree_depth);
+     resultsum.accuracy,resultsum.leaf_count,resultsum.tree_depth);
 
   if (verbose)
     for (i=1;i<=no_of_categories;i++)
       if (resultsum.class[2*i] != 0)
-	{
-	  j = 100.0 * resultsum.class[2*i-1]/resultsum.class[2*i];
-	  printf("Category %d : accuracy = %.2f (%d/%d)\n",
-		 i, 100.0 * resultsum.class[2*i-1]/resultsum.class[2*i],
-		 resultsum.class[2*i-1],resultsum.class[2*i]);
-	}
+    {
+      j = 100.0 * resultsum.class[2*i-1]/resultsum.class[2*i];
+      printf("Category %d : accuracy = %.2f (%d/%d)\n",
+         i, 100.0 * resultsum.class[2*i-1]/resultsum.class[2*i],
+         resultsum.class[2*i-1],resultsum.class[2*i]);
+    }
 
 }
 
 
 /************************************************************************/
-/* Module name :	print_log_and_exit				                            */
-/* Functionality :	prints the log of a run of OC1 into the user-	      */
-/*			specified "log_file" (default : oc1.log). Log	                  */
-/*			mainly consists of the parameter settings for                   */
+/* Module name :    print_log_and_exit                                  */
+/* Functionality :  prints the log of a run of OC1 into the user-       */
+/*          specified "log_file" (default : oc1.log). Log               */
+/*          mainly consists of the parameter settings for               */
 /*                      the particular run.                             */
-/* Returns :	Nothing.						                                      */
-/* Calls modules :	none.						                                    */
-/* Is called by modules :	main					                                */
+/* Returns :    Nothing.                                                */
+/* Calls modules :  none.                                               */
+/* Is called by modules :   main                                        */
 /************************************************************************/
 print_log_and_exit()
 {
@@ -1553,7 +1553,7 @@ int no_of_points;
     attribute_min[j] = min(temp,no_of_points);
     if (attribute_min[j] < 0)
       for (i=1;i<=no_of_points;i++)
-	points[i]->dimension[j] -= attribute_min[j];
+    points[i]->dimension[j] -= attribute_min[j];
 
   }
  free_vector(temp,1,no_of_points);
@@ -1583,8 +1583,8 @@ unnormalize_data(points,no_of_points)
   for (j=1;j<=no_of_dimensions;j++)
     {
       if (attribute_min[j] < 0)
-	for (i=1;i<=no_of_points;i++)
-	  points[i]->dimension[j] += attribute_min[j];
+    for (i=1;i<=no_of_points;i++)
+      points[i]->dimension[j] += attribute_min[j];
     }
 }
 
@@ -1609,7 +1609,7 @@ unnormalize_hyperplane()
 
   for (i=1;i<=no_of_dimensions;i++)
     if (attribute_min[i] < 0)
-	coeff_array[no_of_coeffs] -= coeff_array[i]*attribute_min[i];
+    coeff_array[no_of_coeffs] -= coeff_array[i]*attribute_min[i];
 }
 /************************************************************************/
 /************************************************************************/

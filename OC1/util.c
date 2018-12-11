@@ -1,34 +1,34 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                                */
-/* Department of Computer Science		                            */
+/* Johns Hopkins University                                     */
+/* Department of Computer Science                               */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					                        */
+/* Contact : murthy@cs.jhu.edu                                  */
 /****************************************************************/
-/* File Name :	util.c						                              */
-/* Author : Sreerama K. Murthy					                        */
-/* Last modified : July 1994					                          */
-/* Contains modules : 	error					                          */
-/*			myrandom				                                        */
-/*			vector					                                        */
-/*			free_vector				                                      */
-/*			ivector					                                        */
-/*			free_ivector				                                    */
-/*			dvector					                                        */
-/*			free_dvector				                                    */
-/* Uses modules in : None.					                            */
-/* Is used by modules in :	classify.c			                    */
-/*				compute_impurity.c		                                */
-/*				display.c			                                        */
-/*				gendata.c			                                        */
-/*				impurity_measure.c		                                */
-/*				load_data.c			                                      */
-/*				mktree.c			                                        */
-/*				perturb.c			                                        */
-/*				tree_util.c			                                      */
-/* Remarks       :	These are general-purpose utility           */
+/* File Name :  util.c                                          */
+/* Author : Sreerama K. Murthy                                  */
+/* Last modified : July 1994                                    */
+/* Contains modules :   error                                   */
+/*      myrandom                                                */
+/*      vector                                                  */
+/*      free_vector                                             */
+/*      ivector                                                 */
+/*      free_ivector                                            */
+/*      dvector                                                 */
+/*      free_dvector                                            */
+/* Uses modules in : None.                                      */
+/* Is used by modules in :  classify.c                          */
+/*        compute_impurity.c                                    */
+/*        display.c                                             */
+/*        gendata.c                                             */
+/*        impurity_measure.c                                    */
+/*        load_data.c                                           */
+/*        mktree.c                                              */
+/*        perturb.c                                             */
+/*        tree_util.c                                           */
+/* Remarks       :  These are general-purpose utility           */
 /*                      routines used by most of the modules    */
-/*                      in the package.	                        */
+/*                      in the package.                         */
 /****************************************************************/
 #include <stdio.h>
 
@@ -58,9 +58,9 @@ float myabs(x)
 }
 
 /************************************************************************/
-/* Module name : error							                                    */
-/* Functionality :	Displays an error message, and exits execution	    */
-/*			normally.					                                              */
+/* Module name : error                                                  */
+/* Functionality :  Displays an error message, and exits execution      */
+/*      normally.                                                       */
 /************************************************************************/
 error(error_text)
      char error_text[];
@@ -70,13 +70,13 @@ error(error_text)
 }
 
 /************************************************************************/
-/* Module name :	myrandom					                                    */
-/* Functionality :	Generates a random number between 0 and 1, and	    */
-/*			scales it to given range.        		                            */
-/* Parameters :	above, below : lower and upper limits, respectively on	*/
-/*		the random number to be generated.			                          */
-/* Returns :	a floating point number.				                          */
-/* Calls modules :	drand48 (C library call)			                      */
+/* Module name :  myrandom                                              */
+/* Functionality :  Generates a random number between 0 and 1, and      */
+/*      scales it to given range.                                       */
+/* Parameters : above, below : lower and upper limits, respectively on  */
+/*    the random number to be generated.                                */
+/* Returns :  a floating point number.                                  */
+/* Calls modules :  drand48 (C library call)                            */
 /* Remarks: If your system doesn't support drand48(), you can substitute*/
 /*          the call below with any good pseudo random number generator */
 /*          function call.                                              */
@@ -149,12 +149,12 @@ float sdev(a,n)
 }
 
 /************************************************************************/
-/* Module name : ivector						                                    */
-/* Functionality :	Allocates a 1-D integer array, whose indices	      */
-/*			range from "nl" through "nh", and returns a	                    */
-/*			pointer to this array.				                                  */
-/* Parameters :	nl,nh : lowest and highest indices.			                */
-/* Calls modules :	error						                                    */
+/* Module name : ivector                                                */
+/* Functionality :  Allocates a 1-D integer array, whose indices        */
+/*      range from "nl" through "nh", and returns a                     */
+/*      pointer to this array.                                          */
+/* Parameters : nl,nh : lowest and highest indices.                     */
+/* Calls modules :  error                                               */
 /************************************************************************/
 int *ivector(nl,nh)
      int nl,nh;
@@ -167,12 +167,12 @@ int *ivector(nl,nh)
 }
 
 /************************************************************************/
-/* Module name : vector							                                    */
-/* Functionality :	Allocates a 1-D float array, whose indices	        */
-/*			range from "nl" through "nh", and returns a	                    */
-/*			pointer to this array.				                                  */
-/* Parameters :	nl,nh : lowest and highest indices.			                */
-/* Calls modules :	error						                                    */
+/* Module name : vector                                                 */
+/* Functionality :  Allocates a 1-D float array, whose indices          */
+/*      range from "nl" through "nh", and returns a                     */
+/*      pointer to this array.                                          */
+/* Parameters : nl,nh : lowest and highest indices.                     */
+/* Calls modules :  error                                               */
 /************************************************************************/
 float *vector(nl,nh)
      int nl,nh;
@@ -185,12 +185,12 @@ float *vector(nl,nh)
 }
 
 /************************************************************************/
-/* Module name : dvector						                                    */
-/* Functionality :	Allocates a 1-D double array, whose indices	        */
-/*			range from "nl" through "nh", and returns a	                    */
-/*			pointer to this array.				                                  */
-/* Parameters :	nl,nh : lowest and highest indices.			                */
-/* Calls modules :	error						                                    */
+/* Module name : dvector                                                */
+/* Functionality :  Allocates a 1-D double array, whose indices         */
+/*      range from "nl" through "nh", and returns a                     */
+/*      pointer to this array.                                          */
+/* Parameters : nl,nh : lowest and highest indices.                     */
+/* Calls modules :  error                                               */
 /************************************************************************/
 double *dvector(nl,nh)
      int nl,nh;
@@ -203,10 +203,10 @@ double *dvector(nl,nh)
 }
 
 /************************************************************************/
-/* Module name : free_ivector						                                */
-/* Functionality :	Frees a 1-D integer array. 			                    */
-/* Parameters :	v : pointer to the array				                        */
-/*		nl,nh : lowest and highest indices.			                          */
+/* Module name : free_ivector                                           */
+/* Functionality :  Frees a 1-D integer array.                          */
+/* Parameters : v : pointer to the array                                */
+/*    nl,nh : lowest and highest indices.                               */
 /* Remarks: It is possible that the memory deallocation modules do not  */
 /*          work well always. This should not be a major problem in most*/
 /*          cases, however.                                             */
@@ -218,10 +218,10 @@ free_ivector(v,nl,nh)
 }
 
 /************************************************************************/
-/* Module name : free_vector						                                */
-/* Functionality :	Frees a 1-D float array. 			                      */
-/* Parameters :	v : pointer to the array				                        */
-/*		nl,nh : lowest and highest indices.			                          */
+/* Module name : free_vector                                            */
+/* Functionality :  Frees a 1-D float array.                            */
+/* Parameters : v : pointer to the array                                */
+/*    nl,nh : lowest and highest indices.                               */
 /* Remarks: It is possible that the memory deallocation modules do not  */
 /*          work well always. This should not be a major problem in most*/
 /*          cases, however.                                             */
@@ -234,10 +234,10 @@ free_vector(v,nl,nh)
 }
 
 /************************************************************************/
-/* Module name : free_dvector						                                */
-/* Functionality :	Frees a 1-D double array. 			                    */
-/* Parameters :	v : pointer to the array				                        */
-/*		nl,nh : lowest and highest indices.			                          */
+/* Module name : free_dvector                                           */
+/* Functionality :  Frees a 1-D double array.                           */
+/* Parameters : v : pointer to the array                                */
+/*    nl,nh : lowest and highest indices.                               */
 /* Remarks: It is possible that the memory deallocation modules do not  */
 /*          work well always. This should not be a major problem in most*/
 /*          cases, however.                                             */
@@ -250,14 +250,14 @@ free_dvector(v,nl,nh)
 }
 
 /************************************************************************/
-/* Module name :	generate_random_hyperplane			                      */
-/* Functionality :	generates coefficients of a hyperplane randomly.    */
-/* Parameters :	array_name, length of the array.                        */
+/* Module name :  generate_random_hyperplane                            */
+/* Functionality :  generates coefficients of a hyperplane randomly.    */
+/* Parameters : array_name, length of the array.                        */
 /*              max_value : maximum absolute  value of any coefficient  */
-/* Returns :	Nothing.						                                      */
-/* Calls modules :	myrandom        				                            */
-/* Is called by modules :	oblique_split (mktree.c)		                  */
-/*				perturb_randomly (perturb.c)		                              */
+/* Returns :  Nothing.                                                  */
+/* Calls modules :  myrandom                                            */
+/* Is called by modules : oblique_split (mktree.c)                      */
+/*        perturb_randomly (perturb.c)                                  */
 /************************************************************************/
 generate_random_hyperplane(array_name,length,max_value)
      float *array_name,max_value;

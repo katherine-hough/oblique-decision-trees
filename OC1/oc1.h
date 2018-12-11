@@ -1,13 +1,13 @@
 /****************************************************************/
 /* Copyright 1993, 1994                                         */
-/* Johns Hopkins University			                                */
-/* Department of Computer Science		                            */
+/* Johns Hopkins University                                     */
+/* Department of Computer Science                               */
 /****************************************************************/
-/* Contact : murthy@cs.jhu.edu					                        */
+/* Contact : murthy@cs.jhu.edu                                  */
 /****************************************************************/
 /* File Name : oc1.h                                            */
-/* Author : Sreerama K. Murthy					                        */
-/* Last modified : July 1994					                          */
+/* Author : Sreerama K. Murthy                                  */
+/* Last modified : July 1994                                    */
 /* Contains modules : Data structure and constant definitions   */
 /* Is used by modules in : All *.c files, except util.c.        */
 /****************************************************************/
@@ -22,46 +22,46 @@
 
 #define IMPURITY twoing()
 /* possible values are: maxminority                                    */
-/*			summinority                                                    */
-/*			variance				                                               */
-/*			info_gain				                                               */
-/*			gini_index				                                             */
-/*			twoing					                                               */
+/*          summinority                                                */
+/*          variance                                                   */
+/*          info_gain                                                  */
+/*          gini_index                                                 */
+/*          twoing                                                     */
 
 
-#define NO_OF_STD_ERRORS	0 /* used for cost complexity pruning,
+#define NO_OF_STD_ERRORS    0 /* used for cost complexity pruning,
                                      in prune.c */
-#define SEQUENTIAL 		0
-#define BEST_FIRST 	 	1
+#define SEQUENTIAL      0
+#define BEST_FIRST      1
 #define RANDOM                  2
 
-#define CORRECT 		1
-#define INCORRECT 		0
+#define CORRECT         1
+#define INCORRECT       0
 
-#define TRUE 			1
-#define FALSE 			0
+#define TRUE            1
+#define FALSE           0
 
-#define LEFT 			0
-#define RIGHT 			1
+#define LEFT            0
+#define RIGHT           1
 
-#define LESS_THAN 		0
-#define MORE_THAN 		1
+#define LESS_THAN       0
+#define MORE_THAN       1
 
-#define MAX_COEFFICIENT 	1.0
-#define MAX_NO_OF_ATTRIBUTES	100001
-#define MAX_DT_DEPTH 		50
-#define MAX_NO_OF_STAGNANT_PERTURBATIONS 	10
+#define MAX_COEFFICIENT     1.0
+#define MAX_NO_OF_ATTRIBUTES    100001
+#define MAX_DT_DEPTH        50
+#define MAX_NO_OF_STAGNANT_PERTURBATIONS    10
 #define MAX_CART_CYCLES         100
 
-#define TOLERANCE		0.0001
-#define TOO_SMALL_THRESHOLD	2.0
-#define TOO_SMALL_FOR_ANY_SPLIT		1
-#define TOO_SMALL_FOR_OBLIQUE_SPLIT	2 * no_of_dimensions
+#define TOLERANCE       0.0001
+#define TOO_SMALL_THRESHOLD 2.0
+#define TOO_SMALL_FOR_ANY_SPLIT     1
+#define TOO_SMALL_FOR_OBLIQUE_SPLIT 2 * no_of_dimensions
 
-#define TRAIN			1
-#define	TEST			2
+#define TRAIN           1
+#define TEST            2
 
-#define LINESIZE 		80
+#define LINESIZE        80
 #define MISSING_VALUE           -1.0 * HUGE_VALF
 
 #define translatex(x) ((x - xmin) * (pmaxx - pminx) / (xmax - xmin) + pminx)
